@@ -1,18 +1,18 @@
 package com.mikosik.logger;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsString;
-import static org.testory.Testory.any;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
-import static org.testory.Testory.onInstance;
-import static org.testory.Testory.thenCalled;
-import static org.testory.Testory.thenCalledNever;
+import static org.testory.Testory.then;
+import static org.testory.Testory.thenEqual;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.function.Predicate;
 
@@ -21,14 +21,15 @@ import org.junit.Test;
 
 public class TestConfiguration {
   private Predicate<Method> allMethods, noMethods;
-  private Writer writer;
+  private StringWriter writer;
   private Object argumentA, argumentB, argumentC, field;
   private Throwable throwable;
-  private Wrappable original;
+  private Wrappable instance;
 
   @Before
   public void before() {
     givenTest(this);
+    given(writer = new StringWriter());
     given(allMethods = method -> true);
     given(noMethods = method -> false);
     given(throwable = new Throwable());
@@ -71,7 +72,7 @@ public class TestConfiguration {
     when(() -> new Configuration(noMethods, writer)
         .wrap(new Wrappable())
         .method());
-    thenCalledNever(onInstance(writer));
+    thenEqual(writer.toString(), "");
   }
 
   @Test
@@ -79,7 +80,7 @@ public class TestConfiguration {
     when(() -> new Configuration(allMethods, writer)
         .wrap(new Wrappable())
         .method());
-    thenCalled(writer).write(any(String.class, containsString("method")));
+    then(writer.toString(), containsString("method"));
   }
 
   @Test
@@ -87,18 +88,18 @@ public class TestConfiguration {
     when(() -> new Configuration(allMethods, writer)
         .wrap(new Wrappable())
         .methodWithArguments(argumentA, argumentB, argumentC));
-    thenCalled(writer).write(any(String.class, containsString(argumentA.toString())));
-    thenCalled(writer).write(any(String.class, containsString(argumentB.toString())));
-    thenCalled(writer).write(any(String.class, containsString(argumentC.toString())));
+    then(writer.toString(), containsString(argumentA.toString()));
+    then(writer.toString(), containsString(argumentB.toString()));
+    then(writer.toString(), containsString(argumentC.toString()));
   }
 
   @Test
   public void logs_instance() throws IOException {
-    given(original = new Wrappable());
+    given(instance = new Wrappable());
     when(() -> new Configuration(allMethods, writer)
-        .wrap(original)
+        .wrap(instance)
         .method());
-    thenCalled(writer).write(any(String.class, containsString(original.toString())));
+    then(writer.toString(), containsString(instance.toString()));
   }
 
   @Test
@@ -106,7 +107,7 @@ public class TestConfiguration {
     when(() -> new Configuration(allMethods, writer)
         .wrap(new Wrappable(field))
         .methodReturningField());
-    thenCalled(writer).write(any(String.class, containsString(field.toString())));
+    then(writer.toString(), containsString("returned " + field.toString() + "\n"));
   }
 
   @Test
@@ -115,7 +116,15 @@ public class TestConfiguration {
     when(() -> new Configuration(allMethods, writer)
         .wrap(new Wrappable(field))
         .methodThrowingField());
-    thenCalled(writer).write(any(String.class, containsString(field.toString())));
+    then(writer.toString(), containsString("thrown " + field.toString() + "\n"));
+  }
+
+  @Test
+  public void formats_invocation() throws IOException {
+    when(() -> new Configuration(allMethods, writer)
+        .wrap(new Wrappable())
+        .methodWithArguments(argumentA, argumentB, argumentC));
+    then(writer.toString(), stringContainsInOrder(asList(".", "(", ",", ",", ")\n")));
   }
 
   public static class Wrappable {

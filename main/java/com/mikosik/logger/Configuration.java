@@ -1,5 +1,9 @@
 package com.mikosik.logger;
 
+import static java.lang.String.format;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -41,27 +45,38 @@ public class Configuration {
     return new InvocationHandler() {
       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (predicate.test(method)) {
-          writer.write(original.toString());
-          writer.write(method.getName());
-          for (Object argument : args) {
-            writer.write(argument.toString());
-          }
+          writer.write(formatInvocation(original, method, args));
           writer.write("\n");
         }
         try {
           Object result = method.invoke(original, args);
-          // log result
           if (predicate.test(method)) {
-            writer.write(result.toString());
+            writer.write(formatReturned(result));
             writer.write("\n");
           }
           return result;
         } catch (InvocationTargetException e) {
           Throwable cause = e.getCause();
-          writer.write(cause.toString());
+          writer.write(formatThrown(cause));
+          writer.write("\n");
           throw cause;
         }
       }
     };
+  }
+
+  private String formatReturned(Object result) {
+    return format("returned %s", result);
+  }
+
+  private String formatThrown(Throwable throwable) {
+    return format("thrown %s", throwable);
+  }
+
+  private static String formatInvocation(Object instance, Method method, Object[] arguments) {
+    String argumentsString = stream(arguments)
+        .map(Object::toString)
+        .collect(joining(", "));
+    return format("%s.%s(%s)", instance, method.getName(), argumentsString);
   }
 }
