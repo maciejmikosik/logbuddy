@@ -1,20 +1,23 @@
 package com.mikosik.logger;
 
-import static org.testory.proxy.Invocation.invocation;
-import static org.testory.proxy.Invocations.invoke;
-import static org.testory.proxy.Proxies.proxy;
-import static org.testory.proxy.Typing.typing;
-
 import java.io.Writer;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.function.Predicate;
 
-import org.testory.proxy.Handler;
-import org.testory.proxy.Invocation;
-import org.testory.proxy.Typing;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
+
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.InvocationHandlerAdapter;
+import net.bytebuddy.matcher.ElementMatchers;
 
 public class Configuration {
+  private final Objenesis objenesis = new ObjenesisStd();
+  private final ByteBuddy byteBuddy = new ByteBuddy();
+
   private final Writer writer;
   private final Predicate<Method> predicate;
 
@@ -24,31 +27,41 @@ public class Configuration {
   }
 
   public <T> T wrap(T original) {
-    Typing typing = typing(original.getClass(), new HashSet<Class<?>>());
-    return (T) proxy(typing, new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        if (predicate.test(invocation.method)) {
+    Class<?> wrappedType = byteBuddy
+        .subclass(original.getClass())
+        .method(ElementMatchers.any())
+        .intercept(InvocationHandlerAdapter.of(invocationHandlerWrapping(original)))
+        .make()
+        .load(getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
+        .getLoaded();
+    return (T) objenesis.newInstance(wrappedType);
+  }
+
+  private <T> InvocationHandler invocationHandlerWrapping(T original) {
+    return new InvocationHandler() {
+      public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if (predicate.test(method)) {
           writer.write(original.toString());
-          writer.write(invocation.method.getName());
-          for (Object argument : invocation.arguments) {
+          writer.write(method.getName());
+          for (Object argument : args) {
             writer.write(argument.toString());
           }
           writer.write("\n");
         }
         try {
-          Object result = invoke(invocation(invocation.method, original, invocation.arguments));
+          Object result = method.invoke(original, args);
           // log result
-          if (predicate.test(invocation.method)) {
+          if (predicate.test(method)) {
             writer.write(result.toString());
             writer.write("\n");
           }
           return result;
-        } catch (Throwable throwable) {
-          writer.write(throwable.toString());
-          // log exception
-          throw throwable;
+        } catch (InvocationTargetException e) {
+          Throwable cause = e.getCause();
+          writer.write(cause.toString());
+          throw cause;
         }
       }
-    });
+    };
   }
 }
