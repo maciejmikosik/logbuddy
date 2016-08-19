@@ -25,6 +25,7 @@ public class TestConfiguration {
   private Object argumentA, argumentB, argumentC, field;
   private Throwable throwable;
   private Wrappable instance;
+  private Configuration configuration;
 
   @Before
   public void before() {
@@ -127,6 +128,38 @@ public class TestConfiguration {
     then(writer.toString(), stringContainsInOrder(asList(".", "(", ",", ",", ")\n")));
   }
 
+  @Test
+  public void formats_stack_indentation_if_returned() {
+    given(configuration = new Configuration(allMethods, writer));
+    when(() -> configuration.wrap(new Wrappable(
+        configuration.wrap(new Wrappable(
+            configuration.wrap(new Wrappable())))))
+        .chain());
+    then(writer.toString(), stringContainsInOrder(asList(
+        "chain", "\n",
+        "\t", "chain", "\n",
+        "\t\t", "chain", "\n",
+        "\t\treturned", "\n",
+        "\treturned", "\n",
+        "returned", "\n")));
+  }
+
+  @Test
+  public void formats_stack_indentation_if_thrown() {
+    given(configuration = new Configuration(allMethods, writer));
+    when(() -> configuration.wrap(new Wrappable(
+        configuration.wrap(new Wrappable(
+            configuration.wrap(new Wrappable(throwable))))))
+        .chain());
+    then(writer.toString(), stringContainsInOrder(asList(
+        "chain", "\n",
+        "\t", "chain", "\n",
+        "\t\t", "chain", "\n",
+        "\t\tthrown", "\n",
+        "\tthrown", "\n",
+        "thrown", "\n")));
+  }
+
   public static class Wrappable {
     private Object field;
 
@@ -146,6 +179,14 @@ public class TestConfiguration {
 
     public Object methodThrowingField() throws Throwable {
       throw (Throwable) field;
+    }
+
+    public void chain() throws Throwable {
+      if (field instanceof Wrappable) {
+        ((Wrappable) field).chain();
+      } else if (field instanceof Throwable) {
+        throw (Throwable) field;
+      }
     }
   }
 }

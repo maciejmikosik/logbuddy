@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,6 +26,7 @@ public class Configuration {
 
   private final Writer writer;
   private final Predicate<Method> predicate;
+  private int depth = 0;
 
   public Configuration(Predicate<Method> predicate, Writer writer) {
     this.predicate = predicate;
@@ -51,22 +53,34 @@ public class Configuration {
 
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
       if (predicate.test(method)) {
+        writeDepth();
         writer.write(formatInvocation(original, method, arguments));
         writer.write("\n");
       }
       try {
+        depth++;
         Object result = method.invoke(original, arguments);
+        depth--;
         if (predicate.test(method)) {
+          writeDepth();
           writer.write(formatReturned(result));
           writer.write("\n");
         }
         return result;
       } catch (InvocationTargetException e) {
+        depth--;
         Throwable cause = e.getCause();
+        writeDepth();
         writer.write(formatThrown(cause));
         writer.write("\n");
         throw cause;
       }
+    }
+  }
+
+  private void writeDepth() throws IOException {
+    for (int i = 0; i < depth; i++) {
+      writer.write("\t");
     }
   }
 
