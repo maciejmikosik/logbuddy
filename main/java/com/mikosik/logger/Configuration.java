@@ -5,7 +5,6 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
 import java.io.Writer;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Predicate;
@@ -15,7 +14,9 @@ import org.objenesis.ObjenesisStd;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
-import net.bytebuddy.implementation.InvocationHandlerAdapter;
+import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.matcher.ElementMatchers;
 
 public class Configuration {
@@ -34,35 +35,39 @@ public class Configuration {
     Class<?> wrappedType = byteBuddy
         .subclass(original.getClass())
         .method(ElementMatchers.any())
-        .intercept(InvocationHandlerAdapter.of(invocationHandlerWrapping(original)))
+        .intercept(MethodDelegation.to(new LoggingHandler(original)))
         .make()
         .load(getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
         .getLoaded();
     return (T) objenesis.newInstance(wrappedType);
   }
 
-  private <T> InvocationHandler invocationHandlerWrapping(T original) {
-    return new InvocationHandler() {
-      public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (predicate.test(method)) {
-          writer.write(formatInvocation(original, method, args));
-          writer.write("\n");
-        }
-        try {
-          Object result = method.invoke(original, args);
-          if (predicate.test(method)) {
-            writer.write(formatReturned(result));
-            writer.write("\n");
-          }
-          return result;
-        } catch (InvocationTargetException e) {
-          Throwable cause = e.getCause();
-          writer.write(formatThrown(cause));
-          writer.write("\n");
-          throw cause;
-        }
+  public class LoggingHandler {
+    private final Object original;
+
+    public LoggingHandler(Object original) {
+      this.original = original;
+    }
+
+    public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
+      if (predicate.test(method)) {
+        writer.write(formatInvocation(original, method, arguments));
+        writer.write("\n");
       }
-    };
+      try {
+        Object result = method.invoke(original, arguments);
+        if (predicate.test(method)) {
+          writer.write(formatReturned(result));
+          writer.write("\n");
+        }
+        return result;
+      } catch (InvocationTargetException e) {
+        Throwable cause = e.getCause();
+        writer.write(formatThrown(cause));
+        writer.write("\n");
+        throw cause;
+      }
+    }
   }
 
   private String formatReturned(Object result) {
