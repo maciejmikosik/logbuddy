@@ -17,12 +17,12 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestConfiguration {
+public class TestLogging {
   private Logger logger;
   private Object argumentA, argumentB, argumentC, field;
   private Throwable throwable;
   private Wrappable instance;
-  private Configuration configuration;
+  private Logging logging;
 
   @Before
   public void before() {
@@ -32,7 +32,7 @@ public class TestConfiguration {
 
   @Test
   public void returns_from_method() {
-    when(new Configuration(logger)
+    when(new Logging(logger)
         .wrap(new Wrappable(field))
         .methodReturningField());
     thenReturned(field);
@@ -40,7 +40,7 @@ public class TestConfiguration {
 
   @Test
   public void throws_from_method() {
-    when(() -> new Configuration(logger)
+    when(() -> new Logging(logger)
         .wrap(new Wrappable(throwable))
         .methodThrowingField());
     thenThrown(throwable);
@@ -48,7 +48,7 @@ public class TestConfiguration {
 
   @Test
   public void logs_method_name() throws IOException {
-    when(() -> new Configuration(logger)
+    when(() -> new Logging(logger)
         .wrap(new Wrappable())
         .method());
     thenCalled(logger).log(any(String.class, containsString("method")));
@@ -56,7 +56,7 @@ public class TestConfiguration {
 
   @Test
   public void logs_arguments() throws IOException {
-    when(() -> new Configuration(logger)
+    when(() -> new Logging(logger)
         .wrap(new Wrappable())
         .methodWithArguments(argumentA, argumentB, argumentC));
     thenCalled(logger).log(any(String.class, containsString(argumentA.toString())));
@@ -67,7 +67,7 @@ public class TestConfiguration {
   @Test
   public void logs_instance() throws IOException {
     given(instance = new Wrappable());
-    when(() -> new Configuration(logger)
+    when(() -> new Logging(logger)
         .wrap(instance)
         .method());
     thenCalled(logger).log(any(String.class, containsString(instance.toString())));
@@ -75,7 +75,7 @@ public class TestConfiguration {
 
   @Test
   public void logs_returned_result() throws IOException {
-    when(() -> new Configuration(logger)
+    when(() -> new Logging(logger)
         .wrap(new Wrappable(field))
         .methodReturningField());
     thenCalled(logger).log(any(String.class, containsString("returned " + field.toString())));
@@ -84,7 +84,7 @@ public class TestConfiguration {
   @Test
   public void logs_thrown_exception() throws IOException {
     given(field = new RuntimeException());
-    when(() -> new Configuration(logger)
+    when(() -> new Logging(logger)
         .wrap(new Wrappable(field))
         .methodThrowingField());
     thenCalled(logger).log(any(String.class, containsString("thrown " + field.toString())));
@@ -92,7 +92,7 @@ public class TestConfiguration {
 
   @Test
   public void formats_invocation() throws IOException {
-    when(() -> new Configuration(logger)
+    when(() -> new Logging(logger)
         .wrap(new Wrappable())
         .methodWithArguments(argumentA, argumentB, argumentC));
     thenCalled(logger).log(any(String.class, stringContainsInOrder(asList(".", "(", ",", ",", ")"))));
@@ -100,10 +100,10 @@ public class TestConfiguration {
 
   @Test
   public void formats_stack_indentation_if_returned() {
-    given(configuration = new Configuration(logger));
-    when(() -> configuration.wrap(new Wrappable(
-        configuration.wrap(new Wrappable(
-            configuration.wrap(new Wrappable())))))
+    given(logging = new Logging(logger));
+    when(() -> logging.wrap(new Wrappable(
+        logging.wrap(new Wrappable(
+            logging.wrap(new Wrappable())))))
         .chain());
     thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("chain"))));
     thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t", "chain"))));
@@ -115,10 +115,10 @@ public class TestConfiguration {
 
   @Test
   public void formats_stack_indentation_if_thrown() {
-    given(configuration = new Configuration(logger));
-    when(() -> configuration.wrap(new Wrappable(
-        configuration.wrap(new Wrappable(
-            configuration.wrap(new Wrappable(throwable))))))
+    given(logging = new Logging(logger));
+    when(() -> logging.wrap(new Wrappable(
+        logging.wrap(new Wrappable(
+            logging.wrap(new Wrappable(throwable))))))
         .chain());
     thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("chain"))));
     thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t", "chain"))));

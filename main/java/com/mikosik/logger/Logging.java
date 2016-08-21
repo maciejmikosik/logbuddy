@@ -17,14 +17,14 @@ import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.matcher.ElementMatchers;
 
-public class Configuration {
+public class Logging {
   private final Objenesis objenesis = new ObjenesisStd();
   private final ByteBuddy byteBuddy = new ByteBuddy();
 
   private final Logger logger;
   private int depth = 0;
 
-  public Configuration(Logger logger) {
+  public Logging(Logger logger) {
     this.logger = logger;
   }
 
