@@ -3,21 +3,22 @@ package com.mikosik.logger;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.stringContainsInOrder;
+import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
-import static org.testory.Testory.then;
+import static org.testory.Testory.thenCalled;
+import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestConfiguration {
-  private StringWriter writer;
+  private Logger logger;
   private Object argumentA, argumentB, argumentC, field;
   private Throwable throwable;
   private Wrappable instance;
@@ -26,13 +27,12 @@ public class TestConfiguration {
   @Before
   public void before() {
     givenTest(this);
-    given(writer = new StringWriter());
     given(throwable = new Throwable());
   }
 
   @Test
   public void returns_from_method() {
-    when(new Configuration(writer)
+    when(new Configuration(logger)
         .wrap(new Wrappable(field))
         .methodReturningField());
     thenReturned(field);
@@ -40,7 +40,7 @@ public class TestConfiguration {
 
   @Test
   public void throws_from_method() {
-    when(() -> new Configuration(writer)
+    when(() -> new Configuration(logger)
         .wrap(new Wrappable(throwable))
         .methodThrowingField());
     thenThrown(throwable);
@@ -48,86 +48,84 @@ public class TestConfiguration {
 
   @Test
   public void logs_method_name() throws IOException {
-    when(() -> new Configuration(writer)
+    when(() -> new Configuration(logger)
         .wrap(new Wrappable())
         .method());
-    then(writer.toString(), containsString("method"));
+    thenCalled(logger).log(any(String.class, containsString("method")));
   }
 
   @Test
   public void logs_arguments() throws IOException {
-    when(() -> new Configuration(writer)
+    when(() -> new Configuration(logger)
         .wrap(new Wrappable())
         .methodWithArguments(argumentA, argumentB, argumentC));
-    then(writer.toString(), containsString(argumentA.toString()));
-    then(writer.toString(), containsString(argumentB.toString()));
-    then(writer.toString(), containsString(argumentC.toString()));
+    thenCalled(logger).log(any(String.class, containsString(argumentA.toString())));
+    thenCalled(logger).log(any(String.class, containsString(argumentB.toString())));
+    thenCalled(logger).log(any(String.class, containsString(argumentC.toString())));
   }
 
   @Test
   public void logs_instance() throws IOException {
     given(instance = new Wrappable());
-    when(() -> new Configuration(writer)
+    when(() -> new Configuration(logger)
         .wrap(instance)
         .method());
-    then(writer.toString(), containsString(instance.toString()));
+    thenCalled(logger).log(any(String.class, containsString(instance.toString())));
   }
 
   @Test
   public void logs_returned_result() throws IOException {
-    when(() -> new Configuration(writer)
+    when(() -> new Configuration(logger)
         .wrap(new Wrappable(field))
         .methodReturningField());
-    then(writer.toString(), containsString("returned " + field.toString() + "\n"));
+    thenCalled(logger).log(any(String.class, containsString("returned " + field.toString())));
   }
 
   @Test
   public void logs_thrown_exception() throws IOException {
     given(field = new RuntimeException());
-    when(() -> new Configuration(writer)
+    when(() -> new Configuration(logger)
         .wrap(new Wrappable(field))
         .methodThrowingField());
-    then(writer.toString(), containsString("thrown " + field.toString() + "\n"));
+    thenCalled(logger).log(any(String.class, containsString("thrown " + field.toString())));
   }
 
   @Test
   public void formats_invocation() throws IOException {
-    when(() -> new Configuration(writer)
+    when(() -> new Configuration(logger)
         .wrap(new Wrappable())
         .methodWithArguments(argumentA, argumentB, argumentC));
-    then(writer.toString(), stringContainsInOrder(asList(".", "(", ",", ",", ")\n")));
+    thenCalled(logger).log(any(String.class, stringContainsInOrder(asList(".", "(", ",", ",", ")"))));
   }
 
   @Test
   public void formats_stack_indentation_if_returned() {
-    given(configuration = new Configuration(writer));
+    given(configuration = new Configuration(logger));
     when(() -> configuration.wrap(new Wrappable(
         configuration.wrap(new Wrappable(
             configuration.wrap(new Wrappable())))))
         .chain());
-    then(writer.toString(), stringContainsInOrder(asList(
-        "chain", "\n",
-        "\t", "chain", "\n",
-        "\t\t", "chain", "\n",
-        "\t\treturned", "\n",
-        "\treturned", "\n",
-        "returned", "\n")));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("chain"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t", "chain"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t\t", "chain"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t\treturned"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\treturned"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("returned"))));
   }
 
   @Test
   public void formats_stack_indentation_if_thrown() {
-    given(configuration = new Configuration(writer));
+    given(configuration = new Configuration(logger));
     when(() -> configuration.wrap(new Wrappable(
         configuration.wrap(new Wrappable(
             configuration.wrap(new Wrappable(throwable))))))
         .chain());
-    then(writer.toString(), stringContainsInOrder(asList(
-        "chain", "\n",
-        "\t", "chain", "\n",
-        "\t\t", "chain", "\n",
-        "\t\tthrown", "\n",
-        "\tthrown", "\n",
-        "thrown", "\n")));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("chain"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t", "chain"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t\t", "chain"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t\tthrown"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\tthrown"))));
+    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("thrown"))));
   }
 
   public static class Wrappable {

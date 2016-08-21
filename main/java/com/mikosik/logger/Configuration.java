@@ -4,8 +4,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -23,11 +21,11 @@ public class Configuration {
   private final Objenesis objenesis = new ObjenesisStd();
   private final ByteBuddy byteBuddy = new ByteBuddy();
 
-  private final Writer writer;
+  private final Logger logger;
   private int depth = 0;
 
-  public Configuration(Writer writer) {
-    this.writer = writer;
+  public Configuration(Logger logger) {
+    this.logger = logger;
   }
 
   public <T> T wrap(T original) {
@@ -49,46 +47,42 @@ public class Configuration {
     }
 
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
-      writeDepth();
-      writer.write(formatInvocation(original, method, arguments));
-      writer.write("\n");
+      logger.log(formatInvocation(original, method, arguments));
       try {
         depth++;
         Object result = method.invoke(original, arguments);
         depth--;
-        writeDepth();
-        writer.write(formatReturned(result));
-        writer.write("\n");
+        logger.log(formatReturned(result));
         return result;
       } catch (InvocationTargetException e) {
         depth--;
         Throwable cause = e.getCause();
-        writeDepth();
-        writer.write(formatThrown(cause));
-        writer.write("\n");
+        logger.log(formatThrown(cause));
         throw cause;
       }
     }
   }
 
-  private void writeDepth() throws IOException {
+  private String formatDepth() {
+    StringBuilder builder = new StringBuilder();
     for (int i = 0; i < depth; i++) {
-      writer.write("\t");
+      builder.append("\t");
     }
+    return builder.toString();
   }
 
   private String formatReturned(Object result) {
-    return format("returned %s", result);
+    return format("%sreturned %s", formatDepth(), result);
   }
 
   private String formatThrown(Throwable throwable) {
-    return format("thrown %s", throwable);
+    return format("%sthrown %s", formatDepth(), throwable);
   }
 
-  private static String formatInvocation(Object instance, Method method, Object[] arguments) {
+  private String formatInvocation(Object instance, Method method, Object[] arguments) {
     String argumentsString = stream(arguments)
         .map(Object::toString)
         .collect(joining(", "));
-    return format("%s.%s(%s)", instance, method.getName(), argumentsString);
+    return format("%s%s.%s(%s)", formatDepth(), instance, method.getName(), argumentsString);
   }
 }
