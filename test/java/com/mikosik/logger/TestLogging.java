@@ -7,7 +7,6 @@ import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalled;
-import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
@@ -22,7 +21,6 @@ public class TestLogging {
   private Object argumentA, argumentB, argumentC, field;
   private Throwable throwable;
   private Wrappable instance;
-  private Logging logging;
 
   @Before
   public void before() {
@@ -98,36 +96,6 @@ public class TestLogging {
     thenCalled(logger).log(any(String.class, stringContainsInOrder(asList(".", "(", ",", ",", ")"))));
   }
 
-  @Test
-  public void formats_stack_indentation_if_returned() {
-    given(logging = new Logging(logger));
-    when(() -> logging.wrap(new Wrappable(
-        logging.wrap(new Wrappable(
-            logging.wrap(new Wrappable())))))
-        .chain());
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("chain"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t", "chain"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t\t", "chain"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t\treturned"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\treturned"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("returned"))));
-  }
-
-  @Test
-  public void formats_stack_indentation_if_thrown() {
-    given(logging = new Logging(logger));
-    when(() -> logging.wrap(new Wrappable(
-        logging.wrap(new Wrappable(
-            logging.wrap(new Wrappable(throwable))))))
-        .chain());
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("chain"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t", "chain"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t\t", "chain"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t\tthrown"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\tthrown"))));
-    thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("thrown"))));
-  }
-
   public static class Wrappable {
     private Object field;
 
@@ -147,14 +115,6 @@ public class TestLogging {
 
     public Object methodThrowingField() throws Throwable {
       throw (Throwable) field;
-    }
-
-    public void chain() throws Throwable {
-      if (field instanceof Wrappable) {
-        ((Wrappable) field).chain();
-      } else if (field instanceof Throwable) {
-        throw (Throwable) field;
-      }
     }
   }
 }
