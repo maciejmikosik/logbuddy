@@ -1,0 +1,79 @@
+#!/bin/bash -e
+
+HERE=`dirname ${0}`
+cd "${HERE}/.."
+PROJECT=`pwd`
+	RUN="${PROJECT}/run"
+	BUILDING="/tmp/build_logger"
+
+	MAIN="${PROJECT}/main"
+		JAVA="${MAIN}/java"
+		JAR="${MAIN}/jar"
+
+########## CLEANUP ##########
+rm \
+  --recursive \
+  --force \
+  ${BUILDING}
+
+mkdir \
+  --parents \
+  ${BUILDING}
+
+########## COMPILE SOURCES ##########
+javac \
+  -classpath "${JAR}/byte-buddy-1.4.19.jar:${JAR}/objenesis-2.4.jar" \
+  -sourcepath "${JAVA}" \
+  -source 1.8 \
+  -target 1.8 \
+  -d "${BUILDING}" \
+  "${JAVA}/com/mikosik/logger/Build.java"
+
+########## COPY SOURCES ##########
+cp \
+  --recursive \
+  "${JAVA}/." \
+  "${BUILDING}"
+
+########## COPY DEPENDENCIES ##########
+unzip \
+  -q \
+  "${JAR}/byte-buddy-1.4.19.jar" \
+  -d "${BUILDING}" \
+  net/*
+unzip \
+  -q \
+  "${JAR}/objenesis-2.4.jar" \
+  -d "${BUILDING}" \
+  org/*
+
+########## RESET TIMESTAMPS ##########
+find \
+  ${BUILDING}/ \
+| xargs \
+touch \
+  --date=@0
+
+########## ZIP JAR ##########
+cd ${BUILDING}
+zip \
+  --quiet \
+  --recurse-paths \
+  ./logging.jar \
+  ./*
+cd "${PROJECT}"
+
+########## INLINE DEPENDENCIES ##########
+java \
+  -jar "${RUN}/jarjar-1.4.jar" \
+  process "${RUN}/jarjar-rules.txt" \
+  "${BUILDING}/logging.jar" \
+  "${BUILDING}/logging.jar"
+
+
+echo ""
+echo "BUILD SUCCESSFUL"
+echo "created ${BUILDING}/logging.jar"
+echo "sha1sum=`sha1sum ${BUILDING}/logging.jar | cut -f1 -d' '`"
+
+

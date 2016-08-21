@@ -1,0 +1,4 @@
+rule net.bytebuddy.**.* com.mikosik.logging.external.net.bytebuddy.@1.$@2
+rule net.bytebuddy.* com.mikosik.logging.external.net.bytebuddy.$@1
+rule org.objenesis.**.* com.mikosik.logging.external.org.objenesis.@1.$@2
+rule org.objenesis.* com.mikosik.logging.external.org.objenesis.$@1
