@@ -21,6 +21,7 @@ import org.junit.Test;
 
 public class TestLoggingStack {
   private Logger logger;
+  private Formatter formatter;
   private Throwable throwable;
   private Logging logging;
   private List<Object> messages;
@@ -29,11 +30,12 @@ public class TestLoggingStack {
   public void before() {
     givenTest(this);
     given(throwable = new Throwable());
+    given(formatter = object -> "format(" + object + ")");
   }
 
   @Test
   public void formats_stack_indentation_if_returned() {
-    given(logging = new Logging(logger));
+    given(logging = new Logging(logger, formatter));
     when(() -> logging.wrap(new Wrappable(
         logging.wrap(new Wrappable(
             logging.wrap(new Wrappable())))))
@@ -48,7 +50,7 @@ public class TestLoggingStack {
 
   @Test
   public void formats_stack_indentation_if_thrown() {
-    given(logging = new Logging(logger));
+    given(logging = new Logging(logger, formatter));
     when(() -> logging.wrap(new Wrappable(
         logging.wrap(new Wrappable(
             logging.wrap(new Wrappable(throwable))))))
@@ -65,7 +67,7 @@ public class TestLoggingStack {
   public void does_not_join_stack_from_different_threads() {
     given(messages = synchronizedList(new ArrayList<>()));
     given(logger = message -> messages.add(message));
-    given(logging = new Logging(logger));
+    given(logging = new Logging(logger, formatter));
     when(() -> logging.wrap(new Wrappable(
         logging.wrap(new Wrappable(
             logging.wrap(new Wrappable())))))

@@ -24,9 +24,11 @@ public class Logging {
 
   private final Depth depth = new Depth();
   private final Logger logger;
+  private final Formatter formatter;
 
-  public Logging(Logger logger) {
+  public Logging(Logger logger, Formatter formatter) {
     this.logger = new DepthLogger(depth, logger);
+    this.formatter = formatter;
   }
 
   public <T> T wrap(T original) {
@@ -63,18 +65,18 @@ public class Logging {
   }
 
   private String formatReturned(Object result) {
-    return format("returned %s", result);
+    return format("returned %s", formatter.format(result));
   }
 
   private String formatThrown(Throwable throwable) {
-    return format("thrown %s", throwable);
+    return format("thrown %s", formatter.format(throwable));
   }
 
   private String formatInvocation(Object instance, Method method, Object[] arguments) {
     String argumentsString = stream(arguments)
-        .map(Object::toString)
+        .map(formatter::format)
         .collect(joining(", "));
-    return format("%s.%s(%s)", instance, method.getName(), argumentsString);
+    return format("%s.%s(%s)", formatter.format(instance), method.getName(), argumentsString);
   }
 
   private static class DepthLogger implements Logger {
