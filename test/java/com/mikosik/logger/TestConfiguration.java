@@ -6,21 +6,17 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.then;
-import static org.testory.Testory.thenEqual;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.reflect.Method;
-import java.util.function.Predicate;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestConfiguration {
-  private Predicate<Method> allMethods, noMethods;
   private StringWriter writer;
   private Object argumentA, argumentB, argumentC, field;
   private Throwable throwable;
@@ -31,54 +27,28 @@ public class TestConfiguration {
   public void before() {
     givenTest(this);
     given(writer = new StringWriter());
-    given(allMethods = method -> true);
-    given(noMethods = method -> false);
     given(throwable = new Throwable());
   }
 
   @Test
-  public void returns_from_unlogged_method() {
-    when(new Configuration(noMethods, writer)
+  public void returns_from_method() {
+    when(new Configuration(writer)
         .wrap(new Wrappable(field))
         .methodReturningField());
     thenReturned(field);
   }
 
   @Test
-  public void returns_from_logged_method() {
-    when(new Configuration(allMethods, writer)
-        .wrap(new Wrappable(field))
-        .methodReturningField());
-    thenReturned(field);
-  }
-
-  @Test
-  public void throws_from_unlogged_method() {
-    when(() -> new Configuration(noMethods, writer)
+  public void throws_from_method() {
+    when(() -> new Configuration(writer)
         .wrap(new Wrappable(throwable))
         .methodThrowingField());
     thenThrown(throwable);
-  }
-
-  @Test
-  public void throws_from_logged_method() {
-    when(() -> new Configuration(allMethods, writer)
-        .wrap(new Wrappable(throwable))
-        .methodThrowingField());
-    thenThrown(throwable);
-  }
-
-  @Test
-  public void does_not_log_unmatched_method() throws IOException {
-    when(() -> new Configuration(noMethods, writer)
-        .wrap(new Wrappable())
-        .method());
-    thenEqual(writer.toString(), "");
   }
 
   @Test
   public void logs_method_name() throws IOException {
-    when(() -> new Configuration(allMethods, writer)
+    when(() -> new Configuration(writer)
         .wrap(new Wrappable())
         .method());
     then(writer.toString(), containsString("method"));
@@ -86,7 +56,7 @@ public class TestConfiguration {
 
   @Test
   public void logs_arguments() throws IOException {
-    when(() -> new Configuration(allMethods, writer)
+    when(() -> new Configuration(writer)
         .wrap(new Wrappable())
         .methodWithArguments(argumentA, argumentB, argumentC));
     then(writer.toString(), containsString(argumentA.toString()));
@@ -97,7 +67,7 @@ public class TestConfiguration {
   @Test
   public void logs_instance() throws IOException {
     given(instance = new Wrappable());
-    when(() -> new Configuration(allMethods, writer)
+    when(() -> new Configuration(writer)
         .wrap(instance)
         .method());
     then(writer.toString(), containsString(instance.toString()));
@@ -105,7 +75,7 @@ public class TestConfiguration {
 
   @Test
   public void logs_returned_result() throws IOException {
-    when(() -> new Configuration(allMethods, writer)
+    when(() -> new Configuration(writer)
         .wrap(new Wrappable(field))
         .methodReturningField());
     then(writer.toString(), containsString("returned " + field.toString() + "\n"));
@@ -114,7 +84,7 @@ public class TestConfiguration {
   @Test
   public void logs_thrown_exception() throws IOException {
     given(field = new RuntimeException());
-    when(() -> new Configuration(allMethods, writer)
+    when(() -> new Configuration(writer)
         .wrap(new Wrappable(field))
         .methodThrowingField());
     then(writer.toString(), containsString("thrown " + field.toString() + "\n"));
@@ -122,7 +92,7 @@ public class TestConfiguration {
 
   @Test
   public void formats_invocation() throws IOException {
-    when(() -> new Configuration(allMethods, writer)
+    when(() -> new Configuration(writer)
         .wrap(new Wrappable())
         .methodWithArguments(argumentA, argumentB, argumentC));
     then(writer.toString(), stringContainsInOrder(asList(".", "(", ",", ",", ")\n")));
@@ -130,7 +100,7 @@ public class TestConfiguration {
 
   @Test
   public void formats_stack_indentation_if_returned() {
-    given(configuration = new Configuration(allMethods, writer));
+    given(configuration = new Configuration(writer));
     when(() -> configuration.wrap(new Wrappable(
         configuration.wrap(new Wrappable(
             configuration.wrap(new Wrappable())))))
@@ -146,7 +116,7 @@ public class TestConfiguration {
 
   @Test
   public void formats_stack_indentation_if_thrown() {
-    given(configuration = new Configuration(allMethods, writer));
+    given(configuration = new Configuration(writer));
     when(() -> configuration.wrap(new Wrappable(
         configuration.wrap(new Wrappable(
             configuration.wrap(new Wrappable(throwable))))))

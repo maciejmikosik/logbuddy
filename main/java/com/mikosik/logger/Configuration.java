@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.function.Predicate;
 
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
@@ -25,11 +24,9 @@ public class Configuration {
   private final ByteBuddy byteBuddy = new ByteBuddy();
 
   private final Writer writer;
-  private final Predicate<Method> predicate;
   private int depth = 0;
 
-  public Configuration(Predicate<Method> predicate, Writer writer) {
-    this.predicate = predicate;
+  public Configuration(Writer writer) {
     this.writer = writer;
   }
 
@@ -52,20 +49,16 @@ public class Configuration {
     }
 
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
-      if (predicate.test(method)) {
-        writeDepth();
-        writer.write(formatInvocation(original, method, arguments));
-        writer.write("\n");
-      }
+      writeDepth();
+      writer.write(formatInvocation(original, method, arguments));
+      writer.write("\n");
       try {
         depth++;
         Object result = method.invoke(original, arguments);
         depth--;
-        if (predicate.test(method)) {
-          writeDepth();
-          writer.write(formatReturned(result));
-          writer.write("\n");
-        }
+        writeDepth();
+        writer.write(formatReturned(result));
+        writer.write("\n");
         return result;
       } catch (InvocationTargetException e) {
         depth--;
