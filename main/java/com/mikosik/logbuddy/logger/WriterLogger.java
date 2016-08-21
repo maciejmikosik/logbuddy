@@ -24,6 +24,7 @@ public class WriterLogger implements Logger {
     try {
       writer.write(message);
       writer.write('\n');
+      writer.flush();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

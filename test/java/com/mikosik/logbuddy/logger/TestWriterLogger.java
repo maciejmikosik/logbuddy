@@ -3,6 +3,8 @@ package com.mikosik.logbuddy.logger;
 import static com.mikosik.logbuddy.logger.WriterLogger.logger;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
+import static org.testory.Testory.spy;
+import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenEqual;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
@@ -25,7 +27,7 @@ public class TestWriterLogger {
   @Before
   public void before() {
     givenTest(this);
-    given(writer = new StringWriter());
+    given(writer = spy(new StringWriter()));
   }
 
   @Test
@@ -34,6 +36,13 @@ public class TestWriterLogger {
     when(() -> logger.log(message));
     thenReturned();
     thenEqual(writer.toString(), message + "\n");
+  }
+
+  @Test
+  public void flushes_stream() throws IOException {
+    given(logger = logger(writer));
+    when(() -> logger.log(message));
+    thenCalled(writer).flush();
   }
 
   @Test
