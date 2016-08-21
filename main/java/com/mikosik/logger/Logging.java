@@ -21,8 +21,8 @@ public class Logging {
   private final Objenesis objenesis = new ObjenesisStd();
   private final ByteBuddy byteBuddy = new ByteBuddy();
 
+  private final Depth depth = new Depth();
   private final Logger logger;
-  private int depth = 0;
 
   public Logging(Logger logger) {
     this.logger = logger;
@@ -49,13 +49,10 @@ public class Logging {
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
       logger.log(formatInvocation(original, method, arguments));
       try {
-        depth++;
-        Object result = method.invoke(original, arguments);
-        depth--;
+        Object result = depth.invoke(() -> method.invoke(original, arguments));
         logger.log(formatReturned(result));
         return result;
       } catch (InvocationTargetException e) {
-        depth--;
         Throwable cause = e.getCause();
         logger.log(formatThrown(cause));
         throw cause;
@@ -65,7 +62,7 @@ public class Logging {
 
   private String formatDepth() {
     StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < depth; i++) {
+    for (int i = 0; i < depth.get(); i++) {
       builder.append("\t");
     }
     return builder.toString();
