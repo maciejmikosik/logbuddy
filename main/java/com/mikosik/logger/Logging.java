@@ -25,7 +25,7 @@ public class Logging {
   private final Logger logger;
 
   public Logging(Logger logger) {
-    this.logger = logger;
+    this.logger = new DepthLogger(depth, logger);
   }
 
   public <T> T wrap(T original) {
@@ -60,26 +60,37 @@ public class Logging {
     }
   }
 
-  private String formatDepth() {
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < depth.get(); i++) {
-      builder.append("\t");
-    }
-    return builder.toString();
-  }
-
   private String formatReturned(Object result) {
-    return format("%sreturned %s", formatDepth(), result);
+    return format("returned %s", result);
   }
 
   private String formatThrown(Throwable throwable) {
-    return format("%sthrown %s", formatDepth(), throwable);
+    return format("thrown %s", throwable);
   }
 
   private String formatInvocation(Object instance, Method method, Object[] arguments) {
     String argumentsString = stream(arguments)
         .map(Object::toString)
         .collect(joining(", "));
-    return format("%s%s.%s(%s)", formatDepth(), instance, method.getName(), argumentsString);
+    return format("%s.%s(%s)", instance, method.getName(), argumentsString);
+  }
+
+  private static class DepthLogger implements Logger {
+    private final Depth depth;
+    private final Logger logger;
+
+    public DepthLogger(Depth depth, Logger logger) {
+      this.depth = depth;
+      this.logger = logger;
+    }
+
+    public void log(String message) {
+      StringBuilder builder = new StringBuilder();
+      for (int i = 0; i < depth.get(); i++) {
+        builder.append("\t");
+      }
+      builder.append(message);
+      logger.log(builder.toString());
+    }
   }
 }
