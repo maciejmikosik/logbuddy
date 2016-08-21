@@ -1,4 +1,4 @@
-package com.mikosik.logger.logger;
+package com.mikosik.logbuddy.logger;
 
 import static java.util.Objects.requireNonNull;
 
@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 
-import com.mikosik.logger.Logger;
+import com.mikosik.logbuddy.Logger;
 
 public class WriterLogger implements Logger {
   private final Writer writer;

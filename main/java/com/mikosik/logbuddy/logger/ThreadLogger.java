@@ -1,8 +1,8 @@
-package com.mikosik.logger.logger;
+package com.mikosik.logbuddy.logger;
 
 import static java.lang.String.format;
 
-import com.mikosik.logger.Logger;
+import com.mikosik.logbuddy.Logger;
 
 public class ThreadLogger implements Logger {
   private final Logger logger;

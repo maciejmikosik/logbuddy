@@ -1,6 +1,6 @@
-package com.mikosik.logger.logger;
+package com.mikosik.logbuddy.logger;
 
-import static com.mikosik.logger.logger.TimeLogger.time;
+import static com.mikosik.logbuddy.logger.TimeLogger.time;
 import static java.time.Clock.fixed;
 import static org.hamcrest.Matchers.containsString;
 import static org.testory.Testory.any;
@@ -18,7 +18,7 @@ import java.time.ZoneOffset;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.mikosik.logger.Logger;
+import com.mikosik.logbuddy.Logger;
 
 public class TestTimeLogger {
   private String message;

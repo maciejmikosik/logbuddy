@@ -1,6 +1,6 @@
-package com.mikosik.logger.logger;
+package com.mikosik.logbuddy.logger;
 
-import static com.mikosik.logger.logger.SynchronizedLogger.synchronize;
+import static com.mikosik.logbuddy.logger.SynchronizedLogger.synchronize;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalled;
@@ -11,7 +11,7 @@ import static org.testory.Testory.when;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.mikosik.logger.Logger;
+import com.mikosik.logbuddy.Logger;
 
 public class TestSynchronizedLogger {
   private String message;

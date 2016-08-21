@@ -1,4 +1,4 @@
-package com.mikosik.logger;
+package com.mikosik.logbuddy;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsString;

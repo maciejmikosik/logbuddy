@@ -1,6 +1,6 @@
-package com.mikosik.logger.logger;
+package com.mikosik.logbuddy.logger;
 
-import static com.mikosik.logger.logger.WriterLogger.logger;
+import static com.mikosik.logbuddy.logger.WriterLogger.logger;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenEqual;
@@ -15,7 +15,7 @@ import java.io.Writer;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.mikosik.logger.Logger;
+import com.mikosik.logbuddy.Logger;
 
 public class TestWriterLogger {
   private Writer writer;

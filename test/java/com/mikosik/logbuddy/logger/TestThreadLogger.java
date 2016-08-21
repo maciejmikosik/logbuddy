@@ -1,6 +1,6 @@
-package com.mikosik.logger.logger;
+package com.mikosik.logbuddy.logger;
 
-import static com.mikosik.logger.logger.ThreadLogger.thread;
+import static com.mikosik.logbuddy.logger.ThreadLogger.thread;
 import static java.lang.String.format;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
@@ -10,7 +10,7 @@ import static org.testory.Testory.when;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.mikosik.logger.Logger;
+import com.mikosik.logbuddy.Logger;
 
 public class TestThreadLogger {
   private Logger logger, threadLogger;

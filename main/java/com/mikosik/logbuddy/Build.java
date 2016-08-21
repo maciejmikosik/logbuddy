@@ -1,14 +1,14 @@
-package com.mikosik.logger;
+package com.mikosik.logbuddy;
 
 import static java.util.Arrays.asList;
 
 import java.util.List;
 
-import com.mikosik.logger.logger.NoLogger;
-import com.mikosik.logger.logger.SynchronizedLogger;
-import com.mikosik.logger.logger.ThreadLogger;
-import com.mikosik.logger.logger.TimeLogger;
-import com.mikosik.logger.logger.WriterLogger;
+import com.mikosik.logbuddy.logger.NoLogger;
+import com.mikosik.logbuddy.logger.SynchronizedLogger;
+import com.mikosik.logbuddy.logger.ThreadLogger;
+import com.mikosik.logbuddy.logger.TimeLogger;
+import com.mikosik.logbuddy.logger.WriterLogger;
 
 public class Build {
   public List<Class<?>> loggers = asList(

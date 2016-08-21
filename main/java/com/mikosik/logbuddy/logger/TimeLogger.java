@@ -1,4 +1,4 @@
-package com.mikosik.logger.logger;
+package com.mikosik.logbuddy.logger;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
@@ -12,7 +12,7 @@ import java.time.Clock;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
-import com.mikosik.logger.Logger;
+import com.mikosik.logbuddy.Logger;
 
 public class TimeLogger implements Logger {
   private final Clock clock;

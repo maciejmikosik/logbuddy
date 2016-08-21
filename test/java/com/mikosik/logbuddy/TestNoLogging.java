@@ -1,4 +1,4 @@
-package com.mikosik.logger;
+package com.mikosik.logbuddy;
 
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;

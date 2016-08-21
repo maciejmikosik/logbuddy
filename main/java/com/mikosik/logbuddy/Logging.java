@@ -1,4 +1,4 @@
-package com.mikosik.logger;
+package com.mikosik.logbuddy;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;

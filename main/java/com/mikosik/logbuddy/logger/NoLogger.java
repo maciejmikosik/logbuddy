@@ -1,6 +1,6 @@
-package com.mikosik.logger.logger;
+package com.mikosik.logbuddy.logger;
 
-import com.mikosik.logger.Logger;
+import com.mikosik.logbuddy.Logger;
 
 public class NoLogger implements Logger {
   public void log(String message) {}

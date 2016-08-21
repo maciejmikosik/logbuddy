@@ -1,6 +1,6 @@
-package com.mikosik.logger;
+package com.mikosik.logbuddy;
 
-import com.mikosik.logger.logger.NoLogger;
+import com.mikosik.logbuddy.logger.NoLogger;
 
 public class NoLogging extends Logging {
   public NoLogging() {

@@ -1,4 +1,4 @@
-package com.mikosik.logger;
+package com.mikosik.logbuddy;
 
 public class Depth {
   private final ThreadLocal<Integer> depth = new ThreadLocal<Integer>() {

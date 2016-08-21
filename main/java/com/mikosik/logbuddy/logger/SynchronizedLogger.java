@@ -1,8 +1,8 @@
-package com.mikosik.logger.logger;
+package com.mikosik.logbuddy.logger;
 
 import static java.util.Objects.requireNonNull;
 
-import com.mikosik.logger.Logger;
+import com.mikosik.logbuddy.Logger;
 
 public class SynchronizedLogger implements Logger {
   private final Logger logger;
