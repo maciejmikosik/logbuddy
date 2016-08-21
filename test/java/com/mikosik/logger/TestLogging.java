@@ -21,6 +21,7 @@ public class TestLogging {
   private Object argumentA, argumentB, argumentC, field;
   private Throwable throwable;
   private Wrappable instance;
+  private String string;
 
   @Before
   public void before() {
@@ -34,6 +35,14 @@ public class TestLogging {
         .wrap(new Wrappable(field))
         .methodReturningField());
     thenReturned(field);
+  }
+
+  @Test
+  public void returns_from_typed_method() {
+    when(new Logging(logger)
+        .wrap(new Wrappable())
+        .methodReturningString(string));
+    thenReturned(string);
   }
 
   @Test
@@ -111,6 +120,10 @@ public class TestLogging {
 
     public Object methodReturningField() {
       return field;
+    }
+
+    public String methodReturningString(String string) {
+      return string;
     }
 
     public Object methodThrowingField() throws Throwable {

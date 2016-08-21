@@ -15,6 +15,7 @@ import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.matcher.ElementMatchers;
 
 public class Logging {
@@ -46,6 +47,7 @@ public class Logging {
       this.original = original;
     }
 
+    @RuntimeType
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
       logger.log(formatInvocation(original, method, arguments));
       try {
