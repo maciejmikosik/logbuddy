@@ -8,9 +8,9 @@ import static org.testory.Testory.when;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestNoLogging {
-  private Logging logging;
-  private Wrappable original;
+public class TestNoDecorator {
+  private Decorator decorator;
+  private Decorable original;
 
   @Before
   public void before() {
@@ -18,12 +18,12 @@ public class TestNoLogging {
   }
 
   @Test
-  public void does_not_wrap() {
-    given(original = new Wrappable());
-    given(logging = new NoLogging());
-    when(() -> logging.wrap(original));
+  public void does_not_decorate() {
+    given(original = new Decorable());
+    given(decorator = new NoDecorator());
+    when(() -> decorator.decorate(original));
     thenReturned(original);
   }
 
-  public static class Wrappable {}
+  public static class Decorable {}
 }

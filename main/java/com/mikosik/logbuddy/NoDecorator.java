@@ -2,12 +2,12 @@ package com.mikosik.logbuddy;
 
 import com.mikosik.logbuddy.logger.NoLogger;
 
-public class NoLogging extends Logging {
-  public NoLogging() {
+public class NoDecorator extends Decorator {
+  public NoDecorator() {
     super(new NoLogger(), object -> "");
   }
 
-  public <T> T wrap(T original) {
+  public <T> T decorate(T original) {
     return original;
   }
 }

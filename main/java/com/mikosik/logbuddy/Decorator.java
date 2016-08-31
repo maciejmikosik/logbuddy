@@ -18,7 +18,7 @@ import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.matcher.ElementMatchers;
 
-public class Logging {
+public class Decorator {
   private final Objenesis objenesis = new ObjenesisStd();
   private final ByteBuddy byteBuddy = new ByteBuddy();
 
@@ -26,26 +26,26 @@ public class Logging {
   private final Logger logger;
   private final Formatter formatter;
 
-  public Logging(Logger logger, Formatter formatter) {
+  public Decorator(Logger logger, Formatter formatter) {
     this.logger = new DepthLogger(depth, logger);
     this.formatter = formatter;
   }
 
-  public <T> T wrap(T original) {
-    Class<?> wrappedType = byteBuddy
+  public <T> T decorate(T original) {
+    Class<?> decorableType = byteBuddy
         .subclass(original.getClass())
         .method(ElementMatchers.any())
-        .intercept(MethodDelegation.to(new LoggingHandler(original)))
+        .intercept(MethodDelegation.to(new DecorateHandler(original)))
         .make()
         .load(getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
         .getLoaded();
-    return (T) objenesis.newInstance(wrappedType);
+    return (T) objenesis.newInstance(decorableType);
   }
 
-  public class LoggingHandler {
+  public class DecorateHandler {
     private final Object original;
 
-    public LoggingHandler(Object original) {
+    public DecorateHandler(Object original) {
       this.original = original;
     }
 

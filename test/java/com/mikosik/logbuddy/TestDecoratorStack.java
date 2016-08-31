@@ -19,11 +19,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestLoggingStack {
+public class TestDecoratorStack {
   private Logger logger;
   private Formatter formatter;
   private Throwable throwable;
-  private Logging logging;
+  private Decorator decorator;
   private List<Object> messages;
 
   @Before
@@ -35,10 +35,10 @@ public class TestLoggingStack {
 
   @Test
   public void formats_stack_indentation_if_returned() {
-    given(logging = new Logging(logger, formatter));
-    when(() -> logging.wrap(new Wrappable(
-        logging.wrap(new Wrappable(
-            logging.wrap(new Wrappable())))))
+    given(decorator = new Decorator(logger, formatter));
+    when(() -> decorator.decorate(new Decorable(
+        decorator.decorate(new Decorable(
+            decorator.decorate(new Decorable())))))
         .chain());
     thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("chain"))));
     thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t", "chain"))));
@@ -50,10 +50,10 @@ public class TestLoggingStack {
 
   @Test
   public void formats_stack_indentation_if_thrown() {
-    given(logging = new Logging(logger, formatter));
-    when(() -> logging.wrap(new Wrappable(
-        logging.wrap(new Wrappable(
-            logging.wrap(new Wrappable(throwable))))))
+    given(decorator = new Decorator(logger, formatter));
+    when(() -> decorator.decorate(new Decorable(
+        decorator.decorate(new Decorable(
+            decorator.decorate(new Decorable(throwable))))))
         .chain());
     thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("chain"))));
     thenCalledInOrder(logger).log(any(String.class, stringContainsInOrder(asList("\t", "chain"))));
@@ -67,37 +67,37 @@ public class TestLoggingStack {
   public void does_not_join_stack_from_different_threads() {
     given(messages = synchronizedList(new ArrayList<>()));
     given(logger = message -> messages.add(message));
-    given(logging = new Logging(logger, formatter));
-    when(() -> logging.wrap(new Wrappable(
-        logging.wrap(new Wrappable(
-            logging.wrap(new Wrappable())))))
+    given(decorator = new Decorator(logger, formatter));
+    when(() -> decorator.decorate(new Decorable(
+        decorator.decorate(new Decorable(
+            decorator.decorate(new Decorable())))))
         .chainInNewThread());
     then(messages, not(hasItem(containsString("\t"))));
   }
 
-  public static class Wrappable {
+  public static class Decorable {
     private Object field;
 
-    public Wrappable() {}
+    public Decorable() {}
 
-    public Wrappable(Object field) {
+    public Decorable(Object field) {
       this.field = field;
     }
 
     public void chain() throws Throwable {
-      if (field instanceof Wrappable) {
-        ((Wrappable) field).chain();
+      if (field instanceof Decorable) {
+        ((Decorable) field).chain();
       } else if (field instanceof Throwable) {
         throw (Throwable) field;
       }
     }
 
     public void chainInNewThread() throws Throwable {
-      if (field instanceof Wrappable) {
+      if (field instanceof Decorable) {
         Thread thread = new Thread() {
           public void run() {
             try {
-              ((Wrappable) field).chainInNewThread();
+              ((Decorable) field).chainInNewThread();
             } catch (Throwable e) {
               e.printStackTrace();
             }

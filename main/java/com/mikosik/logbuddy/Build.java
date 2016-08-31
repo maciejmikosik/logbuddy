@@ -17,7 +17,7 @@ public class Build {
       ThreadLogger.class,
       NoLogger.class,
       SynchronizedLogger.class);
-  public List<Class<?>> logging = asList(
-      Logging.class,
-      NoLogging.class);
+  public List<Class<?>> decorator = asList(
+      Decorator.class,
+      NoDecorator.class);
 }
