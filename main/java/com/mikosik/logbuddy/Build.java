@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 
 import java.util.List;
 
+import com.mikosik.logbuddy.formatter.Charts;
 import com.mikosik.logbuddy.formatter.DefaultFormatter;
 import com.mikosik.logbuddy.formatter.HtmlFormatter;
 import com.mikosik.logbuddy.logger.BrowserLogger;
@@ -27,4 +28,6 @@ public class Build {
   public List<Class<?>> formatters = asList(
       DefaultFormatter.class,
       HtmlFormatter.class);
+  public List<Class<?>> helpers = asList(
+      Charts.class);
 }
