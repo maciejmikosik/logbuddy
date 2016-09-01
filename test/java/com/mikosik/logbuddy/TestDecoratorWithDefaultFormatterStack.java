@@ -19,7 +19,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestDecoratorStack {
+import com.mikosik.logbuddy.formatter.DefaultFormatter;
+
+public class TestDecoratorWithDefaultFormatterStack {
   private Logger logger;
   private Formatter formatter;
   private Throwable throwable;
@@ -30,7 +32,7 @@ public class TestDecoratorStack {
   public void before() {
     givenTest(this);
     given(throwable = new Throwable());
-    given(formatter = object -> "format(" + object + ")");
+    given(formatter = new DefaultFormatter());
   }
 
   @Test

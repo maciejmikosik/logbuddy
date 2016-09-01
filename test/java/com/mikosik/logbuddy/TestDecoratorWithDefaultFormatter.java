@@ -16,7 +16,9 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestDecorator {
+import com.mikosik.logbuddy.formatter.DefaultFormatter;
+
+public class TestDecoratorWithDefaultFormatter {
   private Logger logger;
   private Formatter formatter;
   private Object argumentA, argumentB, argumentC, field;
@@ -28,7 +30,7 @@ public class TestDecorator {
   public void before() {
     givenTest(this);
     given(throwable = new Throwable());
-    given(formatter = object -> "format(" + object + ")");
+    given(formatter = new DefaultFormatter());
   }
 
   @Test
@@ -68,9 +70,9 @@ public class TestDecorator {
     when(() -> new Decorator(logger, formatter)
         .decorate(new Decorable())
         .methodWithArguments(argumentA, argumentB, argumentC));
-    thenCalled(logger).log(any(String.class, containsString(formatter.format(argumentA))));
-    thenCalled(logger).log(any(String.class, containsString(formatter.format(argumentB))));
-    thenCalled(logger).log(any(String.class, containsString(formatter.format(argumentC))));
+    thenCalled(logger).log(any(String.class, containsString(argumentA.toString())));
+    thenCalled(logger).log(any(String.class, containsString(argumentB.toString())));
+    thenCalled(logger).log(any(String.class, containsString(argumentC.toString())));
   }
 
   @Test
@@ -79,7 +81,7 @@ public class TestDecorator {
     when(() -> new Decorator(logger, formatter)
         .decorate(instance)
         .method());
-    thenCalled(logger).log(any(String.class, containsString(formatter.format(instance))));
+    thenCalled(logger).log(any(String.class, containsString(instance.toString())));
   }
 
   @Test
@@ -87,7 +89,7 @@ public class TestDecorator {
     when(() -> new Decorator(logger, formatter)
         .decorate(new Decorable(field))
         .methodReturningField());
-    thenCalled(logger).log(any(String.class, containsString("returned " + formatter.format(field))));
+    thenCalled(logger).log(any(String.class, containsString("returned " + field.toString())));
   }
 
   @Test
@@ -96,7 +98,7 @@ public class TestDecorator {
     when(() -> new Decorator(logger, formatter)
         .decorate(new Decorable(field))
         .methodThrowingField());
-    thenCalled(logger).log(any(String.class, containsString("thrown " + formatter.format(field))));
+    thenCalled(logger).log(any(String.class, containsString("thrown " + field.toString())));
   }
 
   @Test

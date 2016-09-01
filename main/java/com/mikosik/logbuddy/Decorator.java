@@ -1,8 +1,9 @@
 package com.mikosik.logbuddy;
 
-import static java.lang.String.format;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
+import static com.mikosik.logbuddy.formatter.Invocation.invocation;
+import static com.mikosik.logbuddy.formatter.Returned.returned;
+import static com.mikosik.logbuddy.formatter.Thrown.thrown;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -51,32 +52,17 @@ public class Decorator {
 
     @RuntimeType
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
-      logger.log(formatInvocation(original, method, arguments));
+      logger.log(formatter.format(invocation(original, method, asList(arguments))));
       try {
         Object result = depth.invoke(() -> method.invoke(original, arguments));
-        logger.log(formatReturned(result));
+        logger.log(formatter.format(returned(result)));
         return result;
       } catch (InvocationTargetException e) {
         Throwable cause = e.getCause();
-        logger.log(formatThrown(cause));
+        logger.log(formatter.format(thrown(cause)));
         throw cause;
       }
     }
-  }
-
-  private String formatReturned(Object result) {
-    return format("returned %s", formatter.format(result));
-  }
-
-  private String formatThrown(Throwable throwable) {
-    return format("thrown %s", formatter.format(throwable));
-  }
-
-  private String formatInvocation(Object instance, Method method, Object[] arguments) {
-    String argumentsString = stream(arguments)
-        .map(formatter::format)
-        .collect(joining(", "));
-    return format("%s.%s(%s)", formatter.format(instance), method.getName(), argumentsString);
   }
 
   private static class DepthLogger implements Logger {
