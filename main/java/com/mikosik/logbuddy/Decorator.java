@@ -38,7 +38,7 @@ public class Decorator {
         .method(ElementMatchers.any())
         .intercept(MethodDelegation.to(new DecorateHandler(original)))
         .make()
-        .load(getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
+        .load(original.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
         .getLoaded();
     return (T) objenesis.newInstance(decorableType);
   }
