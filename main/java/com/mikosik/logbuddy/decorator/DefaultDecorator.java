@@ -3,6 +3,7 @@ package com.mikosik.logbuddy.decorator;
 import static com.mikosik.logbuddy.LogBuddyException.check;
 import static com.mikosik.logbuddy.formatter.Invocation.invocation;
 import static com.mikosik.logbuddy.formatter.Returned.returned;
+import static com.mikosik.logbuddy.formatter.Text.text;
 import static com.mikosik.logbuddy.formatter.Thrown.thrown;
 import static java.util.Arrays.asList;
 
@@ -34,7 +35,7 @@ public class DefaultDecorator implements Decorator {
   private final Formatter formatter;
 
   private DefaultDecorator(Logger logger, Formatter formatter) {
-    this.logger = new DepthLogger(depth, logger);
+    this.logger = new DepthLogger(depth, logger, formatter);
     this.formatter = formatter;
   }
 
@@ -80,16 +81,18 @@ public class DefaultDecorator implements Decorator {
   private static class DepthLogger implements Logger {
     private final Depth depth;
     private final Logger logger;
+    private final Formatter formatter;
 
-    public DepthLogger(Depth depth, Logger logger) {
+    public DepthLogger(Depth depth, Logger logger, Formatter formatter) {
       this.depth = depth;
       this.logger = logger;
+      this.formatter = formatter;
     }
 
     public void log(String message) {
       StringBuilder builder = new StringBuilder();
       for (int i = 0; i < depth.get(); i++) {
-        builder.append("\t");
+        builder.append(formatter.format(text("\t")));
       }
       builder.append(message);
       logger.log(builder.toString());
