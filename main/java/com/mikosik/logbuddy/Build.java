@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import java.util.List;
 
 import com.mikosik.logbuddy.formatter.DefaultFormatter;
+import com.mikosik.logbuddy.formatter.HtmlFormatter;
 import com.mikosik.logbuddy.logger.BrowserLogger;
 import com.mikosik.logbuddy.logger.NoLogger;
 import com.mikosik.logbuddy.logger.SynchronizedLogger;
@@ -24,5 +25,6 @@ public class Build {
       Decorator.class,
       NoDecorator.class);
   public List<Class<?>> formatters = asList(
-      DefaultFormatter.class);
+      DefaultFormatter.class,
+      HtmlFormatter.class);
 }
