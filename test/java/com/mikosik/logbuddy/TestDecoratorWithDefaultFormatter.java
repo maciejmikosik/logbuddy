@@ -16,103 +16,105 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestLogging {
+import com.mikosik.logbuddy.formatter.DefaultFormatter;
+
+public class TestDecoratorWithDefaultFormatter {
   private Logger logger;
   private Formatter formatter;
   private Object argumentA, argumentB, argumentC, field;
   private Throwable throwable;
-  private Wrappable instance;
+  private Decorable instance;
   private String string;
 
   @Before
   public void before() {
     givenTest(this);
     given(throwable = new Throwable());
-    given(formatter = object -> "format(" + object + ")");
+    given(formatter = new DefaultFormatter());
   }
 
   @Test
   public void returns_from_method() {
-    when(new Logging(logger, formatter)
-        .wrap(new Wrappable(field))
+    when(new Decorator(logger, formatter)
+        .decorate(new Decorable(field))
         .methodReturningField());
     thenReturned(field);
   }
 
   @Test
   public void returns_from_typed_method() {
-    when(new Logging(logger, formatter)
-        .wrap(new Wrappable())
+    when(new Decorator(logger, formatter)
+        .decorate(new Decorable())
         .methodReturningString(string));
     thenReturned(string);
   }
 
   @Test
   public void throws_from_method() {
-    when(() -> new Logging(logger, formatter)
-        .wrap(new Wrappable(throwable))
+    when(() -> new Decorator(logger, formatter)
+        .decorate(new Decorable(throwable))
         .methodThrowingField());
     thenThrown(throwable);
   }
 
   @Test
   public void logs_method_name() throws IOException {
-    when(() -> new Logging(logger, formatter)
-        .wrap(new Wrappable())
+    when(() -> new Decorator(logger, formatter)
+        .decorate(new Decorable())
         .method());
     thenCalled(logger).log(any(String.class, containsString("method")));
   }
 
   @Test
   public void logs_arguments() throws IOException {
-    when(() -> new Logging(logger, formatter)
-        .wrap(new Wrappable())
+    when(() -> new Decorator(logger, formatter)
+        .decorate(new Decorable())
         .methodWithArguments(argumentA, argumentB, argumentC));
-    thenCalled(logger).log(any(String.class, containsString(formatter.format(argumentA))));
-    thenCalled(logger).log(any(String.class, containsString(formatter.format(argumentB))));
-    thenCalled(logger).log(any(String.class, containsString(formatter.format(argumentC))));
+    thenCalled(logger).log(any(String.class, containsString(argumentA.toString())));
+    thenCalled(logger).log(any(String.class, containsString(argumentB.toString())));
+    thenCalled(logger).log(any(String.class, containsString(argumentC.toString())));
   }
 
   @Test
   public void logs_instance() throws IOException {
-    given(instance = new Wrappable());
-    when(() -> new Logging(logger, formatter)
-        .wrap(instance)
+    given(instance = new Decorable());
+    when(() -> new Decorator(logger, formatter)
+        .decorate(instance)
         .method());
-    thenCalled(logger).log(any(String.class, containsString(formatter.format(instance))));
+    thenCalled(logger).log(any(String.class, containsString(instance.toString())));
   }
 
   @Test
   public void logs_returned_result() throws IOException {
-    when(() -> new Logging(logger, formatter)
-        .wrap(new Wrappable(field))
+    when(() -> new Decorator(logger, formatter)
+        .decorate(new Decorable(field))
         .methodReturningField());
-    thenCalled(logger).log(any(String.class, containsString("returned " + formatter.format(field))));
+    thenCalled(logger).log(any(String.class, containsString("returned " + field.toString())));
   }
 
   @Test
   public void logs_thrown_exception() throws IOException {
     given(field = new RuntimeException());
-    when(() -> new Logging(logger, formatter)
-        .wrap(new Wrappable(field))
+    when(() -> new Decorator(logger, formatter)
+        .decorate(new Decorable(field))
         .methodThrowingField());
-    thenCalled(logger).log(any(String.class, containsString("thrown " + formatter.format(field))));
+    thenCalled(logger).log(any(String.class, containsString("thrown " + field.toString())));
   }
 
   @Test
   public void formats_invocation() throws IOException {
-    when(() -> new Logging(logger, formatter)
-        .wrap(new Wrappable())
+    when(() -> new Decorator(logger, formatter)
+        .decorate(new Decorable())
         .methodWithArguments(argumentA, argumentB, argumentC));
     thenCalled(logger).log(any(String.class, stringContainsInOrder(asList(".", "(", ",", ",", ")"))));
   }
 
-  public static class Wrappable {
+  public static class Decorable {
     private Object field;
 
-    public Wrappable() {}
+    public Decorable() {}
 
-    public Wrappable(Object field) {
+    public Decorable(Object field) {
       this.field = field;
     }
 
