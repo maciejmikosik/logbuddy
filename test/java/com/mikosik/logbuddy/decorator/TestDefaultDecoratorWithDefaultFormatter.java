@@ -1,5 +1,6 @@
-package com.mikosik.logbuddy;
+package com.mikosik.logbuddy.decorator;
 
+import static com.mikosik.logbuddy.decorator.DefaultDecorator.defaultDecorator;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.stringContainsInOrder;
@@ -16,9 +17,11 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.mikosik.logbuddy.Formatter;
+import com.mikosik.logbuddy.Logger;
 import com.mikosik.logbuddy.formatter.DefaultFormatter;
 
-public class TestDecoratorWithDefaultFormatter {
+public class TestDefaultDecoratorWithDefaultFormatter {
   private Logger logger;
   private Formatter formatter;
   private Object argumentA, argumentB, argumentC, field;
@@ -35,7 +38,7 @@ public class TestDecoratorWithDefaultFormatter {
 
   @Test
   public void returns_from_method() {
-    when(new Decorator(logger, formatter)
+    when(defaultDecorator(logger, formatter)
         .decorate(new Decorable(field))
         .methodReturningField());
     thenReturned(field);
@@ -43,7 +46,7 @@ public class TestDecoratorWithDefaultFormatter {
 
   @Test
   public void returns_from_typed_method() {
-    when(new Decorator(logger, formatter)
+    when(defaultDecorator(logger, formatter)
         .decorate(new Decorable())
         .methodReturningString(string));
     thenReturned(string);
@@ -51,7 +54,7 @@ public class TestDecoratorWithDefaultFormatter {
 
   @Test
   public void throws_from_method() {
-    when(() -> new Decorator(logger, formatter)
+    when(() -> defaultDecorator(logger, formatter)
         .decorate(new Decorable(throwable))
         .methodThrowingField());
     thenThrown(throwable);
@@ -59,7 +62,7 @@ public class TestDecoratorWithDefaultFormatter {
 
   @Test
   public void logs_method_name() throws IOException {
-    when(() -> new Decorator(logger, formatter)
+    when(() -> defaultDecorator(logger, formatter)
         .decorate(new Decorable())
         .method());
     thenCalled(logger).log(any(String.class, containsString("method")));
@@ -67,7 +70,7 @@ public class TestDecoratorWithDefaultFormatter {
 
   @Test
   public void logs_arguments() throws IOException {
-    when(() -> new Decorator(logger, formatter)
+    when(() -> defaultDecorator(logger, formatter)
         .decorate(new Decorable())
         .methodWithArguments(argumentA, argumentB, argumentC));
     thenCalled(logger).log(any(String.class, containsString(argumentA.toString())));
@@ -78,7 +81,7 @@ public class TestDecoratorWithDefaultFormatter {
   @Test
   public void logs_instance() throws IOException {
     given(instance = new Decorable());
-    when(() -> new Decorator(logger, formatter)
+    when(() -> defaultDecorator(logger, formatter)
         .decorate(instance)
         .method());
     thenCalled(logger).log(any(String.class, containsString(instance.toString())));
@@ -86,7 +89,7 @@ public class TestDecoratorWithDefaultFormatter {
 
   @Test
   public void logs_returned_result() throws IOException {
-    when(() -> new Decorator(logger, formatter)
+    when(() -> defaultDecorator(logger, formatter)
         .decorate(new Decorable(field))
         .methodReturningField());
     thenCalled(logger).log(any(String.class, containsString("returned " + field.toString())));
@@ -95,7 +98,7 @@ public class TestDecoratorWithDefaultFormatter {
   @Test
   public void logs_thrown_exception() throws IOException {
     given(field = new RuntimeException());
-    when(() -> new Decorator(logger, formatter)
+    when(() -> defaultDecorator(logger, formatter)
         .decorate(new Decorable(field))
         .methodThrowingField());
     thenCalled(logger).log(any(String.class, containsString("thrown " + field.toString())));
@@ -103,7 +106,7 @@ public class TestDecoratorWithDefaultFormatter {
 
   @Test
   public void formats_invocation() throws IOException {
-    when(() -> new Decorator(logger, formatter)
+    when(() -> defaultDecorator(logger, formatter)
         .decorate(new Decorable())
         .methodWithArguments(argumentA, argumentB, argumentC));
     thenCalled(logger).log(any(String.class, stringContainsInOrder(asList(".", "(", ",", ",", ")"))));
