@@ -1,5 +1,6 @@
-package com.mikosik.logbuddy;
+package com.mikosik.logbuddy.decorator;
 
+import static com.mikosik.logbuddy.decorator.DefaultDecorator.defaultDecorator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedList;
 import static org.hamcrest.Matchers.containsString;
@@ -19,9 +20,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.mikosik.logbuddy.Decorator;
+import com.mikosik.logbuddy.Formatter;
+import com.mikosik.logbuddy.Logger;
 import com.mikosik.logbuddy.formatter.DefaultFormatter;
 
-public class TestDecoratorWithDefaultFormatterStack {
+public class TestDefaultDecoratorWithDefaultFormatterStack {
   private Logger logger;
   private Formatter formatter;
   private Throwable throwable;
@@ -37,7 +41,7 @@ public class TestDecoratorWithDefaultFormatterStack {
 
   @Test
   public void formats_stack_indentation_if_returned() {
-    given(decorator = new Decorator(logger, formatter));
+    given(decorator = defaultDecorator(logger, formatter));
     when(() -> decorator.decorate(new Decorable(
         decorator.decorate(new Decorable(
             decorator.decorate(new Decorable())))))
@@ -52,7 +56,7 @@ public class TestDecoratorWithDefaultFormatterStack {
 
   @Test
   public void formats_stack_indentation_if_thrown() {
-    given(decorator = new Decorator(logger, formatter));
+    given(decorator = defaultDecorator(logger, formatter));
     when(() -> decorator.decorate(new Decorable(
         decorator.decorate(new Decorable(
             decorator.decorate(new Decorable(throwable))))))
@@ -69,7 +73,7 @@ public class TestDecoratorWithDefaultFormatterStack {
   public void does_not_join_stack_from_different_threads() {
     given(messages = synchronizedList(new ArrayList<>()));
     given(logger = message -> messages.add(message));
-    given(decorator = new Decorator(logger, formatter));
+    given(decorator = defaultDecorator(logger, formatter));
     when(() -> decorator.decorate(new Decorable(
         decorator.decorate(new Decorable(
             decorator.decorate(new Decorable())))))
