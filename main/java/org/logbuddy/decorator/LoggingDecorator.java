@@ -44,7 +44,7 @@ public class LoggingDecorator implements Decorator {
         .method(ElementMatchers.any())
         .intercept(MethodDelegation.to(new DecorateHandler(decorable)))
         .make()
-        .load(decorable.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
+        .load(Thread.currentThread().getContextClassLoader(), ClassLoadingStrategy.Default.INJECTION)
         .getLoaded();
     return (T) objenesis.newInstance(decorableType);
   }

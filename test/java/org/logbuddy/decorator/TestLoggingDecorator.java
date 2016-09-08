@@ -87,6 +87,13 @@ public class TestLoggingDecorator {
   }
 
   @Test
+  public void decorates_object() {
+    given(decorator = logging(logger));
+    when(() -> decorator.decorate(new Object()));
+    thenReturned(instanceOf(Object.class));
+  }
+
+  @Test
   public void decorates_decorated_object() {
     given(decorator = logging(logger));
     when(() -> decorator.decorate(decorator.decorate(new Decorable())));

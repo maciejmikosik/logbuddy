@@ -47,6 +47,14 @@ unzip \
   -d "${BUILDING}" \
   org/*
 
+########## COPY LICENSE ##########
+cp \
+  "${RUN}"/*license* \
+  "${BUILDING}"
+cp \
+  "${PROJECT}"/LICENSE.txt \
+  "${BUILDING}"
+
 ########## RESET TIMESTAMPS ##########
 find \
   ${BUILDING}/ \
