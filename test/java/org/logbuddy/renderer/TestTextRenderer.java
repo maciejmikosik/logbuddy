@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
+import static org.logbuddy.model.Property.property;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
 import static org.logbuddy.renderer.Text.text;
@@ -119,6 +120,21 @@ public class TestTextRenderer {
   public void renders_stack_trace_depth() {
     when(renderer.render(depth(3, model)));
     thenReturned(text(format("\t\t\t%s", model)));
+  }
+
+  @Test
+  public void renders_property() {
+    given(renderer = new TextRenderer() {
+      public Text render(Object model) {
+        if (model == object) {
+          return text(string);
+        } else {
+          return super.render(model);
+        }
+      }
+    });
+    when(renderer.render(property(object, model)));
+    thenReturned(text(format("%s\t%s", string, model)));
   }
 
   @Test

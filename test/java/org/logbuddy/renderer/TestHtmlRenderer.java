@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
+import static org.logbuddy.model.Property.property;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
 import static org.logbuddy.renderer.Html.html;
@@ -125,6 +126,21 @@ public class TestHtmlRenderer {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
     when(htmlRenderer.render(depth(3, model)));
     thenReturned(html(format("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s", model)));
+  }
+
+  @Test
+  public void renders_property() {
+    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())) {
+      public Html render(Object model) {
+        if (model == object) {
+          return html(string);
+        } else {
+          return super.render(model);
+        }
+      }
+    });
+    when(htmlRenderer.render(property(object, model)));
+    thenReturned(html(format("%s&nbsp;&nbsp;%s", string, model)));
   }
 
   @Test
