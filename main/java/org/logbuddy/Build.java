@@ -8,6 +8,7 @@ import org.logbuddy.decorator.LoggingDecorator;
 import org.logbuddy.logger.BrowserLogger;
 import org.logbuddy.logger.ConsoleLogger;
 import org.logbuddy.logger.StackTraceLogger;
+import org.logbuddy.logger.SynchronizedLogger;
 import org.logbuddy.logger.ThreadLogger;
 import org.logbuddy.logger.TimeLogger;
 import org.logbuddy.renderer.HtmlRenderer;
@@ -18,6 +19,7 @@ public class Build {
       StackTraceLogger.class,
       ThreadLogger.class,
       TimeLogger.class,
+      SynchronizedLogger.class,
       ConsoleLogger.class,
       BrowserLogger.class);
   public List<Class<?>> renderers = asList(
