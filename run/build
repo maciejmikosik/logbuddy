@@ -27,7 +27,7 @@ javac \
   -source 1.8 \
   -target 1.8 \
   -d "${BUILDING}" \
-  "${JAVA}/com/mikosik/logbuddy/Build.java"
+  "${JAVA}/org/logbuddy/Build.java"
 
 ########## COPY SOURCES ##########
 cp \
