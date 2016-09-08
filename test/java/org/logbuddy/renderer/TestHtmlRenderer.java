@@ -2,6 +2,7 @@ package org.logbuddy.renderer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
@@ -29,6 +30,7 @@ public class TestHtmlRenderer {
   private Method method;
   private Object instance, a, b, c;
   private Throwable throwable;
+  private Object model;
 
   @Before
   public void before() {
@@ -116,6 +118,13 @@ public class TestHtmlRenderer {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
     when(htmlRenderer.render(thrown(throwable)));
     thenReturned(html(format("thrown %s", throwable.toString())));
+  }
+
+  @Test
+  public void renders_stack_trace_depth() {
+    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    when(htmlRenderer.render(depth(3, model)));
+    thenReturned(html(format("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s", model)));
   }
 
   @Test

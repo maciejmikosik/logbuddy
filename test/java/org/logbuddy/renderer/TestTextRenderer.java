@@ -2,6 +2,7 @@ package org.logbuddy.renderer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
@@ -28,6 +29,7 @@ public class TestTextRenderer {
   private String string;
   private Throwable throwable;
   private ZonedDateTime time;
+  private Object model;
 
   @Before
   public void before() {
@@ -111,6 +113,12 @@ public class TestTextRenderer {
     given(renderer = new TextRenderer());
     when(renderer.render(thrown(throwable)));
     thenReturned(text(format("thrown %s", throwable.toString())));
+  }
+
+  @Test
+  public void renders_stack_trace_depth() {
+    when(renderer.render(depth(3, model)));
+    thenReturned(text(format("\t\t\t%s", model)));
   }
 
   @Test

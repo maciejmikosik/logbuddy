@@ -6,6 +6,7 @@ import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.renderer.Html.html;
 
 import org.logbuddy.Renderer;
+import org.logbuddy.model.Depth;
 import org.logbuddy.model.Invocation;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
@@ -25,6 +26,8 @@ public class HtmlRenderer implements Renderer<Html> {
       return renderImpl((Returned) model);
     } else if (model instanceof Thrown) {
       return renderImpl((Thrown) model);
+    } else if (model instanceof Depth) {
+      return renderImpl((Depth) model);
     } else {
       return asHtml(textRenderer.render(model));
     }
@@ -46,6 +49,11 @@ public class HtmlRenderer implements Renderer<Html> {
 
   private Html renderImpl(Thrown thrown) {
     return html(format("thrown %s", render(thrown.throwable).body));
+  }
+
+  private Html renderImpl(Depth depth) {
+    String indentation = new String(new char[depth.value]).replace("\0", "&nbsp;&nbsp;");
+    return html(indentation + render(depth.model).body);
   }
 
   private static Html asHtml(Text text) {
