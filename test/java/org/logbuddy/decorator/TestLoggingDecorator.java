@@ -71,6 +71,17 @@ public class TestLoggingDecorator {
   }
 
   @Test
+  public void logs_null_arguments() throws NoSuchMethodException {
+    given(decorated = logging(logger)
+        .decorate(decorable));
+    when(() -> decorated.methodWithArguments(null, null));
+    thenCalled(logger).log(invocation(
+        decorable,
+        Decorable.class.getMethod("methodWithArguments", Object.class, Object.class),
+        asList(null, null)));
+  }
+
+  @Test
   public void logs_returned() {
     given(decorated = logging(logger)
         .decorate(new Decorable(result)));

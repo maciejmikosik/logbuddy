@@ -25,9 +25,7 @@ public class Invocation {
     check(instance != null);
     check(method != null);
     check(arguments != null);
-    List<Object> argumentsList = unmodifiableList(new ArrayList<>(arguments));
-    check(!arguments.contains(null));
-    return new Invocation(instance, method, argumentsList);
+    return new Invocation(instance, method, unmodifiableList(new ArrayList<>(arguments)));
   }
 
   public boolean equals(Object object) {
