@@ -27,6 +27,11 @@ public class LoggingDecorator implements Decorator {
   private final ByteBuddy byteBuddy = new ByteBuddy();
 
   private final Logger logger;
+  private final ThreadLocal<Integer> numberOfRecursions = new ThreadLocal<Integer>() {
+    protected Integer initialValue() {
+      return 0;
+    }
+  };
 
   private LoggingDecorator(Logger logger) {
     this.logger = logger;
@@ -58,15 +63,25 @@ public class LoggingDecorator implements Decorator {
 
     @RuntimeType
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
-      logger.log(invocation(original, method, asList(arguments)));
+      boolean isClientInvocation = numberOfRecursions.get() == 0;
+      numberOfRecursions.set(numberOfRecursions.get() + 1);
+      if (isClientInvocation) {
+        logger.log(invocation(original, method, asList(arguments)));
+      }
       try {
         Object result = method.invoke(original, arguments);
-        logger.log(returned(result));
+        if (isClientInvocation) {
+          logger.log(returned(result));
+        }
         return result;
       } catch (InvocationTargetException e) {
         Throwable cause = e.getCause();
-        logger.log(thrown(cause));
+        if (isClientInvocation) {
+          logger.log(thrown(cause));
+        }
         throw cause;
+      } finally {
+        numberOfRecursions.set(numberOfRecursions.get() - 1);
       }
     }
   }
