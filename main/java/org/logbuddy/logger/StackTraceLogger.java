@@ -9,7 +9,11 @@ import org.logbuddy.model.Thrown;
 
 public class StackTraceLogger implements Logger {
   private final Logger logger;
-  private int numberOfInvocations = 0;
+  private final ThreadLocal<Integer> numberOfInvocations = new ThreadLocal<Integer>() {
+    protected Integer initialValue() {
+      return 0;
+    }
+  };
 
   private StackTraceLogger(Logger logger) {
     this.logger = logger;
@@ -21,11 +25,11 @@ public class StackTraceLogger implements Logger {
 
   public void log(Object model) {
     if (model instanceof Returned || model instanceof Thrown) {
-      numberOfInvocations--;
+      numberOfInvocations.set(numberOfInvocations.get() - 1);
     }
-    logger.log(depth(numberOfInvocations, model));
+    logger.log(depth(numberOfInvocations.get(), model));
     if (model instanceof Invocation) {
-      numberOfInvocations++;
+      numberOfInvocations.set(numberOfInvocations.get() + 1);
     }
   }
 }

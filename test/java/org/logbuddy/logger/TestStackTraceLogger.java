@@ -1,12 +1,17 @@
 package org.logbuddy.logger;
 
+import static java.util.Collections.synchronizedList;
 import static org.logbuddy.logger.StackTraceLogger.stackTrace;
 import static org.logbuddy.model.Depth.depth;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledInOrder;
+import static org.testory.Testory.thenEqual;
 import static org.testory.Testory.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -83,5 +88,18 @@ public class TestStackTraceLogger {
     thenCalledInOrder(logger).log(depth(2, thrown));
     thenCalledInOrder(logger).log(depth(1, returned));
     thenCalledInOrder(logger).log(depth(0, thrown));
+  }
+
+  @Test
+  public void threads_keep_separate_depths() {
+    List<Object> models = synchronizedList(new ArrayList<>());
+    given(stackTraceLogger = stackTrace(model -> models.add(0, model)));
+    given(new Thread() {
+      public void run() {
+        stackTraceLogger.log(invocation);
+      }
+    }).start();
+    when(() -> stackTraceLogger.log(invocation));
+    thenEqual(models.get(0), depth(0, invocation));
   }
 }

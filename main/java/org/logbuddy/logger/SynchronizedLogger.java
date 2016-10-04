@@ -16,7 +16,7 @@ public class SynchronizedLogger implements Logger {
     return new SynchronizedLogger(logger);
   }
 
-  public void log(Object model) {
+  public synchronized void log(Object model) {
     logger.log(model);
   }
 }
