@@ -129,6 +129,20 @@ public class TestHtmlRenderer {
   }
 
   @Test
+  public void renders_empty_list() {
+    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    when(htmlRenderer.render(asList()));
+    thenReturned(html("List[]"));
+  }
+
+  @Test
+  public void renders_list() {
+    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    when(htmlRenderer.render(asList(a, b, c)));
+    thenReturned(html(format("List[%s,&nbsp;%s,&nbsp;%s]", a, b, c)));
+  }
+
+  @Test
   public void renders_property() {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())) {
       public Html render(Object model) {

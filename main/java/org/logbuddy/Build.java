@@ -14,6 +14,7 @@ import org.logbuddy.logger.TimeLogger;
 import org.logbuddy.renderer.HtmlRenderer;
 import org.logbuddy.renderer.TextRenderer;
 import org.logbuddy.renderer.chart.LineChart;
+import org.logbuddy.renderer.gallery.Gallery;
 
 public class Build {
   public List<Class<?>> loggers = asList(
@@ -26,7 +27,8 @@ public class Build {
   public List<Class<?>> renderers = asList(
       TextRenderer.class,
       HtmlRenderer.class,
-      LineChart.class);
+      LineChart.class,
+      Gallery.class);
   public List<Class<?>> decorators = asList(
       LoggingDecorator.class);
 }
