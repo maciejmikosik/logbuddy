@@ -76,6 +76,14 @@ public class TestLoggingDecorator {
   }
 
   @Test
+  public void logs_nested_invocation() throws NoSuchMethodException {
+    given(decorator = logging(logger));
+    given(decorated = decorator.decorate(new Decorable(decorator.decorate(new Decorable()))));
+    when(() -> decorated.methodDelegating());
+    thenCalledTimes(2, logger).log(any(Invocation.class, instanceOf(Invocation.class)));
+  }
+
+  @Test
   public void logs_null_arguments() throws NoSuchMethodException {
     given(decorated = logging(logger)
         .decorate(decorable));
@@ -177,5 +185,11 @@ public class TestLoggingDecorator {
     }
 
     public void methodWithArguments(Object argumentA, Object argumentB) {}
+
+    public void methodDelegating() {
+      if (field instanceof Decorable) {
+        ((Decorable) field).methodDelegating();
+      }
+    }
   }
 }

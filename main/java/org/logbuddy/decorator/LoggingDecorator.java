@@ -27,11 +27,6 @@ public class LoggingDecorator implements Decorator {
   private final ByteBuddy byteBuddy = new ByteBuddy();
 
   private final Logger logger;
-  private final ThreadLocal<Integer> numberOfRecursions = new ThreadLocal<Integer>() {
-    protected Integer initialValue() {
-      return 0;
-    }
-  };
 
   private LoggingDecorator(Logger logger) {
     this.logger = logger;
@@ -39,7 +34,7 @@ public class LoggingDecorator implements Decorator {
 
   public static Decorator logging(Logger logger) {
     check(logger != null);
-    return new LoggingDecorator(logger);
+    return new LoggingDecorator(preventChainReaction(logger));
   }
 
   public <T> T decorate(T decorable) {
@@ -63,26 +58,34 @@ public class LoggingDecorator implements Decorator {
 
     @RuntimeType
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
-      boolean isClientInvocation = numberOfRecursions.get() == 0;
-      numberOfRecursions.set(numberOfRecursions.get() + 1);
-      if (isClientInvocation) {
-        logger.log(invocation(original, method, asList(arguments)));
-      }
+      logger.log(invocation(original, method, asList(arguments)));
       try {
         Object result = method.invoke(original, arguments);
-        if (isClientInvocation) {
-          logger.log(returned(result));
-        }
+        logger.log(returned(result));
         return result;
       } catch (InvocationTargetException e) {
         Throwable cause = e.getCause();
-        if (isClientInvocation) {
-          logger.log(thrown(cause));
-        }
+        logger.log(thrown(cause));
         throw cause;
-      } finally {
-        numberOfRecursions.set(numberOfRecursions.get() - 1);
       }
     }
+  }
+
+  private static Logger preventChainReaction(Logger logger) {
+    return new Logger() {
+      private final ThreadLocal<Boolean> isEnabled = new ThreadLocal<Boolean>() {
+        protected Boolean initialValue() {
+          return true;
+        }
+      };
+
+      public void log(Object model) {
+        if (isEnabled.get()) {
+          isEnabled.set(false);
+          logger.log(model);
+          isEnabled.set(true);
+        }
+      }
+    };
   }
 }
