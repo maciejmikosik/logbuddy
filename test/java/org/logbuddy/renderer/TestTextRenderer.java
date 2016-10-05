@@ -123,6 +123,18 @@ public class TestTextRenderer {
   }
 
   @Test
+  public void renders_empty_list() {
+    when(renderer.render(asList()));
+    thenReturned(text(format("List[]")));
+  }
+
+  @Test
+  public void renders_list() {
+    when(renderer.render(asList(a, b, c)));
+    thenReturned(text(format("List[%s, %s, %s]", a, b, c)));
+  }
+
+  @Test
   public void renders_property() {
     given(renderer = new TextRenderer() {
       public Text render(Object model) {

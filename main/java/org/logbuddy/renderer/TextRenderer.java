@@ -12,6 +12,7 @@ import static org.logbuddy.renderer.Text.text;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.List;
 
 import org.logbuddy.Renderer;
 import org.logbuddy.model.Depth;
@@ -51,6 +52,10 @@ public class TextRenderer implements Renderer<Text> {
       return renderImpl((Property) model);
     } else if (model instanceof ZonedDateTime) {
       return renderImpl((ZonedDateTime) model);
+    } else if (model instanceof List) {
+      return text(((List<?>) model).stream()
+          .map(element -> render(element).string)
+          .collect(joining(", ", "List[", "]")));
     } else {
       return text(String.valueOf(model));
     }

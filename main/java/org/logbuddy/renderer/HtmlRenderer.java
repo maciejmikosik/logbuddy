@@ -4,6 +4,10 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.renderer.Html.html;
+import static org.logbuddy.renderer.gallery.Gallery.gallery;
+
+import java.awt.image.BufferedImage;
+import java.util.List;
 
 import org.logbuddy.Renderer;
 import org.logbuddy.model.Depth;
@@ -31,6 +35,14 @@ public class HtmlRenderer implements Renderer<Html> {
       return renderImpl((Depth) model);
     } else if (model instanceof Property) {
       return renderImpl((Property) model);
+    } else if (model instanceof List) {
+      return html(((List<?>) model).stream()
+          .map(element -> render(element).body)
+          .collect(joining(escape(", "), escape("List["), escape("]"))));
+    } else if (model instanceof BufferedImage) {
+      return gallery()
+          .height(100)
+          .paint((BufferedImage) model);
     } else {
       return asHtml(textRenderer.render(model));
     }
