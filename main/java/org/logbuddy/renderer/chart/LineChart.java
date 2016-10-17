@@ -30,12 +30,12 @@ public class LineChart {
     return new LineChart(configuration.height(height));
   }
 
-  public LineChart bottom(double bottom) {
-    return new LineChart(configuration.bottom(bottom));
+  public LineChart minimum(double minimum) {
+    return new LineChart(configuration.minimum(minimum));
   }
 
-  public LineChart top(double top) {
-    return new LineChart(configuration.top(top));
+  public LineChart maximum(double maximum) {
+    return new LineChart(configuration.maximum(maximum));
   }
 
   public LineChart color(Color color) {
@@ -60,23 +60,23 @@ public class LineChart {
 
   public Html plot(NumberTable table) {
     DoubleSummaryStatistics statistics = table.statistics();
-    double bottom = configuration.bottom().orElse(statistics.getMin());
-    double top = configuration.top().orElse(statistics.getMax());
+    double minimum = configuration.minimum().orElse(statistics.getMin());
+    double maximum = configuration.maximum().orElse(statistics.getMax());
 
     int height = (int) (1.0 * configuration.height() / table.numberOfColumns());
     return html(table.columns().stream()
-        .map(list -> plotDoubles(list, bottom, top, height))
+        .map(list -> plotDoubles(list, minimum, maximum, height))
         .map(html -> html.body)
         .collect(joining()));
   }
 
-  private Html plotDoubles(List<Number> values, double bottom, double top, int height) {
+  private Html plotDoubles(List<Number> values, double minimum, double maximum, int height) {
     List<Double> dots = values.stream()
-        .map(number -> (1 - phase(bottom, number.doubleValue(), top)) * height)
+        .map(number -> (1 - phase(minimum, number.doubleValue(), maximum)) * height)
         .collect(toList());
 
     Canvas canvas = canvas(configuration.width(), height);
-    drawAxis(canvas, bottom, top);
+    drawAxis(canvas, minimum, maximum);
     drawChart(canvas, dots);
     return html(canvas.toHtml());
   }
@@ -98,8 +98,8 @@ public class LineChart {
     }
   }
 
-  private void drawAxis(Canvas canvas, double bottom, double top) {
-    double phase = phase(bottom, 0, top);
+  private void drawAxis(Canvas canvas, double minimum, double maximum) {
+    double phase = phase(minimum, 0, maximum);
     int axisY = (int) ((1 - phase) * canvas.height);
     canvas.beginPath();
     canvas.moveTo(0, axisY);

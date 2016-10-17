@@ -29,12 +29,12 @@ public class SaturationChart {
     return new SaturationChart(configuration.height(height));
   }
 
-  public SaturationChart bottom(double bottom) {
-    return new SaturationChart(configuration.bottom(bottom));
+  public SaturationChart minimum(double minimum) {
+    return new SaturationChart(configuration.minimum(minimum));
   }
 
-  public SaturationChart top(double top) {
-    return new SaturationChart(configuration.top(top));
+  public SaturationChart maximum(double maximum) {
+    return new SaturationChart(configuration.maximum(maximum));
   }
 
   public SaturationChart color(Color color) {
@@ -43,8 +43,8 @@ public class SaturationChart {
 
   public Html plot(NumberTable table) {
     DoubleSummaryStatistics statistics = table.statistics();
-    double bottom = configuration.bottom().orElse(statistics.getMin());
-    double top = configuration.top().orElse(statistics.getMax());
+    double min = configuration.minimum().orElse(statistics.getMin());
+    double max = configuration.maximum().orElse(statistics.getMax());
     double pointWidth = 1.0 * configuration.width() / table.numberOfRows();
     double pointHeight = 1.0 * configuration.height() / table.numberOfColumns();
 
@@ -52,7 +52,7 @@ public class SaturationChart {
     for (int y = 0; y < table.numberOfColumns(); y++) {
       List<Number> column = table.column(y);
       for (int x = 0; x < column.size(); x++) {
-        double saturation = phase(bottom, column.get(x).doubleValue(), top);
+        double saturation = phase(min, column.get(x).doubleValue(), max);
         canvas.fillStyle(saturate(saturation, configuration.color()));
         canvas.fillRect(x * pointWidth, y * pointHeight, pointWidth, pointHeight);
       }
