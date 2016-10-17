@@ -20,7 +20,7 @@ public class SaturationChart {
   }
 
   public static SaturationChart saturationChart() {
-    return new SaturationChart(new Configuration().dotColor(BLUE));
+    return new SaturationChart(new Configuration().color(BLUE));
   }
 
   public SaturationChart width(int width) {
@@ -39,8 +39,8 @@ public class SaturationChart {
     return new SaturationChart(configuration.top(top));
   }
 
-  public SaturationChart dotColor(Color color) {
-    return new SaturationChart(configuration.dotColor(color));
+  public SaturationChart color(Color color) {
+    return new SaturationChart(configuration.color(color));
   }
 
   public Html plot(List<? extends Number> model) {
@@ -70,7 +70,7 @@ public class SaturationChart {
         canvas.lineTo(configuration.width() * x / list.size(), 1.0 * configuration.height() * (y + 1) / values.size());
         canvas.lineWidth(1.0 * configuration.width() / list.size());
         double saturation = phase(bottom, list.get(x), top);
-        canvas.strokeStyle(saturate(saturation, configuration.dotColor()));
+        canvas.strokeStyle(saturate(saturation, configuration.color()));
         canvas.stroke();
       }
     }

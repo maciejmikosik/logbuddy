@@ -39,6 +39,10 @@ public class LineChart {
     return new LineChart(configuration.top(top));
   }
 
+  public LineChart color(Color color) {
+    return new LineChart(configuration.color(color));
+  }
+
   public LineChart axisColor(Color color) {
     return new LineChart(configuration.axisColor(color));
   }
@@ -47,16 +51,8 @@ public class LineChart {
     return new LineChart(configuration.axisWidth(width));
   }
 
-  public LineChart lineColor(Color color) {
-    return new LineChart(configuration.lineColor(color));
-  }
-
   public LineChart lineWidth(double width) {
     return new LineChart(configuration.lineWidth(width));
-  }
-
-  public LineChart dotColor(Color color) {
-    return new LineChart(configuration.dotColor(color));
   }
 
   public LineChart dotSize(double size) {
@@ -110,9 +106,9 @@ public class LineChart {
       canvas.lineTo((i + 1) * scaleX, dots.get(i + 1));
     }
     canvas.lineWidth(configuration.lineWidth());
-    canvas.strokeStyle(configuration.lineColor());
+    canvas.strokeStyle(configuration.color());
     canvas.stroke();
-    canvas.fillStyle(configuration.dotColor());
+    canvas.fillStyle(configuration.color());
     double dotSize = configuration.dotSize();
     for (int i = 0; i < dots.size(); i++) {
       canvas.fillRect(i * scaleX - 0.5 * dotSize, dots.get(i) - 0.5 * dotSize, dotSize, dotSize);

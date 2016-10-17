@@ -8,11 +8,10 @@ public class Configuration implements Cloneable {
   private int height = 100;
   private Optional<Double> bottom = Optional.empty();
   private Optional<Double> top = Optional.empty();
+  private Color color = Color.black;
   private Color axisColor = Color.black;
   private double axisWidth = 1;
-  private Color lineColor = Color.black;
   private double lineWidth = 0.5;
-  private Color dotColor = Color.black;
   private double dotSize = 2;
 
   public Configuration width(int width) {
@@ -55,6 +54,16 @@ public class Configuration implements Cloneable {
     return top;
   }
 
+  public Configuration color(Color color) {
+    Configuration copy = copy();
+    copy.color = color;
+    return copy;
+  }
+
+  public Color color() {
+    return color;
+  }
+
   public Configuration axisColor(Color color) {
     Configuration copy = copy();
     copy.axisColor = color;
@@ -76,17 +85,6 @@ public class Configuration implements Cloneable {
     return axisWidth;
   }
 
-  public Configuration lineColor(Color color) {
-    Configuration copy = copy();
-    copy.lineColor = color;
-    return copy;
-
-  }
-
-  public Color lineColor() {
-    return lineColor;
-  }
-
   public Configuration lineWidth(double width) {
     Configuration copy = copy();
     copy.lineWidth = width;
@@ -95,17 +93,6 @@ public class Configuration implements Cloneable {
 
   public double lineWidth() {
     return lineWidth;
-  }
-
-  public Configuration dotColor(Color color) {
-    Configuration copy = copy();
-    copy.dotColor = color;
-    return copy;
-
-  }
-
-  public Color dotColor() {
-    return dotColor;
   }
 
   public Configuration dotSize(double size) {
