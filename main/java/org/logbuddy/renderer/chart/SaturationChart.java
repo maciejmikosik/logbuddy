@@ -45,18 +45,16 @@ public class SaturationChart {
     DoubleSummaryStatistics statistics = table.statistics();
     double bottom = configuration.bottom().orElse(statistics.getMin());
     double top = configuration.top().orElse(statistics.getMax());
+    double pointWidth = 1.0 * configuration.width() / table.numberOfRows();
+    double pointHeight = 1.0 * configuration.height() / table.numberOfColumns();
 
     Canvas canvas = canvas(configuration.width(), configuration.height());
     for (int y = 0; y < table.numberOfColumns(); y++) {
-      List<Number> list = table.column(y);
-      for (int x = 0; x < list.size(); x++) {
-        canvas.beginPath();
-        canvas.moveTo(configuration.width() * x / list.size(), 1.0 * configuration.height() * y / table.numberOfColumns());
-        canvas.lineTo(configuration.width() * x / list.size(), 1.0 * configuration.height() * (y + 1) / table.numberOfColumns());
-        canvas.lineWidth(1.0 * configuration.width() / list.size());
-        double saturation = phase(bottom, list.get(x).doubleValue(), top);
-        canvas.strokeStyle(saturate(saturation, configuration.color()));
-        canvas.stroke();
+      List<Number> column = table.column(y);
+      for (int x = 0; x < column.size(); x++) {
+        double saturation = phase(bottom, column.get(x).doubleValue(), top);
+        canvas.fillStyle(saturate(saturation, configuration.color()));
+        canvas.fillRect(x * pointWidth, y * pointHeight, pointWidth, pointHeight);
       }
     }
     return html(canvas.toHtml());
