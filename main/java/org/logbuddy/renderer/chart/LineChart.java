@@ -102,7 +102,7 @@ public class LineChart implements Cloneable {
     int axisY = (int) ((1 - phase) * canvas.height);
     canvas.beginPath();
     canvas.moveTo(0, axisY);
-    canvas.lineTo(1000, axisY);
+    canvas.lineTo(canvas.width, axisY);
     canvas.lineWidth(configuration.axisWidth());
     canvas.strokeStyle(configuration.axisColor());
     canvas.stroke();
