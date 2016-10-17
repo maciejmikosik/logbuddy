@@ -1,14 +1,13 @@
 package org.logbuddy.renderer.chart;
 
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.chart.Canvas.canvas;
 
 import java.awt.Color;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.logbuddy.renderer.Html;
 
@@ -59,37 +58,21 @@ public class LineChart {
     return new LineChart(configuration.dotSize(size));
   }
 
-  public Html plot(List<? extends Number> model) {
-    List<Double> doubles = model.stream()
-        .map(number -> number.doubleValue())
-        .collect(toList());
-    return plotAllDoubles(asList(doubles));
-  }
+  public Html plot(NumberTable table) {
+    DoubleSummaryStatistics statistics = table.statistics();
+    double bottom = configuration.bottom().orElse(statistics.getMin());
+    double top = configuration.top().orElse(statistics.getMax());
 
-  public Html plotAll(List<List<? extends Number>> model) {
-    List<List<Double>> doubleModel = model.stream()
-        .map(list -> list
-            .stream()
-            .map(value -> value.doubleValue())
-            .collect(toList()))
-        .collect(toList());
-    return plotAllDoubles(doubleModel);
-  }
-
-  private Html plotAllDoubles(List<List<Double>> values) {
-    double bottom = configuration.bottom().orElseGet(() -> streamDeep(values).min(Double::compare).get());
-    double top = configuration.top().orElseGet(() -> streamDeep(values).max(Double::compare).get());
-
-    int height = (int) (1.0 * configuration.height() / values.size());
-    return html(values.stream()
+    int height = (int) (1.0 * configuration.height() / table.numberOfColumns());
+    return html(table.columns().stream()
         .map(list -> plotDoubles(list, bottom, top, height))
         .map(html -> html.body)
         .collect(joining()));
   }
 
-  private Html plotDoubles(List<Double> values, double bottom, double top, int height) {
+  private Html plotDoubles(List<Number> values, double bottom, double top, int height) {
     List<Double> dots = values.stream()
-        .map(value -> (1 - phase(bottom, value, top)) * height)
+        .map(number -> (1 - phase(bottom, number.doubleValue(), top)) * height)
         .collect(toList());
 
     Canvas canvas = canvas(configuration.width(), height);
@@ -128,9 +111,5 @@ public class LineChart {
 
   private static double phase(double begin, double value, double end) {
     return (value - begin) / (end - begin);
-  }
-
-  private static <E> Stream<E> streamDeep(List<List<E>> list) {
-    return list.stream().flatMap(innerList -> innerList.stream());
   }
 }
