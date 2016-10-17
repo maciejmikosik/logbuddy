@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import org.logbuddy.renderer.Html;
 
-public class SaturationChart implements Cloneable {
+public class SaturationChart {
   private final Configuration configuration;
 
   private SaturationChart(Configuration configuration) {

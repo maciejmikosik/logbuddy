@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import org.logbuddy.renderer.Html;
 
-public class LineChart implements Cloneable {
+public class LineChart {
   private final Configuration configuration;
 
   private LineChart(Configuration configuration) {
