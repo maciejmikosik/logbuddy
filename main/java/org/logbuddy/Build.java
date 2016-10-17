@@ -14,6 +14,7 @@ import org.logbuddy.logger.TimeLogger;
 import org.logbuddy.renderer.HtmlRenderer;
 import org.logbuddy.renderer.TextRenderer;
 import org.logbuddy.renderer.chart.LineChart;
+import org.logbuddy.renderer.chart.SaturationChart;
 import org.logbuddy.renderer.gallery.Gallery;
 
 public class Build {
@@ -28,6 +29,7 @@ public class Build {
       TextRenderer.class,
       HtmlRenderer.class,
       LineChart.class,
+      SaturationChart.class,
       Gallery.class);
   public List<Class<?>> decorators = asList(
       LoggingDecorator.class);
