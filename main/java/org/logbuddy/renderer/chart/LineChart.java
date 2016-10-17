@@ -1,15 +1,17 @@
 package org.logbuddy.renderer.chart;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.chart.Canvas.canvas;
 
 import java.awt.Color;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 import org.logbuddy.renderer.Html;
 
-public class LineChart implements Cloneable {
+public class LineChart {
   private final Configuration configuration;
 
   private LineChart(Configuration configuration) {
@@ -28,12 +30,16 @@ public class LineChart implements Cloneable {
     return new LineChart(configuration.height(height));
   }
 
-  public LineChart bottom(double bottom) {
-    return new LineChart(configuration.bottom(bottom));
+  public LineChart minimum(double minimum) {
+    return new LineChart(configuration.minimum(minimum));
   }
 
-  public LineChart top(double top) {
-    return new LineChart(configuration.top(top));
+  public LineChart maximum(double maximum) {
+    return new LineChart(configuration.maximum(maximum));
+  }
+
+  public LineChart color(Color color) {
+    return new LineChart(configuration.color(color));
   }
 
   public LineChart axisColor(Color color) {
@@ -44,38 +50,33 @@ public class LineChart implements Cloneable {
     return new LineChart(configuration.axisWidth(width));
   }
 
-  public LineChart lineColor(Color color) {
-    return new LineChart(configuration.lineColor(color));
-  }
-
   public LineChart lineWidth(double width) {
     return new LineChart(configuration.lineWidth(width));
-  }
-
-  public LineChart dotColor(Color color) {
-    return new LineChart(configuration.dotColor(color));
   }
 
   public LineChart dotSize(double size) {
     return new LineChart(configuration.dotSize(size));
   }
 
-  public Html plot(List<? extends Number> values) {
-    List<Double> doubles = values.stream()
-        .map(number -> number.doubleValue())
-        .collect(toList());
-    return plotDoubles(doubles);
+  public Html plot(NumberTable table) {
+    DoubleSummaryStatistics statistics = table.statistics();
+    double minimum = configuration.minimum().orElse(statistics.getMin());
+    double maximum = configuration.maximum().orElse(statistics.getMax());
+
+    int height = (int) (1.0 * configuration.height() / table.numberOfColumns());
+    return html(table.columns().stream()
+        .map(list -> plotDoubles(list, minimum, maximum, height))
+        .map(html -> html.body)
+        .collect(joining()));
   }
 
-  private Html plotDoubles(List<Double> values) {
-    double bottom = configuration.bottom().orElseGet(() -> values.stream().min(Double::compare).get());
-    double top = configuration.top().orElseGet(() -> values.stream().max(Double::compare).get());
+  private Html plotDoubles(List<Number> values, double minimum, double maximum, int height) {
     List<Double> dots = values.stream()
-        .map(value -> (1 - phase(bottom, value, top)) * configuration.height())
+        .map(number -> (1 - phase(minimum, number.doubleValue(), maximum)) * height)
         .collect(toList());
 
-    Canvas canvas = canvas(configuration.width(), configuration.height());
-    drawAxis(canvas, bottom, top);
+    Canvas canvas = canvas(configuration.width(), height);
+    drawAxis(canvas, minimum, maximum);
     drawChart(canvas, dots);
     return html(canvas.toHtml());
   }
@@ -88,21 +89,21 @@ public class LineChart implements Cloneable {
       canvas.lineTo((i + 1) * scaleX, dots.get(i + 1));
     }
     canvas.lineWidth(configuration.lineWidth());
-    canvas.strokeStyle(configuration.lineColor());
+    canvas.strokeStyle(configuration.color());
     canvas.stroke();
-    canvas.fillStyle(configuration.dotColor());
+    canvas.fillStyle(configuration.color());
     double dotSize = configuration.dotSize();
     for (int i = 0; i < dots.size(); i++) {
       canvas.fillRect(i * scaleX - 0.5 * dotSize, dots.get(i) - 0.5 * dotSize, dotSize, dotSize);
     }
   }
 
-  private void drawAxis(Canvas canvas, double bottom, double top) {
-    double phase = phase(bottom, 0, top);
+  private void drawAxis(Canvas canvas, double minimum, double maximum) {
+    double phase = phase(minimum, 0, maximum);
     int axisY = (int) ((1 - phase) * canvas.height);
     canvas.beginPath();
     canvas.moveTo(0, axisY);
-    canvas.lineTo(1000, axisY);
+    canvas.lineTo(canvas.width, axisY);
     canvas.lineWidth(configuration.axisWidth());
     canvas.strokeStyle(configuration.axisColor());
     canvas.stroke();
