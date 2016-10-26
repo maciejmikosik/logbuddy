@@ -6,6 +6,10 @@ import static org.logbuddy.decorator.LoggingDecorator.logging;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
+import static org.logbuddy.testing.TestingAnonymous.anonymousAbstractList;
+import static org.logbuddy.testing.TestingAnonymous.anonymousArrayList;
+import static org.logbuddy.testing.TestingAnonymous.anonymousList;
+import static org.logbuddy.testing.TestingAnonymous.anonymousObject;
 import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
@@ -148,6 +152,34 @@ public class TestLoggingDecorator {
     given(decorator = logging(logger));
     when(() -> decorator.decorate(decorator.decorate(new Decorable())));
     thenReturned(instanceOf(Decorable.class));
+  }
+
+  @Test
+  public void decorates_unaccessible_anonymous_interface() {
+    given(decorator = logging(logger));
+    when(() -> decorator.decorate(anonymousList()).toString());
+    thenReturned();
+  }
+
+  @Test
+  public void decorates_unaccessible_anonymous_abstract_class() {
+    given(decorator = logging(logger));
+    when(() -> decorator.decorate(anonymousAbstractList()).toString());
+    thenReturned();
+  }
+
+  @Test
+  public void decorates_unaccessible_anonymous_concrete_class() {
+    given(decorator = logging(logger));
+    when(() -> decorator.decorate(anonymousArrayList()).toString());
+    thenReturned();
+  }
+
+  @Test
+  public void decorates_unaccessible_anonymous_object() {
+    given(decorator = logging(logger));
+    when(() -> decorator.decorate(anonymousObject()).toString());
+    thenReturned();
   }
 
   @Test
