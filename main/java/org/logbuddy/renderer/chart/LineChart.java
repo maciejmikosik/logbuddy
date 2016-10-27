@@ -1,13 +1,12 @@
 package org.logbuddy.renderer.chart;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.chart.Canvas.canvas;
+import static org.logbuddy.renderer.chart.Translation.translation;
 
 import java.awt.Color;
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Map.Entry;
 
 import org.logbuddy.renderer.Html;
 
@@ -58,58 +57,61 @@ public class LineChart {
     return new LineChart(configuration.dotSize(size));
   }
 
-  public Html plot(NumberTable table) {
-    DoubleSummaryStatistics statistics = table.statistics();
-    double minimum = configuration.minimum().orElse(statistics.getMin());
-    double maximum = configuration.maximum().orElse(statistics.getMax());
+  public Html plot(Data data) {
+    Translation translation = translation()
+        .sourceX(data.points.firstKey(), data.points.lastKey())
+        .sourceY(
+            configuration.minimum()
+                .orElseGet(() -> data.points.values().stream().min(Double::compareTo).get()),
+            configuration.maximum()
+                .orElseGet(() -> data.points.values().stream().max(Double::compareTo).get()))
+        .targetX(0, configuration.width())
+        .targetY(configuration.height(), 0);
 
-    int height = (int) (1.0 * configuration.height() / table.numberOfColumns());
-    return html(table.columns().stream()
-        .map(list -> plotDoubles(list, minimum, maximum, height))
-        .map(html -> html.body)
-        .collect(joining()));
-  }
-
-  private Html plotDoubles(List<Number> values, double minimum, double maximum, int height) {
-    List<Double> dots = values.stream()
-        .map(number -> (1 - phase(minimum, number.doubleValue(), maximum)) * height)
-        .collect(toList());
-
-    Canvas canvas = canvas(configuration.width(), height);
-    drawAxis(canvas, minimum, maximum);
-    drawChart(canvas, dots);
+    Canvas canvas = canvas(configuration.width(), configuration.height());
+    drawAxis(data, canvas, translation);
+    drawLine(data, canvas, translation);
+    drawPoints(data, canvas, translation);
     return html(canvas.toHtml());
   }
 
-  private void drawChart(Canvas canvas, List<Double> dots) {
-    double scaleX = 1.0 * canvas.width / dots.size();
+  private void drawAxis(Data data, Canvas canvas, Translation translation) {
+    Entry<Double, Double> axisBegin = translation.translate(
+        new SimpleImmutableEntry<>(data.points.firstKey(), 0.0));
+    Entry<Double, Double> axisEnd = translation.translate(
+        new SimpleImmutableEntry<>(data.points.lastKey(), 0.0));
     canvas.beginPath();
-    for (int i = 0; i < dots.size() - 1; i++) {
-      canvas.moveTo(i * scaleX, dots.get(i));
-      canvas.lineTo((i + 1) * scaleX, dots.get(i + 1));
-    }
-    canvas.lineWidth(configuration.lineWidth());
-    canvas.strokeStyle(configuration.color());
-    canvas.stroke();
-    canvas.fillStyle(configuration.color());
-    double dotSize = configuration.dotSize();
-    for (int i = 0; i < dots.size(); i++) {
-      canvas.fillRect(i * scaleX - 0.5 * dotSize, dots.get(i) - 0.5 * dotSize, dotSize, dotSize);
-    }
-  }
-
-  private void drawAxis(Canvas canvas, double minimum, double maximum) {
-    double phase = phase(minimum, 0, maximum);
-    int axisY = (int) ((1 - phase) * canvas.height);
-    canvas.beginPath();
-    canvas.moveTo(0, axisY);
-    canvas.lineTo(canvas.width, axisY);
+    canvas.moveTo(axisBegin.getKey(), axisBegin.getValue());
+    canvas.lineTo(axisEnd.getKey(), axisEnd.getValue());
     canvas.lineWidth(configuration.axisWidth());
     canvas.strokeStyle(configuration.axisColor());
     canvas.stroke();
   }
 
-  private static double phase(double begin, double value, double end) {
-    return (value - begin) / (end - begin);
+  private void drawLine(Data data, Canvas canvas, Translation translation) {
+    canvas.beginPath();
+    Entry<Double, Double> start = translation.translate(data.points.firstEntry());
+    canvas.moveTo(start.getKey(), start.getValue());
+    data.points.entrySet().stream()
+        .map(point -> translation.translate(point))
+        .skip(1)
+        .forEach(point -> canvas.lineTo(point.getKey(), point.getValue()));
+    canvas.lineWidth(configuration.lineWidth());
+    canvas.strokeStyle(configuration.color());
+    canvas.stroke();
+  }
+
+  private void drawPoints(Data data, Canvas canvas, Translation translation) {
+    canvas.fillStyle(configuration.color());
+    double dotSize = configuration.dotSize();
+    data.points.entrySet().stream()
+        .map(point -> translation.translate(point))
+        .forEach(point -> {
+          canvas.fillRect(
+              point.getKey() - 0.5 * dotSize,
+              point.getValue() - 0.5 * dotSize,
+              dotSize,
+              dotSize);
+        });
   }
 }
