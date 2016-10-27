@@ -74,6 +74,18 @@ public class Canvas {
     return this;
   }
 
+  public LinearGradient createLinearGradient(double x0, double y0, double x1, double y1) {
+    String gradientId = format("gradient_%s", idGenerator.incrementAndGet());
+    script.append(format("var %s = context.createLinearGradient(%s, %s, %s, %s);\n",
+        gradientId, x0, y0, x1, y1));
+    return new LinearGradient(gradientId);
+  }
+
+  public Canvas fillStyle(LinearGradient gradient) {
+    script.append(format("context.fillStyle = %s;\n", gradient.gradientId));
+    return this;
+  }
+
   public Canvas fillRect(double x, double y, double width, double height) {
     script.append(format("context.fillRect(%s, %s, %s, %s);\n", x, y, width, height));
     return this;
@@ -81,5 +93,18 @@ public class Canvas {
 
   private static String hex(Color color) {
     return format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+  }
+
+  public class LinearGradient {
+    private final String gradientId;
+
+    private LinearGradient(String gradientId) {
+      this.gradientId = gradientId;
+    }
+
+    public LinearGradient addColorStop(double phase, Color color) {
+      script.append(format("%s.addColorStop(%s, '%s');\n", gradientId, phase, hex(color)));
+      return this;
+    }
   }
 }

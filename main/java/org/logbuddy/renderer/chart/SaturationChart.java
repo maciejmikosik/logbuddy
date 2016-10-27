@@ -3,12 +3,12 @@ package org.logbuddy.renderer.chart;
 import static java.awt.Color.BLUE;
 import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.chart.Canvas.canvas;
+import static org.logbuddy.renderer.chart.Translation.translation;
 
 import java.awt.Color;
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
 
 import org.logbuddy.renderer.Html;
+import org.logbuddy.renderer.chart.Canvas.LinearGradient;
 
 public class SaturationChart {
   private final Configuration configuration;
@@ -41,22 +41,27 @@ public class SaturationChart {
     return new SaturationChart(configuration.color(color));
   }
 
-  public Html plot(NumberTable table) {
-    DoubleSummaryStatistics statistics = table.statistics();
-    double min = configuration.minimum().orElse(statistics.getMin());
-    double max = configuration.maximum().orElse(statistics.getMax());
-    double pointWidth = 1.0 * configuration.width() / table.numberOfRows();
-    double pointHeight = 1.0 * configuration.height() / table.numberOfColumns();
+  public Html plot(Data data) {
+    Double min = configuration.minimum()
+        .orElseGet(() -> data.points.values().stream().min(Double::compareTo).get());
+    Double max = configuration.maximum()
+        .orElseGet(() -> data.points.values().stream().max(Double::compareTo).get());
+
+    Translation translation = translation()
+        .sourceX(data.points.firstKey(), data.points.lastKey())
+        .targetX(0, 1);
 
     Canvas canvas = canvas(configuration.width(), configuration.height());
-    for (int y = 0; y < table.numberOfColumns(); y++) {
-      List<Number> column = table.column(y);
-      for (int x = 0; x < column.size(); x++) {
-        double saturation = phase(min, column.get(x).doubleValue(), max);
-        canvas.fillStyle(saturate(saturation, configuration.color()));
-        canvas.fillRect(x * pointWidth, y * pointHeight, pointWidth, pointHeight);
-      }
-    }
+    LinearGradient gradient = canvas.createLinearGradient(0, 0, canvas.width, 0);
+
+    data.points.entrySet().stream()
+        .map(point -> translation.translate(point))
+        .forEach(point -> {
+          double saturation = phase(min, point.getValue(), max);
+          gradient.addColorStop(point.getKey(), saturate(saturation, configuration.color()));
+        });
+    canvas.fillStyle(gradient);
+    canvas.fillRect(0, 0, canvas.width, canvas.height);
     return html(canvas.toHtml());
   }
 
