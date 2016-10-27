@@ -71,13 +71,42 @@ zip \
   ./*
 cd "${PROJECT}"
 
-########## INLINE DEPENDENCIES ##########
-java \
-  -jar "${RUN}/jarjar-1.4.jar" \
-  process "${RUN}/jarjar-rules.txt" \
-  "${BUILDING}/logbuddy.jar" \
-  "${BUILDING}/logbuddy.jar"
+########## GENERATE SHADING MAP ##########
 
+jar tf ${BUILDING}/logbuddy.jar \
+  | grep "\.class$" \
+  | grep -v "$org/logbuddy/" \
+  | sed 's/\.class$//g' \
+  | sed  's/\//\./g' \
+  | xargs -I{} echo {} -\> org.logbuddy.shaded.{} : \
+  > ${BUILDING}/shading_map.txt
+
+########## SHADE DEPENDENCIES ##########
+java \
+  -cp "${RUN}/proguard-base-5.3.1.jar" \
+  proguard.ProGuard \
+  -injars "${BUILDING}/logbuddy.jar" \
+  -outjars "${BUILDING}/logbuddy-shaded.jar" \
+  -dontwarn org.objenesis.** \
+  -dontnote org.objenesis.** \
+  -dontwarn net.bytebuddy.** \
+  -dontnote net.bytebuddy.** \
+  -dontwarn org.logbuddy.** \
+  -dontshrink \
+  -dontoptimize \
+  -dontpreverify \
+  -keepattributes \* \
+  -keepparameternames \
+  -keepclassmembers class \* { \
+   \*\*\* \*\; \
+   \*\*\* \*\(...\)\; \
+  } \
+  -keep class org.logbuddy.** \
+  -applymapping "${BUILDING}/shading_map.txt"
+
+mv "${BUILDING}/logbuddy-shaded.jar" "${BUILDING}/logbuddy.jar"
+
+########## BUILD SUCCESSFUL ##########
 
 echo ""
 echo "BUILD SUCCESSFUL"
