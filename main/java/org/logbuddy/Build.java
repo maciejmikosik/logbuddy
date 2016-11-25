@@ -9,10 +9,10 @@ import org.logbuddy.decorator.LoggingDecorator;
 import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
 import org.logbuddy.logger.BrowserLogger;
-import org.logbuddy.logger.ConsoleLogger;
 import org.logbuddy.logger.Fuse;
 import org.logbuddy.logger.StackTraceLogger;
 import org.logbuddy.logger.SynchronizedLogger;
+import org.logbuddy.logger.TextWritingLogger;
 import org.logbuddy.logger.ThreadLogger;
 import org.logbuddy.logger.TimeLogger;
 import org.logbuddy.renderer.HtmlRenderer;
@@ -29,7 +29,7 @@ public class Build {
       SynchronizedLogger.class,
       AsynchronousLogger.class,
       Fuse.class,
-      ConsoleLogger.class,
+      TextWritingLogger.class,
       BrowserLogger.class);
   public List<Class<?>> renderers = asList(
       TextRenderer.class,

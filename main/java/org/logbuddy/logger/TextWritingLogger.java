@@ -10,19 +10,19 @@ import org.logbuddy.Logger;
 import org.logbuddy.Renderer;
 import org.logbuddy.renderer.Text;
 
-public class ConsoleLogger implements Logger {
+public class TextWritingLogger implements Logger {
   private final Renderer<Text> renderer;
   private final Writer writer;
 
-  private ConsoleLogger(Renderer<Text> renderer, Writer writer) {
+  private TextWritingLogger(Renderer<Text> renderer, Writer writer) {
     this.renderer = renderer;
     this.writer = writer;
   }
 
-  public static Logger console(Renderer<Text> renderer, Writer writer) {
+  public static Logger writing(Renderer<Text> renderer, Writer writer) {
     check(renderer != null);
     check(writer != null);
-    return new ConsoleLogger(renderer, writer);
+    return new TextWritingLogger(renderer, writer);
   }
 
   public void log(Object model) {

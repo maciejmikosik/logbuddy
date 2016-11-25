@@ -1,6 +1,6 @@
 package org.logbuddy.logger;
 
-import static org.logbuddy.logger.ConsoleLogger.console;
+import static org.logbuddy.logger.TextWritingLogger.writing;
 import static org.logbuddy.renderer.Text.text;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
@@ -21,7 +21,7 @@ import org.logbuddy.Logger;
 import org.logbuddy.Renderer;
 import org.logbuddy.renderer.Text;
 
-public class TestConsoleLogger {
+public class TestTextWritingLogger {
   private StringWriter writer;
   private Renderer<Text> renderer;
   private Logger logger;
@@ -37,7 +37,7 @@ public class TestConsoleLogger {
 
   @Test
   public void writes_line_to_writer() {
-    given(logger = console(renderer, writer));
+    given(logger = writing(renderer, writer));
     given(willReturn(rendered), renderer).render(model);
     when(() -> logger.log(model));
     thenReturned();
@@ -46,7 +46,7 @@ public class TestConsoleLogger {
 
   @Test
   public void flushes_stream() {
-    given(logger = console(renderer, writer));
+    given(logger = writing(renderer, writer));
     given(willReturn(rendered), renderer).render(model);
     when(() -> logger.log(model));
     thenReturned();
@@ -56,14 +56,14 @@ public class TestConsoleLogger {
   @Test
   public void renderer_cannot_be_null() {
     given(renderer = null);
-    when(() -> console(renderer, writer));
+    when(() -> writing(renderer, writer));
     thenThrown(LogBuddyException.class);
   }
 
   @Test
   public void writer_cannot_be_null() {
     given(writer = null);
-    when(() -> console(renderer, writer));
+    when(() -> writing(renderer, writer));
     thenThrown(LogBuddyException.class);
   }
 }
