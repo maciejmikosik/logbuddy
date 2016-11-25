@@ -30,6 +30,7 @@ public class TestTextRenderer {
   private String string;
   private Throwable throwable;
   private ZonedDateTime time;
+  private Thread thread;
   private Object model;
 
   @Before
@@ -135,6 +136,24 @@ public class TestTextRenderer {
   }
 
   @Test
+  public void renders_empty_array() {
+    when(renderer.render(new Object[] {}));
+    thenReturned(text("[]"));
+  }
+
+  @Test
+  public void renders_array() {
+    when(renderer.render(new Object[] { a, b, c }));
+    thenReturned(text(format("[%s, %s, %s]", a, b, c)));
+  }
+
+  @Test
+  public void renders_primitive_array() {
+    when(renderer.render(new int[] { 1, 2, 3 }));
+    thenReturned(text(format("[%s, %s, %s]", 1, 2, 3)));
+  }
+
+  @Test
   public void renders_property() {
     given(renderer = new TextRenderer() {
       public Text render(Object model) {
@@ -161,5 +180,12 @@ public class TestTextRenderer {
     given(time = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneOffset.ofHours(2)));
     when(renderer.render(time));
     thenReturned(text("1970-01-01T02:00:00.000+02:00"));
+  }
+
+  @Test
+  public void renders_thread() {
+    given(thread = new Thread(string));
+    when(renderer.render(thread));
+    thenReturned(text(format("Thread(%s)", string)));
   }
 }

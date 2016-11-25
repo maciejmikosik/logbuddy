@@ -4,9 +4,13 @@ import static java.util.Arrays.asList;
 
 import java.util.List;
 
+import org.logbuddy.decorator.ComposedDecorator;
 import org.logbuddy.decorator.LoggingDecorator;
+import org.logbuddy.decorator.NoDecorator;
+import org.logbuddy.logger.AsynchronousLogger;
 import org.logbuddy.logger.BrowserLogger;
 import org.logbuddy.logger.ConsoleLogger;
+import org.logbuddy.logger.Fuse;
 import org.logbuddy.logger.StackTraceLogger;
 import org.logbuddy.logger.SynchronizedLogger;
 import org.logbuddy.logger.ThreadLogger;
@@ -23,6 +27,8 @@ public class Build {
       ThreadLogger.class,
       TimeLogger.class,
       SynchronizedLogger.class,
+      AsynchronousLogger.class,
+      Fuse.class,
       ConsoleLogger.class,
       BrowserLogger.class);
   public List<Class<?>> renderers = asList(
@@ -32,5 +38,7 @@ public class Build {
       SaturationChart.class,
       Gallery.class);
   public List<Class<?>> decorators = asList(
-      LoggingDecorator.class);
+      LoggingDecorator.class,
+      ComposedDecorator.class,
+      NoDecorator.class);
 }

@@ -9,9 +9,11 @@ import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.util.stream.Collectors.joining;
 import static org.logbuddy.renderer.Text.text;
 
+import java.lang.reflect.Array;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.logbuddy.Renderer;
@@ -40,7 +42,9 @@ public class TextRenderer implements Renderer<Text> {
   }
 
   public Text render(Object model) {
-    if (model instanceof Invocation) {
+    if (model == null) {
+      return text("null");
+    } else if (model instanceof Invocation) {
       return renderImpl((Invocation) model);
     } else if (model instanceof Returned) {
       return renderImpl((Returned) model);
@@ -52,10 +56,12 @@ public class TextRenderer implements Renderer<Text> {
       return renderImpl((Property) model);
     } else if (model instanceof ZonedDateTime) {
       return renderImpl((ZonedDateTime) model);
+    } else if (model instanceof Thread) {
+      return renderImpl((Thread) model);
     } else if (model instanceof List) {
-      return text(((List<?>) model).stream()
-          .map(element -> render(element).string)
-          .collect(joining(", ", "List[", "]")));
+      return renderImpl("List", (List<?>) model);
+    } else if (model.getClass().isArray()) {
+      return renderImpl("", arrayToList(model));
     } else {
       return text(String.valueOf(model));
     }
@@ -84,6 +90,12 @@ public class TextRenderer implements Renderer<Text> {
     return text(indentation + render(depth.model).string);
   }
 
+  private Text renderImpl(String prefix, List<?> list) {
+    return text(list.stream()
+        .map(element -> render(element).string)
+        .collect(joining(", ", prefix + "[", "]")));
+  }
+
   private Text renderImpl(Property property) {
     return text(format("%s\t%s",
         render(property.value).string,
@@ -92,5 +104,18 @@ public class TextRenderer implements Renderer<Text> {
 
   private Text renderImpl(ZonedDateTime zonedDateTime) {
     return text(dateTimeFormatter.format(zonedDateTime));
+  }
+
+  private Text renderImpl(Thread thread) {
+    return text(format("Thread(%s)", thread.getName()));
+  }
+
+  private static List<Object> arrayToList(Object array) {
+    int length = Array.getLength(array);
+    List<Object> list = new ArrayList<>(length);
+    for (int i = 0; i < length; i++) {
+      list.add(Array.get(array, i));
+    }
+    return list;
   }
 }
