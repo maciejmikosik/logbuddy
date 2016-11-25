@@ -1,4 +1,4 @@
-package org.logbuddy.logger;
+package org.logbuddy.logger.wire;
 
 import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.logger.TextWritingLogger.writing;

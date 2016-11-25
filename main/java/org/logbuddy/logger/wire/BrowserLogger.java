@@ -1,4 +1,4 @@
-package org.logbuddy.logger;
+package org.logbuddy.logger.wire;
 
 import static java.lang.ProcessBuilder.Redirect.INHERIT;
 import static org.logbuddy.LogBuddyException.check;

@@ -8,9 +8,6 @@ import org.logbuddy.decorator.ComposedDecorator;
 import org.logbuddy.decorator.LoggingDecorator;
 import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
-import org.logbuddy.logger.BrowserLogger;
-import org.logbuddy.logger.ConsoleLogger;
-import org.logbuddy.logger.FileLogger;
 import org.logbuddy.logger.Fuse;
 import org.logbuddy.logger.HtmlWritingLogger;
 import org.logbuddy.logger.StackTraceLogger;
@@ -18,6 +15,9 @@ import org.logbuddy.logger.SynchronizedLogger;
 import org.logbuddy.logger.TextWritingLogger;
 import org.logbuddy.logger.ThreadLogger;
 import org.logbuddy.logger.TimeLogger;
+import org.logbuddy.logger.wire.BrowserLogger;
+import org.logbuddy.logger.wire.ConsoleLogger;
+import org.logbuddy.logger.wire.FileLogger;
 import org.logbuddy.renderer.HtmlRenderer;
 import org.logbuddy.renderer.TextRenderer;
 import org.logbuddy.renderer.chart.LineChart;
@@ -33,8 +33,9 @@ public class Build {
       AsynchronousLogger.class,
       Fuse.class,
       TextWritingLogger.class,
+      HtmlWritingLogger.class);
+  public List<Class<?>> wiredLoggers = asList(
       ConsoleLogger.class,
-      HtmlWritingLogger.class,
       BrowserLogger.class,
       FileLogger.class);
   public List<Class<?>> renderers = asList(

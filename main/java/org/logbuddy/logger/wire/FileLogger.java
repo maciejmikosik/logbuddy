@@ -1,4 +1,4 @@
-package org.logbuddy.logger;
+package org.logbuddy.logger.wire;
 
 import static java.nio.file.Files.createFile;
 import static java.nio.file.Files.deleteIfExists;
