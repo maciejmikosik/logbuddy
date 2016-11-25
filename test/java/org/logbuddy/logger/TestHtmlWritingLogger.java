@@ -1,7 +1,7 @@
 package org.logbuddy.logger;
 
-import static org.logbuddy.logger.ConsoleLogger.console;
-import static org.logbuddy.renderer.Text.text;
+import static org.logbuddy.logger.HtmlWritingLogger.writing;
+import static org.logbuddy.renderer.Html.html;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.spy;
@@ -19,34 +19,34 @@ import org.junit.Test;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 import org.logbuddy.Renderer;
-import org.logbuddy.renderer.Text;
+import org.logbuddy.renderer.Html;
 
-public class TestConsoleLogger {
+public class TestHtmlWritingLogger {
   private StringWriter writer;
-  private Renderer<Text> renderer;
+  private Renderer<Html> renderer;
   private Logger logger;
-  private Text rendered;
+  private Html rendered;
   private Object model;
 
   @Before
   public void before() {
     givenTest(this);
     given(writer = spy(new StringWriter()));
-    given(rendered = text("rendered.string"));
+    given(rendered = html("rendered.body"));
   }
 
   @Test
   public void writes_line_to_writer() {
-    given(logger = console(renderer, writer));
+    given(logger = writing(renderer, writer));
     given(willReturn(rendered), renderer).render(model);
     when(() -> logger.log(model));
     thenReturned();
-    thenEqual(writer.toString(), rendered.string + "\n");
+    thenEqual(writer.toString(), "<code>" + rendered.body + "</code><br/>" + "\n");
   }
 
   @Test
   public void flushes_stream() {
-    given(logger = console(renderer, writer));
+    given(logger = writing(renderer, writer));
     given(willReturn(rendered), renderer).render(model);
     when(() -> logger.log(model));
     thenReturned();
@@ -56,14 +56,14 @@ public class TestConsoleLogger {
   @Test
   public void renderer_cannot_be_null() {
     given(renderer = null);
-    when(() -> console(renderer, writer));
+    when(() -> writing(renderer, writer));
     thenThrown(LogBuddyException.class);
   }
 
   @Test
   public void writer_cannot_be_null() {
     given(writer = null);
-    when(() -> console(renderer, writer));
+    when(() -> writing(renderer, writer));
     thenThrown(LogBuddyException.class);
   }
 }
