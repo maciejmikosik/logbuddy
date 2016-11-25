@@ -136,6 +136,24 @@ public class TestTextRenderer {
   }
 
   @Test
+  public void renders_empty_array() {
+    when(renderer.render(new Object[] {}));
+    thenReturned(text("[]"));
+  }
+
+  @Test
+  public void renders_array() {
+    when(renderer.render(new Object[] { a, b, c }));
+    thenReturned(text(format("[%s, %s, %s]", a, b, c)));
+  }
+
+  @Test
+  public void renders_primitive_array() {
+    when(renderer.render(new int[] { 1, 2, 3 }));
+    thenReturned(text(format("[%s, %s, %s]", 1, 2, 3)));
+  }
+
+  @Test
   public void renders_property() {
     given(renderer = new TextRenderer() {
       public Text render(Object model) {
