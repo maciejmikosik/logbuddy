@@ -10,6 +10,7 @@ import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
 import org.logbuddy.logger.BrowserLogger;
 import org.logbuddy.logger.ConsoleLogger;
+import org.logbuddy.logger.FileLogger;
 import org.logbuddy.logger.Fuse;
 import org.logbuddy.logger.HtmlWritingLogger;
 import org.logbuddy.logger.StackTraceLogger;
@@ -34,7 +35,8 @@ public class Build {
       TextWritingLogger.class,
       ConsoleLogger.class,
       HtmlWritingLogger.class,
-      BrowserLogger.class);
+      BrowserLogger.class,
+      FileLogger.class);
   public List<Class<?>> renderers = asList(
       TextRenderer.class,
       HtmlRenderer.class,
