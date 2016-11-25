@@ -7,6 +7,7 @@ import java.util.List;
 import org.logbuddy.decorator.LoggingDecorator;
 import org.logbuddy.logger.BrowserLogger;
 import org.logbuddy.logger.ConsoleLogger;
+import org.logbuddy.logger.Fuse;
 import org.logbuddy.logger.StackTraceLogger;
 import org.logbuddy.logger.SynchronizedLogger;
 import org.logbuddy.logger.ThreadLogger;
@@ -23,6 +24,7 @@ public class Build {
       ThreadLogger.class,
       TimeLogger.class,
       SynchronizedLogger.class,
+      Fuse.class,
       ConsoleLogger.class,
       BrowserLogger.class);
   public List<Class<?>> renderers = asList(

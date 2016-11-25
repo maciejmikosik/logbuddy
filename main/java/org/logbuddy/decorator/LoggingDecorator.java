@@ -2,6 +2,7 @@ package org.logbuddy.decorator;
 
 import static java.util.Arrays.asList;
 import static org.logbuddy.LogBuddyException.check;
+import static org.logbuddy.logger.Fuse.fuse;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
@@ -34,7 +35,7 @@ public class LoggingDecorator implements Decorator {
 
   public static Decorator logging(Logger logger) {
     check(logger != null);
-    return new LoggingDecorator(preventChainReaction(logger));
+    return new LoggingDecorator(fuse().install(logger));
   }
 
   public <T> T decorate(T decorable) {
@@ -79,23 +80,5 @@ public class LoggingDecorator implements Decorator {
         throw cause;
       }
     }
-  }
-
-  private static Logger preventChainReaction(Logger logger) {
-    return new Logger() {
-      private final ThreadLocal<Boolean> isEnabled = new ThreadLocal<Boolean>() {
-        protected Boolean initialValue() {
-          return true;
-        }
-      };
-
-      public void log(Object model) {
-        if (isEnabled.get()) {
-          isEnabled.set(false);
-          logger.log(model);
-          isEnabled.set(true);
-        }
-      }
-    };
   }
 }
