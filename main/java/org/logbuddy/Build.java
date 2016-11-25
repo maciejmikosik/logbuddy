@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import java.util.List;
 
 import org.logbuddy.decorator.LoggingDecorator;
+import org.logbuddy.logger.AsynchronousLogger;
 import org.logbuddy.logger.BrowserLogger;
 import org.logbuddy.logger.ConsoleLogger;
 import org.logbuddy.logger.Fuse;
@@ -24,6 +25,7 @@ public class Build {
       ThreadLogger.class,
       TimeLogger.class,
       SynchronizedLogger.class,
+      AsynchronousLogger.class,
       Fuse.class,
       ConsoleLogger.class,
       BrowserLogger.class);
