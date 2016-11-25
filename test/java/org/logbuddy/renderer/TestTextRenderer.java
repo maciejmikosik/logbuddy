@@ -30,6 +30,7 @@ public class TestTextRenderer {
   private String string;
   private Throwable throwable;
   private ZonedDateTime time;
+  private Thread thread;
   private Object model;
 
   @Before
@@ -161,5 +162,12 @@ public class TestTextRenderer {
     given(time = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneOffset.ofHours(2)));
     when(renderer.render(time));
     thenReturned(text("1970-01-01T02:00:00.000+02:00"));
+  }
+
+  @Test
+  public void renders_thread() {
+    given(thread = new Thread(string));
+    when(renderer.render(thread));
+    thenReturned(text(format("Thread(%s)", string)));
   }
 }

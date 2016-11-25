@@ -52,6 +52,8 @@ public class TextRenderer implements Renderer<Text> {
       return renderImpl((Property) model);
     } else if (model instanceof ZonedDateTime) {
       return renderImpl((ZonedDateTime) model);
+    } else if (model instanceof Thread) {
+      return renderImpl((Thread) model);
     } else if (model instanceof List) {
       return text(((List<?>) model).stream()
           .map(element -> render(element).string)
@@ -92,5 +94,9 @@ public class TextRenderer implements Renderer<Text> {
 
   private Text renderImpl(ZonedDateTime zonedDateTime) {
     return text(dateTimeFormatter.format(zonedDateTime));
+  }
+
+  private Text renderImpl(Thread thread) {
+    return text(format("Thread(%s)", thread.getName()));
   }
 }
