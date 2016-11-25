@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 
 import java.util.List;
 
+import org.logbuddy.decorator.ComposedDecorator;
 import org.logbuddy.decorator.LoggingDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
 import org.logbuddy.logger.BrowserLogger;
@@ -36,5 +37,6 @@ public class Build {
       SaturationChart.class,
       Gallery.class);
   public List<Class<?>> decorators = asList(
-      LoggingDecorator.class);
+      LoggingDecorator.class,
+      ComposedDecorator.class);
 }
