@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.logbuddy.decorator.ComposedDecorator;
 import org.logbuddy.decorator.LoggingDecorator;
+import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
 import org.logbuddy.logger.BrowserLogger;
 import org.logbuddy.logger.ConsoleLogger;
@@ -38,5 +39,6 @@ public class Build {
       Gallery.class);
   public List<Class<?>> decorators = asList(
       LoggingDecorator.class,
-      ComposedDecorator.class);
+      ComposedDecorator.class,
+      NoDecorator.class);
 }
