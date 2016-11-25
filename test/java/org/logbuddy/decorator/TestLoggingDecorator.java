@@ -25,8 +25,6 @@ import org.logbuddy.Decorator;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 import org.logbuddy.model.Invocation;
-import org.logbuddy.model.Returned;
-import org.logbuddy.model.Thrown;
 
 public class TestLoggingDecorator {
   private Decorator decorator;
@@ -112,32 +110,6 @@ public class TestLoggingDecorator {
         .decorate(new Decorable(throwable)));
     when(() -> decorated.methodThrowingField());
     thenCalled(logger).log(thrown(throwable));
-  }
-
-  @Test
-  public void ignores_recursive_invocations_caused_by_logging() {
-    class TestThrowable extends Throwable {}
-    given(throwable = new TestThrowable());
-    given(decorated = logging(logger)
-        .decorate(new Decorable(throwable)));
-    given(invocation -> {
-      decorated.method();
-      return null;
-    }, logger).log(any(Object.class));
-    when(() -> {
-      decorated.methodReturningField();
-      try {
-        decorated.methodThrowingField();
-      } catch (TestThrowable t) {}
-      decorated.methodReturningField();
-      try {
-        decorated.methodThrowingField();
-      } catch (TestThrowable t) {}
-    });
-    thenReturned();
-    thenCalledTimes(4, logger).log(any(Object.class, instanceOf(Invocation.class)));
-    thenCalledTimes(2, logger).log(any(Object.class, instanceOf(Returned.class)));
-    thenCalledTimes(2, logger).log(any(Object.class, instanceOf(Thrown.class)));
   }
 
   @Test
