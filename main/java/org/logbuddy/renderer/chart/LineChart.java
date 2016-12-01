@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 import org.logbuddy.renderer.Html;
 
-public class LineChart {
+public class LineChart implements Chart {
   private final Configuration configuration;
 
   private LineChart(Configuration configuration) {
@@ -72,7 +72,7 @@ public class LineChart {
     drawAxis(data, canvas, translation);
     drawLine(data, canvas, translation);
     drawPoints(data, canvas, translation);
-    return html(canvas.toHtml());
+    return html(canvas.toHtml().replace("\n", " "));
   }
 
   private void drawAxis(Data data, Canvas canvas, Translation translation) {

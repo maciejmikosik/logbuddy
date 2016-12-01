@@ -10,7 +10,7 @@ import java.awt.Color;
 import org.logbuddy.renderer.Html;
 import org.logbuddy.renderer.chart.Canvas.LinearGradient;
 
-public class SaturationChart {
+public class SaturationChart implements Chart {
   private final Configuration configuration;
 
   private SaturationChart(Configuration configuration) {
@@ -62,7 +62,7 @@ public class SaturationChart {
         });
     canvas.fillStyle(gradient);
     canvas.fillRect(0, 0, canvas.width, canvas.height);
-    return html(canvas.toHtml());
+    return html(canvas.toHtml().replace("\n", " "));
   }
 
   private static double phase(double begin, double value, double end) {
