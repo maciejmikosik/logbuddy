@@ -10,51 +10,51 @@ import java.awt.Color;
 import org.logbuddy.renderer.Html;
 import org.logbuddy.renderer.chart.Canvas.LinearGradient;
 
-public class SaturationChart implements Chart {
+public class SaturationChartRenderer implements ChartRenderer {
   private final Configuration configuration;
 
-  private SaturationChart(Configuration configuration) {
+  private SaturationChartRenderer(Configuration configuration) {
     this.configuration = configuration;
   }
 
-  public static SaturationChart saturationChart() {
-    return new SaturationChart(new Configuration().color(BLUE));
+  public static SaturationChartRenderer saturationChartRenderer() {
+    return new SaturationChartRenderer(new Configuration().color(BLUE));
   }
 
-  public SaturationChart width(int width) {
-    return new SaturationChart(configuration.width(width));
+  public SaturationChartRenderer width(int width) {
+    return new SaturationChartRenderer(configuration.width(width));
   }
 
-  public SaturationChart height(int height) {
-    return new SaturationChart(configuration.height(height));
+  public SaturationChartRenderer height(int height) {
+    return new SaturationChartRenderer(configuration.height(height));
   }
 
-  public SaturationChart minimum(double minimum) {
-    return new SaturationChart(configuration.minimum(minimum));
+  public SaturationChartRenderer minimum(double minimum) {
+    return new SaturationChartRenderer(configuration.minimum(minimum));
   }
 
-  public SaturationChart maximum(double maximum) {
-    return new SaturationChart(configuration.maximum(maximum));
+  public SaturationChartRenderer maximum(double maximum) {
+    return new SaturationChartRenderer(configuration.maximum(maximum));
   }
 
-  public SaturationChart color(Color color) {
-    return new SaturationChart(configuration.color(color));
+  public SaturationChartRenderer color(Color color) {
+    return new SaturationChartRenderer(configuration.color(color));
   }
 
-  public Html plot(Data data) {
+  public Html render(ChartModel model) {
     Double min = configuration.minimum()
-        .orElseGet(() -> data.points.values().stream().min(Double::compareTo).get());
+        .orElseGet(() -> model.points.values().stream().min(Double::compareTo).get());
     Double max = configuration.maximum()
-        .orElseGet(() -> data.points.values().stream().max(Double::compareTo).get());
+        .orElseGet(() -> model.points.values().stream().max(Double::compareTo).get());
 
     Translation translation = translation()
-        .sourceX(data.points.firstKey(), data.points.lastKey())
+        .sourceX(model.points.firstKey(), model.points.lastKey())
         .targetX(0, 1);
 
     Canvas canvas = canvas(configuration.width(), configuration.height());
     LinearGradient gradient = canvas.createLinearGradient(0, 0, canvas.width, 0);
 
-    data.points.entrySet().stream()
+    model.points.entrySet().stream()
         .map(point -> translation.translate(point))
         .forEach(point -> {
           double saturation = phase(min, point.getValue(), max);
