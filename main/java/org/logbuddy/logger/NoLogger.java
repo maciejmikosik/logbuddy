@@ -10,4 +10,8 @@ public class NoLogger implements Logger {
   }
 
   public void log(Object model) {}
+
+  public String toString() {
+    return "noLogger()";
+  }
 }

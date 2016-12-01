@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.model.Property.property;
 
@@ -19,5 +20,9 @@ public class ThreadLogger implements Logger {
 
   public void log(Object model) {
     logger.log(property(Thread.currentThread(), model));
+  }
+
+  public String toString() {
+    return format("thread(%s)", logger);
   }
 }

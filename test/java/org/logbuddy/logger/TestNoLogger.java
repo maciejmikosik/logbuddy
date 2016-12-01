@@ -25,4 +25,11 @@ public class TestNoLogger {
     when(() -> logger.log(model));
     thenReturned();
   }
+
+  @Test
+  public void implements_to_string() {
+    given(logger = noLogger());
+    when(logger.toString());
+    thenReturned("noLogger()");
+  }
 }

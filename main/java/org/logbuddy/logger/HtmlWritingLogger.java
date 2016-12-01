@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.LogBuddyException.check;
 
 import java.io.IOException;
@@ -35,5 +36,9 @@ public class HtmlWritingLogger implements Logger {
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+  }
+
+  public String toString() {
+    return format("writing(%s, %s)", renderer, writer);
   }
 }

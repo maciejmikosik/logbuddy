@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.LogBuddyException.check;
 
 import org.logbuddy.Logger;
@@ -18,5 +19,9 @@ public class SynchronizedLogger implements Logger {
 
   public synchronized void log(Object model) {
     logger.log(model);
+  }
+
+  public String toString() {
+    return format("synchronize(%s)", logger);
   }
 }

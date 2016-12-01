@@ -1,10 +1,12 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.logger.ThreadLogger.thread;
 import static org.logbuddy.model.Property.property;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalled;
+import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 
@@ -27,6 +29,13 @@ public class TestThreadLogger {
     given(threadLogger = thread(logger));
     when(() -> threadLogger.log(model));
     thenCalled(logger).log(property(Thread.currentThread(), model));
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(threadLogger = thread(logger));
+    when(threadLogger.toString());
+    thenReturned(format("thread(%s)", logger));
   }
 
   @Test

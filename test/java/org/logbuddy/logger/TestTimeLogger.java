@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.logger.TimeLogger.time;
 import static org.logbuddy.model.Property.property;
 import static org.testory.Testory.given;
@@ -51,6 +52,13 @@ public class TestTimeLogger {
     when(() -> timeLogger.log(model));
     thenReturned();
     thenCalled(logger).log(property(ZonedDateTime.ofInstant(instant, zone), model));
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(timeLogger = time(clock, logger));
+    when(timeLogger.toString());
+    thenReturned(format("time(%s, %s)", clock, logger));
   }
 
   @Test

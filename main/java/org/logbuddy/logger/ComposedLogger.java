@@ -1,6 +1,7 @@
 package org.logbuddy.logger;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
 import static org.logbuddy.LogBuddyException.check;
 
 import java.util.ArrayList;
@@ -30,5 +31,11 @@ public class ComposedLogger implements Logger {
     for (Logger logger : loggers) {
       logger.log(model);
     }
+  }
+
+  public String toString() {
+    return loggers.stream()
+        .map(Logger::toString)
+        .collect(joining(", ", "compose(", ")"));
   }
 }

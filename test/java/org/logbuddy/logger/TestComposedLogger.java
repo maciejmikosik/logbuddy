@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.logger.ComposedLogger.compose;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
@@ -31,6 +32,13 @@ public class TestComposedLogger {
     thenCalled(loggerA).log(model);
     thenCalled(loggerB).log(model);
     thenCalled(loggerC).log(model);
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(composed = compose(loggerA, loggerB, loggerC));
+    when(composed.toString());
+    thenReturned(format("compose(%s, %s, %s)", loggerA, loggerB, loggerC));
   }
 
   @Test

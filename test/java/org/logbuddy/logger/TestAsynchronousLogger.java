@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
@@ -67,6 +68,13 @@ public class TestAsynchronousLogger {
     thenReturned();
     sleep();
     then(thread, not(sameInstance(Thread.currentThread())));
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(asynchronous = asynchronous(logger));
+    when(asynchronous.toString());
+    thenReturned(format("asynchronous(%s)", logger));
   }
 
   @Test

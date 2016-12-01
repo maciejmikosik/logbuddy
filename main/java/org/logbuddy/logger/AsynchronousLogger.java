@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.logbuddy.LogBuddyException.check;
 
@@ -27,6 +28,10 @@ public class AsynchronousLogger implements Logger {
 
   public void log(Object model) {
     executor.submit(() -> logger.log(model));
+  }
+
+  public String toString() {
+    return format("asynchronous(%s)", logger);
   }
 
   private static ExecutorService newExecutor() {
