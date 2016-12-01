@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.model.Property.property;
 
@@ -27,4 +28,7 @@ public class TimeLogger implements Logger {
     logger.log(property(ZonedDateTime.now(clock), model));
   }
 
+  public String toString() {
+    return format("time(%s, %s)", clock, logger);
+  }
 }

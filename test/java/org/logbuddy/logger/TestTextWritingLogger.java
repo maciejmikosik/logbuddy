@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.logger.TextWritingLogger.writing;
 import static org.logbuddy.renderer.Text.text;
 import static org.testory.Testory.given;
@@ -51,6 +52,13 @@ public class TestTextWritingLogger {
     when(() -> logger.log(model));
     thenReturned();
     thenCalled(writer).flush();
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(logger = writing(renderer, writer));
+    when(logger.toString());
+    thenReturned(format("writing(%s, %s)", renderer, writer));
   }
 
   @Test

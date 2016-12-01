@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.model.Depth.depth;
 
 import org.logbuddy.Logger;
@@ -31,5 +32,9 @@ public class StackTraceLogger implements Logger {
     if (model instanceof Invocation) {
       numberOfInvocations.set(numberOfInvocations.get() + 1);
     }
+  }
+
+  public String toString() {
+    return format("stackTrace(%s)", logger);
   }
 }

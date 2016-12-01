@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static org.logbuddy.logger.SynchronizedLogger.synchronize;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
@@ -35,5 +36,12 @@ public class TestSynchronizedLogger {
     given(logger = null);
     when(() -> synchronize(logger));
     thenThrown(LogBuddyException.class);
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(synchronizedLogger = synchronize(logger));
+    when(synchronizedLogger.toString());
+    thenReturned(format("synchronize(%s)", logger));
   }
 }

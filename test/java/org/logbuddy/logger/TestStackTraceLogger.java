@@ -1,5 +1,6 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
 import static java.util.Collections.synchronizedList;
 import static org.logbuddy.logger.StackTraceLogger.stackTrace;
 import static org.logbuddy.model.Depth.depth;
@@ -8,6 +9,7 @@ import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.thenEqual;
+import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
 
 import java.util.ArrayList;
@@ -101,5 +103,12 @@ public class TestStackTraceLogger {
     }).start();
     when(() -> stackTraceLogger.log(invocation));
     thenEqual(models.get(0), depth(0, invocation));
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(stackTraceLogger = stackTrace(logger));
+    when(stackTraceLogger.toString());
+    thenReturned(format("stackTrace(%s)", logger));
   }
 }

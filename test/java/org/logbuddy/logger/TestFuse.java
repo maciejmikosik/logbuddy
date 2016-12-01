@@ -1,5 +1,8 @@
 package org.logbuddy.logger;
 
+import static java.lang.String.format;
+import static java.lang.System.identityHashCode;
+import static org.hamcrest.Matchers.not;
 import static org.logbuddy.logger.Fuse.fuse;
 import static org.testory.Testory.any;
 import static org.testory.Testory.given;
@@ -59,6 +62,27 @@ public class TestFuse {
     given(fused = fuse.install(otherFuse.install(logger)));
     when(() -> fused.log(model));
     thenCalled(logger).log(model);
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(fuse = fuse());
+    when(fuse.toString());
+    thenReturned(format("fuse(%s)", format("%08x", identityHashCode(fuse))));
+  }
+
+  @Test
+  public void different_fuses_have_different_id() {
+    given(fuse = fuse());
+    when(fuse.toString());
+    thenReturned(not(fuse().toString()));
+  }
+
+  @Test
+  public void installation_implements_to_string() {
+    given(fused = fuse.install(logger));
+    when(fused.toString());
+    thenReturned(format("%s.install(%s)", fuse, logger));
   }
 
   @Test
