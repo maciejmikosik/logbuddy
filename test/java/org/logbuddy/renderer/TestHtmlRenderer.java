@@ -48,6 +48,14 @@ public class TestHtmlRenderer {
   }
 
   @Test
+  public void delegates_rendering_null() {
+    given(htmlRenderer = new HtmlRenderer(textRenderer));
+    given(willReturn(text(string)), textRenderer).render(null);
+    when(htmlRenderer.render(null));
+    thenReturned(html(string));
+  }
+
+  @Test
   public void escapes_html_characters() {
     given(htmlRenderer = new HtmlRenderer(textRenderer));
     given(willReturn(text("&_<_>_ _\t")), textRenderer).render(object);
@@ -118,7 +126,7 @@ public class TestHtmlRenderer {
   public void renders_thrown() {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
     when(htmlRenderer.render(thrown(throwable)));
-    thenReturned(html(format("thrown %s", throwable.toString())));
+    thenReturned(html(format("thrown %s", htmlRenderer.render(throwable).body)));
   }
 
   @Test
@@ -140,6 +148,13 @@ public class TestHtmlRenderer {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
     when(htmlRenderer.render(asList(a, b, c)));
     thenReturned(html(format("List[%s,&nbsp;%s,&nbsp;%s]", a, b, c)));
+  }
+
+  @Test
+  public void renders_array() {
+    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    when(htmlRenderer.render(new Object[] { a, b, c }));
+    thenReturned(html(format("[%s,&nbsp;%s,&nbsp;%s]", a, b, c)));
   }
 
   @Test

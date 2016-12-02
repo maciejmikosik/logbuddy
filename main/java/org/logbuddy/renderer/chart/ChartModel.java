@@ -10,35 +10,35 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
 
-public class Data {
+public class ChartModel {
   public final NavigableMap<Double, Double> points;
 
-  private Data(NavigableMap<Double, Double> points) {
+  private ChartModel(NavigableMap<Double, Double> points) {
     this.points = points;
   }
 
-  public static Data data(List<? extends Number> values) {
+  public static ChartModel chartModel(List<? extends Number> values) {
     NavigableMap<Double, Double> points = new TreeMap<>();
     for (int i = 0; i < values.size(); i++) {
       points.put((double) i, values.get(i).doubleValue());
     }
-    return new Data(unmodifiableNavigableMap(points));
+    return new ChartModel(unmodifiableNavigableMap(points));
   }
 
-  public static Data data(Map<? extends Number, ? extends Number> points) {
+  public static ChartModel chartModel(Map<? extends Number, ? extends Number> points) {
     NavigableMap<Double, Double> pointsCopy = new TreeMap<>();
     points.entrySet().stream()
         .forEach(entry -> pointsCopy.put(
             entry.getKey().doubleValue(),
             entry.getValue().doubleValue()));
-    return new Data(unmodifiableNavigableMap(pointsCopy));
+    return new ChartModel(unmodifiableNavigableMap(pointsCopy));
   }
 
   public boolean equals(Object object) {
-    return object instanceof Data && equals((Data) object);
+    return object instanceof ChartModel && equals((ChartModel) object);
   }
 
-  private boolean equals(Data object) {
+  private boolean equals(ChartModel object) {
     return Objects.equals(points, object.points);
   }
 
@@ -47,6 +47,6 @@ public class Data {
   }
 
   public String toString() {
-    return format("data(%s)", points);
+    return format("chartModel(%s)", points);
   }
 }

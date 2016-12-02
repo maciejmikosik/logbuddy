@@ -20,8 +20,8 @@ import org.logbuddy.logger.wire.ConsoleLogger;
 import org.logbuddy.logger.wire.FileLogger;
 import org.logbuddy.renderer.HtmlRenderer;
 import org.logbuddy.renderer.TextRenderer;
-import org.logbuddy.renderer.chart.LineChart;
-import org.logbuddy.renderer.chart.SaturationChart;
+import org.logbuddy.renderer.chart.LineChartRenderer;
+import org.logbuddy.renderer.chart.SaturationChartRenderer;
 import org.logbuddy.renderer.gallery.Gallery;
 
 public class Build {
@@ -41,8 +41,8 @@ public class Build {
   public List<Class<?>> renderers = asList(
       TextRenderer.class,
       HtmlRenderer.class,
-      LineChart.class,
-      SaturationChart.class,
+      LineChartRenderer.class,
+      SaturationChartRenderer.class,
       Gallery.class);
   public List<Class<?>> decorators = asList(
       LoggingDecorator.class,
