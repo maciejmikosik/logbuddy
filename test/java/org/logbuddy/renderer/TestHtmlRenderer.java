@@ -48,6 +48,14 @@ public class TestHtmlRenderer {
   }
 
   @Test
+  public void delegates_rendering_null() {
+    given(htmlRenderer = new HtmlRenderer(textRenderer));
+    given(willReturn(text(string)), textRenderer).render(null);
+    when(htmlRenderer.render(null));
+    thenReturned(html(string));
+  }
+
+  @Test
   public void escapes_html_characters() {
     given(htmlRenderer = new HtmlRenderer(textRenderer));
     given(willReturn(text("&_<_>_ _\t")), textRenderer).render(object);
