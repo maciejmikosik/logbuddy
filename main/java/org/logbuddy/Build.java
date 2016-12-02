@@ -8,8 +8,10 @@ import org.logbuddy.decorator.ComposedDecorator;
 import org.logbuddy.decorator.LoggingDecorator;
 import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
+import org.logbuddy.logger.ComposedLogger;
 import org.logbuddy.logger.Fuse;
 import org.logbuddy.logger.HtmlWritingLogger;
+import org.logbuddy.logger.NoLogger;
 import org.logbuddy.logger.StackTraceLogger;
 import org.logbuddy.logger.SynchronizedLogger;
 import org.logbuddy.logger.TextWritingLogger;
@@ -32,6 +34,8 @@ public class Build {
       SynchronizedLogger.class,
       AsynchronousLogger.class,
       Fuse.class,
+      ComposedLogger.class,
+      NoLogger.class,
       TextWritingLogger.class,
       HtmlWritingLogger.class);
   public List<Class<?>> wiredLoggers = asList(
