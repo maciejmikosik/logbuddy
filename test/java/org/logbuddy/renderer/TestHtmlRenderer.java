@@ -151,6 +151,13 @@ public class TestHtmlRenderer {
   }
 
   @Test
+  public void renders_array() {
+    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    when(htmlRenderer.render(new Object[] { a, b, c }));
+    thenReturned(html(format("[%s,&nbsp;%s,&nbsp;%s]", a, b, c)));
+  }
+
+  @Test
   public void renders_property() {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())) {
       public Html render(Object model) {

@@ -7,6 +7,8 @@ import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.gallery.Gallery.gallery;
 
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.logbuddy.Renderer;
@@ -36,9 +38,9 @@ public class HtmlRenderer implements Renderer<Html> {
     } else if (model instanceof Property) {
       return renderImpl((Property) model);
     } else if (model instanceof List) {
-      return html(((List<?>) model).stream()
-          .map(element -> render(element).body)
-          .collect(joining(escape(", "), escape("List["), escape("]"))));
+      return renderImpl("List", (List<?>) model);
+    } else if (model != null && model.getClass().isArray()) {
+      return renderImpl("", arrayToList(model));
     } else if (model instanceof BufferedImage) {
       return gallery()
           .height(100)
@@ -71,6 +73,12 @@ public class HtmlRenderer implements Renderer<Html> {
     return html(indentation + render(depth.model).body);
   }
 
+  private Html renderImpl(String prefix, List<?> list) {
+    return html(list.stream()
+        .map(element -> render(element).body)
+        .collect(joining(escape(", "), escape(prefix + "["), escape("]"))));
+  }
+
   private Html renderImpl(Property property) {
     return html(format("%s&nbsp;&nbsp;%s",
         render(property.value).body,
@@ -88,5 +96,14 @@ public class HtmlRenderer implements Renderer<Html> {
         .replace(">", "&gt;")
         .replace(" ", "&nbsp;")
         .replace("\t", "&nbsp;&nbsp;");
+  }
+
+  private static List<Object> arrayToList(Object array) {
+    int length = Array.getLength(array);
+    List<Object> list = new ArrayList<>(length);
+    for (int i = 0; i < length; i++) {
+      list.add(Array.get(array, i));
+    }
+    return list;
   }
 }
