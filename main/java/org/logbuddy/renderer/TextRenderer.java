@@ -7,15 +7,14 @@ import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 import static java.time.temporal.ChronoField.NANO_OF_SECOND;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.util.stream.Collectors.joining;
+import static org.logbuddy.common.Collections.arrayToList;
 import static org.logbuddy.common.Strings.times;
 import static org.logbuddy.common.Throwables.stackTrace;
 import static org.logbuddy.renderer.Text.text;
 
-import java.lang.reflect.Array;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.logbuddy.Renderer;
@@ -110,14 +109,5 @@ public class TextRenderer implements Renderer<Text> {
 
   private Text renderImpl(Thread thread) {
     return text(format("Thread(%s)", thread.getName()));
-  }
-
-  private static List<Object> arrayToList(Object array) {
-    int length = Array.getLength(array);
-    List<Object> list = new ArrayList<>(length);
-    for (int i = 0; i < length; i++) {
-      list.add(Array.get(array, i));
-    }
-    return list;
   }
 }
