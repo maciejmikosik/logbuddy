@@ -1,9 +1,10 @@
 package org.logbuddy.renderer;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static org.logbuddy.LogBuddyException.check;
+import static org.logbuddy.common.Strings.lines;
+import static org.logbuddy.common.Strings.times;
 import static org.logbuddy.common.Throwables.stackTrace;
 import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.gallery.Gallery.gallery;
@@ -86,7 +87,7 @@ public class HtmlRenderer implements Renderer<Html> {
   }
 
   private Html renderImpl(Depth depth) {
-    String indentation = new String(new char[depth.value]).replace("\0", "&nbsp;&nbsp;");
+    String indentation = times(2 * depth.value, "&nbsp;");
     return html(indentation + render(depth.model).body);
   }
 
@@ -122,9 +123,5 @@ public class HtmlRenderer implements Renderer<Html> {
       list.add(Array.get(array, i));
     }
     return list;
-  }
-
-  private static List<String> lines(String string) {
-    return asList(string.split("\n"));
   }
 }

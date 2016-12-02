@@ -7,6 +7,7 @@ import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 import static java.time.temporal.ChronoField.NANO_OF_SECOND;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.util.stream.Collectors.joining;
+import static org.logbuddy.common.Strings.times;
 import static org.logbuddy.common.Throwables.stackTrace;
 import static org.logbuddy.renderer.Text.text;
 
@@ -87,7 +88,7 @@ public class TextRenderer implements Renderer<Text> {
   }
 
   private Text renderImpl(Depth depth) {
-    String indentation = new String(new char[depth.value]).replace('\0', '\t');
+    String indentation = times(depth.value, "\t");
     return text(indentation + render(depth.model).string);
   }
 
