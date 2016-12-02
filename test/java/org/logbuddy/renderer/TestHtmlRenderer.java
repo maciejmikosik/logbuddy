@@ -126,7 +126,7 @@ public class TestHtmlRenderer {
   public void renders_thrown() {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
     when(htmlRenderer.render(thrown(throwable)));
-    thenReturned(html(format("thrown %s", throwable.toString())));
+    thenReturned(html(format("thrown %s", htmlRenderer.render(throwable).body)));
   }
 
   @Test

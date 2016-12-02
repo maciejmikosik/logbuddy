@@ -13,6 +13,8 @@ import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -32,6 +34,7 @@ public class TestTextRenderer {
   private ZonedDateTime time;
   private Thread thread;
   private Object model;
+  private StringWriter buffer;
 
   @Before
   public void before() {
@@ -39,6 +42,7 @@ public class TestTextRenderer {
     givenTest(this);
     given(renderer = new TextRenderer());
     given(throwable = new Throwable());
+    given(buffer = new StringWriter());
   }
 
   @Test
@@ -114,7 +118,8 @@ public class TestTextRenderer {
   public void renders_thrown() {
     given(renderer = new TextRenderer());
     when(renderer.render(thrown(throwable)));
-    thenReturned(text(format("thrown %s", throwable.toString())));
+    throwable.printStackTrace(new PrintWriter(buffer));
+    thenReturned(text(format("thrown %s", buffer.toString())));
   }
 
   @Test

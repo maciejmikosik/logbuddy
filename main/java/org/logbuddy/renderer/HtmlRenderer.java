@@ -1,8 +1,10 @@
 package org.logbuddy.renderer;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static org.logbuddy.LogBuddyException.check;
+import static org.logbuddy.common.Throwables.stackTrace;
 import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.gallery.Gallery.gallery;
 
@@ -33,6 +35,8 @@ public class HtmlRenderer implements Renderer<Html> {
       return renderImpl((Returned) model);
     } else if (model instanceof Thrown) {
       return renderImpl((Thrown) model);
+    } else if (model instanceof Throwable) {
+      return renderImpl((Throwable) model);
     } else if (model instanceof Depth) {
       return renderImpl((Depth) model);
     } else if (model instanceof Property) {
@@ -66,6 +70,19 @@ public class HtmlRenderer implements Renderer<Html> {
 
   private Html renderImpl(Thrown thrown) {
     return html(format("thrown %s", render(thrown.throwable).body));
+  }
+
+  private Html renderImpl(Throwable throwable) {
+    String stackTrace = lines(stackTrace(throwable)).stream()
+        .map(HtmlRenderer::escape)
+        .map(line -> format("<code>%s</code><br/>", line))
+        .collect(joining());
+    String openStackTraceInNewTab = format(""
+        + "var w = window.open(); "
+        + "w.document.write('%s'); "
+        + "w.document.close();",
+        stackTrace);
+    return html(format("<a href=\"#\" onclick=\"%s\">%s</a>", openStackTraceInNewTab, throwable));
   }
 
   private Html renderImpl(Depth depth) {
@@ -105,5 +122,9 @@ public class HtmlRenderer implements Renderer<Html> {
       list.add(Array.get(array, i));
     }
     return list;
+  }
+
+  private static List<String> lines(String string) {
+    return asList(string.split("\n"));
   }
 }
