@@ -21,8 +21,11 @@ public class Fuse {
       public void log(Object model) {
         if (isEnabled.get()) {
           isEnabled.set(false);
-          logger.log(model);
-          isEnabled.set(true);
+          try {
+            logger.log(model);
+          } finally {
+            isEnabled.set(true);
+          }
         }
       }
 
