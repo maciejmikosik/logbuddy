@@ -8,6 +8,7 @@ import org.logbuddy.decorator.ComposedDecorator;
 import org.logbuddy.decorator.LoggingDecorator;
 import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
+import org.logbuddy.logger.CatchingLogger;
 import org.logbuddy.logger.ComposedLogger;
 import org.logbuddy.logger.Fuse;
 import org.logbuddy.logger.HtmlWritingLogger;
@@ -34,6 +35,7 @@ public class Build {
       SynchronizedLogger.class,
       AsynchronousLogger.class,
       Fuse.class,
+      CatchingLogger.class,
       ComposedLogger.class,
       NoLogger.class,
       TextWritingLogger.class,
