@@ -39,6 +39,7 @@ public class TestFuse {
   public void delegates_logging() {
     given(fused = fuse.install(logger));
     when(() -> fused.log(model));
+    thenReturned();
     thenCalled(logger).log(model);
   }
 

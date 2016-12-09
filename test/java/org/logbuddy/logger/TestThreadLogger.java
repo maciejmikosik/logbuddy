@@ -28,6 +28,7 @@ public class TestThreadLogger {
   public void logs_current_thread() {
     given(threadLogger = thread(logger));
     when(() -> threadLogger.log(model));
+    thenReturned();
     thenCalled(logger).log(property(Thread.currentThread(), model));
   }
 

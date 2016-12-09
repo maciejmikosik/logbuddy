@@ -38,6 +38,7 @@ public class TestStackTraceLogger {
   public void initial_depth_is_zero() {
     given(stackTraceLogger = stackTrace(logger));
     when(() -> stackTraceLogger.log(model));
+    thenReturned();
     thenCalled(logger).log(depth(0, model));
   }
 
