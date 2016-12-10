@@ -2,6 +2,7 @@ package org.logbuddy.common;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Collections {
@@ -12,5 +13,12 @@ public class Collections {
       list.add(Array.get(array, i));
     }
     return list;
+  }
+
+  public static <E> E removeAny(Iterable<E> iterable) {
+    Iterator<E> iterator = iterable.iterator();
+    E element = iterator.next();
+    iterator.remove();
+    return element;
   }
 }
