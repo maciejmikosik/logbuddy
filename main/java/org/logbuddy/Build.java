@@ -5,9 +5,12 @@ import static java.util.Arrays.asList;
 import java.util.List;
 
 import org.logbuddy.decorator.ComposedDecorator;
+import org.logbuddy.decorator.InjectingLoggerDecorator;
 import org.logbuddy.decorator.LoggingDecorator;
 import org.logbuddy.decorator.NoDecorator;
+import org.logbuddy.decorator.TraversingDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
+import org.logbuddy.logger.CatchingLogger;
 import org.logbuddy.logger.ComposedLogger;
 import org.logbuddy.logger.Fuse;
 import org.logbuddy.logger.HtmlWritingLogger;
@@ -34,6 +37,7 @@ public class Build {
       SynchronizedLogger.class,
       AsynchronousLogger.class,
       Fuse.class,
+      CatchingLogger.class,
       ComposedLogger.class,
       NoLogger.class,
       TextWritingLogger.class,
@@ -51,5 +55,7 @@ public class Build {
   public List<Class<?>> decorators = asList(
       LoggingDecorator.class,
       ComposedDecorator.class,
-      NoDecorator.class);
+      NoDecorator.class,
+      InjectingLoggerDecorator.class,
+      TraversingDecorator.class);
 }

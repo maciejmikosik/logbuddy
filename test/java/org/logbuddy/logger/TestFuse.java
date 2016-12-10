@@ -7,12 +7,14 @@ import static org.logbuddy.logger.Fuse.fuse;
 import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
+import static org.testory.Testory.givenTry;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledNever;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
+import static org.testory.Testory.willThrow;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,18 +25,21 @@ public class TestFuse {
   private Fuse fuse, otherFuse;
   private Logger logger, fused;
   private Object model;
+  private Throwable throwable;
 
   @Before
   public void before() {
     givenTest(this);
     given(fuse = fuse());
     given(otherFuse = fuse());
+    given(throwable = new RuntimeException());
   }
 
   @Test
   public void delegates_logging() {
     given(fused = fuse.install(logger));
     when(() -> fused.log(model));
+    thenReturned();
     thenCalled(logger).log(model);
   }
 
@@ -62,6 +67,16 @@ public class TestFuse {
     given(fused = fuse.install(otherFuse.install(logger)));
     when(() -> fused.log(model));
     thenCalled(logger).log(model);
+  }
+
+  @Test
+  public void recovers_from_exception() {
+    given(fused = fuse.install(logger));
+    given(willThrow(throwable), logger).log(any(Object.class));
+    givenTry(fused).log(model);
+    when(() -> fused.log(model));
+    thenThrown(throwable);
+    thenCalledTimes(2, logger).log(model);
   }
 
   @Test
