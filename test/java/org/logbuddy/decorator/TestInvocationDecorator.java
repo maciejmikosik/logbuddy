@@ -14,9 +14,7 @@ import static org.logbuddy.testing.TestingAnonymous.anonymousObject;
 import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
-import static org.testory.Testory.onInstance;
 import static org.testory.Testory.thenCalled;
-import static org.testory.Testory.thenCalledNever;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
@@ -157,20 +155,32 @@ public class TestInvocationDecorator {
     thenReturned();
   }
 
+  /**
+   * TODO test access from other package
+   */
   @Test
-  public void ignores_package_private_method() {
+  public void decorates_package_private_method() throws NoSuchMethodException {
     given(decorated = invocationDecorator(logger)
-        .decorate(new Decorable()));
+        .decorate(decorable));
     when(() -> decorated.packagePrivateMethod());
-    thenCalledNever(onInstance(logger));
+    thenCalled(logger).log(invocation(
+        decorable,
+        Decorable.class.getDeclaredMethod("packagePrivateMethod"),
+        asList()));
   }
 
+  /**
+   * TODO test access from other package
+   */
   @Test
-  public void ignores_protected_method() {
+  public void decorates_protected_method() throws NoSuchMethodException {
     given(decorated = invocationDecorator(logger)
-        .decorate(new Decorable()));
+        .decorate(decorable));
     when(() -> decorated.protectedMethod());
-    thenCalledNever(onInstance(logger));
+    thenCalled(logger).log(invocation(
+        decorable,
+        Decorable.class.getDeclaredMethod("protectedMethod"),
+        asList()));
   }
 
   @Test

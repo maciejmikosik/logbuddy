@@ -3,6 +3,7 @@ package org.logbuddy.decorator;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.LogBuddyException.check;
+import static org.logbuddy.common.Classes.makeAccessible;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
@@ -42,7 +43,7 @@ public class InvocationDecorator implements Decorator {
     check(decorable != null);
     Class<?> decorableType = byteBuddy
         .subclass(peel(decorable.getClass()))
-        .method(ElementMatchers.isPublic())
+        .method(ElementMatchers.any())
         .intercept(MethodDelegation.to(new DecorateHandler(decorable)))
         .make()
         .load(Thread.currentThread().getContextClassLoader(), ClassLoadingStrategy.Default.INJECTION)
@@ -71,7 +72,7 @@ public class InvocationDecorator implements Decorator {
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
       logger.log(invocation(original, method, asList(arguments)));
       try {
-        Object result = method.invoke(original, arguments);
+        Object result = makeAccessible(method).invoke(original, arguments);
         logger.log(returned(result));
         return result;
       } catch (InvocationTargetException e) {

@@ -1,8 +1,8 @@
 package org.logbuddy.common;
 
+import static org.logbuddy.common.Classes.makeAccessible;
+
 import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import org.logbuddy.LogBuddyException;
 
@@ -21,15 +21,5 @@ public class Fields {
     } catch (IllegalAccessException e) {
       throw new LogBuddyException(e);
     }
-  }
-
-  private static Field makeAccessible(Field field) {
-    AccessController.doPrivileged(new PrivilegedAction<Void>() {
-      public Void run() {
-        field.setAccessible(true);
-        return null;
-      }
-    });
-    return field;
   }
 }
