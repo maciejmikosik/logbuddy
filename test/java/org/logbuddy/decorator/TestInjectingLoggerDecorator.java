@@ -48,6 +48,15 @@ public class TestInjectingLoggerDecorator {
   }
 
   @Test
+  public void includes_fields_from_superclass() {
+    class SubDecorable extends Decorable {}
+    given(decorable = new SubDecorable());
+    given(injecting = injecting(logger));
+    when(injecting.decorate(decorable));
+    thenEqual(decorable.logger, logger);
+  }
+
+  @Test
   public void implements_to_string() {
     given(injecting = injecting(logger));
     when(injecting.toString());
