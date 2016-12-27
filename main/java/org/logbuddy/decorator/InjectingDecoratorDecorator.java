@@ -8,30 +8,29 @@ import static org.logbuddy.common.Collections.stream;
 import static org.logbuddy.common.Fields.set;
 
 import org.logbuddy.Decorator;
-import org.logbuddy.Logger;
 
-public class InjectingLoggerDecorator implements Decorator {
-  private final Logger logger;
+public class InjectingDecoratorDecorator implements Decorator {
+  private final Decorator injectable;
 
-  private InjectingLoggerDecorator(Logger logger) {
-    this.logger = logger;
+  private InjectingDecoratorDecorator(Decorator injectable) {
+    this.injectable = injectable;
   }
 
-  public static Decorator injecting(Logger logger) {
-    check(logger != null);
-    return new InjectingLoggerDecorator(logger);
+  public static Decorator injecting(Decorator injectable) {
+    check(injectable != null);
+    return new InjectingDecoratorDecorator(injectable);
   }
 
   public <T> T decorate(T decorable) {
     check(decorable != null);
     stream(hierarchy(decorable.getClass()))
         .flatMap(type -> stream(type.getDeclaredFields()))
-        .filter(field -> field.getType() == Logger.class)
-        .forEach(field -> set(decorable, field, logger));
+        .filter(field -> field.getType() == Decorator.class)
+        .forEach(field -> set(decorable, field, injectable));
     return decorable;
   }
 
   public String toString() {
-    return format("injecting(%s)", logger);
+    return format("injecting(%s)", injectable);
   }
 }

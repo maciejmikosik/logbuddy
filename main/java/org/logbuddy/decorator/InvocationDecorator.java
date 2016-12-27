@@ -1,5 +1,6 @@
 package org.logbuddy.decorator;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.model.Invocation.invocation;
@@ -22,26 +23,26 @@ import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.matcher.ElementMatchers;
 
-public class LoggingDecorator implements Decorator {
+public class InvocationDecorator implements Decorator {
   private final Objenesis objenesis = new ObjenesisStd();
   private final ByteBuddy byteBuddy = new ByteBuddy();
 
   private final Logger logger;
 
-  private LoggingDecorator(Logger logger) {
+  private InvocationDecorator(Logger logger) {
     this.logger = logger;
   }
 
-  public static Decorator logging(Logger logger) {
+  public static Decorator invocationDecorator(Logger logger) {
     check(logger != null);
-    return new LoggingDecorator(logger);
+    return new InvocationDecorator(logger);
   }
 
   public <T> T decorate(T decorable) {
     check(decorable != null);
     Class<?> decorableType = byteBuddy
         .subclass(peel(decorable.getClass()))
-        .method(ElementMatchers.any())
+        .method(ElementMatchers.isPublic())
         .intercept(MethodDelegation.to(new DecorateHandler(decorable)))
         .make()
         .load(Thread.currentThread().getContextClassLoader(), ClassLoadingStrategy.Default.INJECTION)
@@ -79,5 +80,9 @@ public class LoggingDecorator implements Decorator {
         throw cause;
       }
     }
+  }
+
+  public String toString() {
+    return format("invocationDecorator(%s)", logger);
   }
 }

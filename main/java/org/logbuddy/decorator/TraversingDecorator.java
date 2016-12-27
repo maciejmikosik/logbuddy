@@ -4,7 +4,9 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static org.logbuddy.LogBuddyException.check;
+import static org.logbuddy.common.Classes.hierarchy;
 import static org.logbuddy.common.Collections.removeAny;
+import static org.logbuddy.common.Collections.stream;
 import static org.logbuddy.common.Fields.read;
 import static org.logbuddy.common.Fields.set;
 
@@ -41,7 +43,9 @@ public class TraversingDecorator implements Decorator {
     while (!decorables.isEmpty()) {
       Object decorable = removeAny(decorables);
       decorateds.add(decorable);
-      stream(decorable.getClass().getDeclaredFields())
+
+      stream(hierarchy(decorable.getClass()))
+          .flatMap(type -> stream(type.getDeclaredFields()))
           .filter(field -> !field.getType().isPrimitive())
           .filter(field -> !Modifier.isStatic(field.getModifiers()))
           .filter(field -> !field.isSynthetic())

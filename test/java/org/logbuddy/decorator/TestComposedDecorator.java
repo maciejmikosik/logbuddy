@@ -1,5 +1,6 @@
 package org.logbuddy.decorator;
 
+import static java.lang.String.format;
 import static org.logbuddy.decorator.ComposedDecorator.compose;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
@@ -38,6 +39,13 @@ public class TestComposedDecorator {
     given(composed = compose());
     when(composed.decorate(service));
     thenReturned(service);
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(composed = compose(decoratorA, decoratorB, decoratorC));
+    when(composed.toString());
+    thenReturned(format("compose(%s, %s, %s)", decoratorA, decoratorB, decoratorC));
   }
 
   @Test
