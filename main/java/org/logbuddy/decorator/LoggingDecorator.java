@@ -41,7 +41,7 @@ public class LoggingDecorator implements Decorator {
     check(decorable != null);
     Class<?> decorableType = byteBuddy
         .subclass(peel(decorable.getClass()))
-        .method(ElementMatchers.any())
+        .method(ElementMatchers.isPublic())
         .intercept(MethodDelegation.to(new DecorateHandler(decorable)))
         .make()
         .load(Thread.currentThread().getContextClassLoader(), ClassLoadingStrategy.Default.INJECTION)

@@ -13,7 +13,9 @@ import static org.logbuddy.testing.TestingAnonymous.anonymousObject;
 import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
+import static org.testory.Testory.onInstance;
 import static org.testory.Testory.thenCalled;
+import static org.testory.Testory.thenCalledNever;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
@@ -155,6 +157,22 @@ public class TestLoggingDecorator {
   }
 
   @Test
+  public void ignores_package_private_method() {
+    given(decorated = logging(logger)
+        .decorate(new Decorable()));
+    when(() -> decorated.packagePrivateMethod());
+    thenCalledNever(onInstance(logger));
+  }
+
+  @Test
+  public void ignores_protected_method() {
+    given(decorated = logging(logger)
+        .decorate(new Decorable()));
+    when(() -> decorated.protectedMethod());
+    thenCalledNever(onInstance(logger));
+  }
+
+  @Test
   public void checks_nulls() {
     when(() -> logging(null));
     thenThrown(LogBuddyException.class);
@@ -195,5 +213,9 @@ public class TestLoggingDecorator {
         ((Decorable) field).methodDelegating();
       }
     }
+
+    void packagePrivateMethod() {}
+
+    protected void protectedMethod() {}
   }
 }
