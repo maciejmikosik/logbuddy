@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import java.util.List;
 
 import org.logbuddy.decorator.ComposedDecorator;
+import org.logbuddy.decorator.InjectingDecoratorDecorator;
 import org.logbuddy.decorator.InjectingLoggerDecorator;
 import org.logbuddy.decorator.InvocationDecorator;
 import org.logbuddy.decorator.NoDecorator;
@@ -57,5 +58,6 @@ public class Build {
       ComposedDecorator.class,
       NoDecorator.class,
       InjectingLoggerDecorator.class,
+      InjectingDecoratorDecorator.class,
       TraversingDecorator.class);
 }
