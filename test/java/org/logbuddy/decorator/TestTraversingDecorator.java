@@ -9,6 +9,7 @@ import static org.logbuddy.testing.Matchers.anyInstanceOf;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.mock;
+import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledNever;
 import static org.testory.Testory.thenEqual;
 import static org.testory.Testory.thenReturned;
@@ -103,6 +104,18 @@ public class TestTraversingDecorator {
     when(traversing.decorate(node));
     thenEqual(node.child(), decorated(nodeA));
     thenEqual(node.secondChild(), nodeB);
+  }
+
+  @Test
+  public void includes_fields_from_superclass() {
+    class SuperDecorable {
+      @SuppressWarnings("unused")
+      private final Node superField = node;
+    }
+    class Decorable extends SuperDecorable {}
+    given(traversing = traversing(allFields, decorator));
+    when(traversing.decorate(new Decorable()));
+    thenCalled(decorator).decorate(node);
   }
 
   @Test

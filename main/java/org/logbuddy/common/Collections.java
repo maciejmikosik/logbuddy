@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class Collections {
   public static List<Object> arrayToList(Object array) {
@@ -20,5 +22,9 @@ public class Collections {
     E element = iterator.next();
     iterator.remove();
     return element;
+  }
+
+  public static <E> Stream<E> stream(Iterable<E> iterable) {
+    return StreamSupport.stream(iterable.spliterator(), false);
   }
 }
