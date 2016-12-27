@@ -26,5 +26,12 @@ public class TestNoDecorator {
     thenReturned(decorable);
   }
 
+  @Test
+  public void implements_to_string() {
+    given(decorator = noDecorator());
+    when(decorator.toString());
+    thenReturned("noDecorator()");
+  }
+
   private static class Decorable {}
 }

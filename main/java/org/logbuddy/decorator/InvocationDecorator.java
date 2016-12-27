@@ -1,5 +1,6 @@
 package org.logbuddy.decorator;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.model.Invocation.invocation;
@@ -79,5 +80,9 @@ public class InvocationDecorator implements Decorator {
         throw cause;
       }
     }
+  }
+
+  public String toString() {
+    return format("invocationDecorator(%s)", logger);
   }
 }

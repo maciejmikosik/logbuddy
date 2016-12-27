@@ -12,4 +12,8 @@ public class NoDecorator implements Decorator {
   public <T> T decorate(T decorable) {
     return decorable;
   }
+
+  public String toString() {
+    return "noDecorator()";
+  }
 }

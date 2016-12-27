@@ -1,5 +1,6 @@
 package org.logbuddy.decorator;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
@@ -170,6 +171,13 @@ public class TestInvocationDecorator {
         .decorate(new Decorable()));
     when(() -> decorated.protectedMethod());
     thenCalledNever(onInstance(logger));
+  }
+
+  @Test
+  public void implements_to_string() {
+    given(decorator = invocationDecorator(logger));
+    when(decorator.toString());
+    thenReturned(format("invocationDecorator(%s)", logger));
   }
 
   @Test
