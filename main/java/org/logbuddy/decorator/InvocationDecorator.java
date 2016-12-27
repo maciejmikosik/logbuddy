@@ -22,19 +22,19 @@ import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.matcher.ElementMatchers;
 
-public class LoggingDecorator implements Decorator {
+public class InvocationDecorator implements Decorator {
   private final Objenesis objenesis = new ObjenesisStd();
   private final ByteBuddy byteBuddy = new ByteBuddy();
 
   private final Logger logger;
 
-  private LoggingDecorator(Logger logger) {
+  private InvocationDecorator(Logger logger) {
     this.logger = logger;
   }
 
-  public static Decorator logging(Logger logger) {
+  public static Decorator invocationDecorator(Logger logger) {
     check(logger != null);
-    return new LoggingDecorator(logger);
+    return new InvocationDecorator(logger);
   }
 
   public <T> T decorate(T decorable) {
