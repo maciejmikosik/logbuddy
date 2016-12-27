@@ -1,13 +1,15 @@
 package org.logbuddy.logger;
 
 import static java.lang.String.format;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
 import static org.logbuddy.logger.HtmlWritingLogger.writing;
 import static org.logbuddy.renderer.Html.html;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.spy;
+import static org.testory.Testory.then;
 import static org.testory.Testory.thenCalled;
-import static org.testory.Testory.thenEqual;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
@@ -42,7 +44,8 @@ public class TestHtmlWritingLogger {
     given(willReturn(rendered), renderer).render(model);
     when(() -> logger.log(model));
     thenReturned();
-    thenEqual(writer.toString(), "<code>" + rendered.body + "</code><br/>" + "\n");
+    then(writer.toString(), containsString(rendered.body));
+    then(writer.toString(), endsWith("\n"));
   }
 
   @Test
