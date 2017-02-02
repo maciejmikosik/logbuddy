@@ -59,13 +59,6 @@ cp \
   "${PROJECT}"/LICENSE.txt \
   "${UNPACKED}"
 
-########## RESET TIMESTAMPS ##########
-find \
-  "${UNPACKED}"/ \
-| xargs \
-touch \
-  --date=@0
-
 ########## ZIP JAR ##########
 cd "${UNPACKED}"
 zip \
@@ -77,6 +70,59 @@ zip \
 cd "${PROJECT}"
 
 ########## CLEAN UNPACKED ##########
+rm \
+  --recursive \
+  --force \
+  "${UNPACKED}"
+
+########## SHADE DEPENDENCIES ##########
+jar tf ${BUILDING}/logbuddy.jar \
+  | grep "\.class$" \
+  | grep -v "$org/logbuddy/" \
+  | sed 's/\.class$//g' \
+  | sed  's/\//\./g' \
+  | xargs -I{} echo {} -\> org.logbuddy.shaded.{} : \
+  > "${BUILDING}/shading_map.txt"
+
+java \
+  -cp "${RUN}/proguard-base-5.3.1.jar" \
+  proguard.ProGuard \
+  -injars "${BUILDING}/logbuddy.jar" \
+  -outjars "${BUILDING}/logbuddy-shaded.jar" \
+  -libraryjars "<java.home>/lib/rt.jar" \
+  -dontnote org.objenesis.** \
+  -dontwarn net.bytebuddy.** \
+  -dontnote net.bytebuddy.** \
+  -dontshrink \
+  -dontoptimize \
+  -keepattributes \* \
+  -keepparameternames \
+  -keepclassmembers class \* { \
+   \*\*\* \*\; \
+   \*\*\* \*\(...\)\; \
+  } \
+  -keep class org.logbuddy.** \
+  -applymapping "${BUILDING}/shading_map.txt"
+
+mv "${BUILDING}/logbuddy-shaded.jar" "${BUILDING}/logbuddy.jar"
+
+rm "${BUILDING}/shading_map.txt"
+
+########## RESET TIMESTAMPS IN JAR ##########
+mkdir "${UNPACKED}"
+unzip \
+  -q \
+  -d "${UNPACKED}" \
+  "${BUILDING}/logbuddy.jar"
+find "${UNPACKED}" | xargs touch --date=@0
+cd "${UNPACKED}"
+zip \
+  --quiet \
+  -X \
+  --recurse-paths \
+  "${BUILDING}/logbuddy.jar" \
+  ./*
+cd "${PROJECT}"
 rm \
   --recursive \
   --force \
