@@ -5,6 +5,7 @@ cd "${HERE}/.."
 PROJECT=`pwd`
 	RUN="${PROJECT}/run"
 	BUILDING="/tmp/build_logbuddy"
+	UNPACKED="${BUILDING}/unpacked"
 
 	MAIN="${PROJECT}/main"
 		JAVA="${MAIN}/java"
@@ -14,62 +15,118 @@ PROJECT=`pwd`
 rm \
   --recursive \
   --force \
-  ${BUILDING}
+  "${BUILDING}"
 
 mkdir \
   --parents \
-  ${BUILDING}
+  "${BUILDING}"
+mkdir \
+  --parents \
+  "${UNPACKED}"
 
 ########## COMPILE SOURCES ##########
 javac \
-  -classpath "${JAR}/byte-buddy-1.4.19.jar:${JAR}/objenesis-2.4.jar" \
+  -classpath "${JAR}/byte-buddy-1.6.6.jar:${JAR}/objenesis-2.4.jar" \
   -sourcepath "${JAVA}" \
   -source 1.8 \
   -target 1.8 \
-  -d "${BUILDING}" \
+  -d "${UNPACKED}" \
   "${JAVA}/org/logbuddy/Build.java"
 
 ########## COPY SOURCES ##########
 cp \
   --recursive \
   "${JAVA}/." \
-  "${BUILDING}"
+  "${UNPACKED}"
 
 ########## COPY DEPENDENCIES ##########
 unzip \
   -q \
-  "${JAR}/byte-buddy-1.4.19.jar" \
-  -d "${BUILDING}" \
+  "${JAR}/byte-buddy-1.6.6.jar" \
+  -d "${UNPACKED}" \
   net/*
 unzip \
   -q \
   "${JAR}/objenesis-2.4.jar" \
-  -d "${BUILDING}" \
+  -d "${UNPACKED}" \
   org/*
 
 ########## COPY LICENSE ##########
 cp \
   "${RUN}"/*license* \
-  "${BUILDING}"
+  "${UNPACKED}"
 cp \
   "${PROJECT}"/LICENSE.txt \
-  "${BUILDING}"
-
-########## RESET TIMESTAMPS ##########
-find \
-  ${BUILDING}/ \
-| xargs \
-touch \
-  --date=@0
+  "${UNPACKED}"
 
 ########## ZIP JAR ##########
-cd ${BUILDING}
+cd "${UNPACKED}"
 zip \
   --quiet \
+  -X \
   --recurse-paths \
-  ./logbuddy.jar \
+  "${BUILDING}/logbuddy.jar" \
   ./*
 cd "${PROJECT}"
+
+########## CLEAN UNPACKED ##########
+rm \
+  --recursive \
+  --force \
+  "${UNPACKED}"
+
+########## SHADE DEPENDENCIES ##########
+jar tf ${BUILDING}/logbuddy.jar \
+  | grep "\.class$" \
+  | grep -v "$org/logbuddy/" \
+  | sed 's/\.class$//g' \
+  | sed  's/\//\./g' \
+  | xargs -I{} echo {} -\> org.logbuddy.shaded.{} : \
+  > "${BUILDING}/shading_map.txt"
+
+java \
+  -cp "${RUN}/proguard-base-5.3.1.jar" \
+  proguard.ProGuard \
+  -injars "${BUILDING}/logbuddy.jar" \
+  -outjars "${BUILDING}/logbuddy-shaded.jar" \
+  -libraryjars "<java.home>/lib/rt.jar" \
+  -dontnote org.objenesis.** \
+  -dontwarn net.bytebuddy.** \
+  -dontnote net.bytebuddy.** \
+  -dontshrink \
+  -dontoptimize \
+  -keepattributes \* \
+  -keepparameternames \
+  -keepclassmembers class \* { \
+   \*\*\* \*\; \
+   \*\*\* \*\(...\)\; \
+  } \
+  -keep class org.logbuddy.** \
+  -applymapping "${BUILDING}/shading_map.txt"
+
+mv "${BUILDING}/logbuddy-shaded.jar" "${BUILDING}/logbuddy.jar"
+
+rm "${BUILDING}/shading_map.txt"
+
+########## RESET TIMESTAMPS IN JAR ##########
+mkdir "${UNPACKED}"
+unzip \
+  -q \
+  -d "${UNPACKED}" \
+  "${BUILDING}/logbuddy.jar"
+find "${UNPACKED}" | xargs touch --date=@0
+cd "${UNPACKED}"
+zip \
+  --quiet \
+  -X \
+  --recurse-paths \
+  "${BUILDING}/logbuddy.jar" \
+  ./*
+cd "${PROJECT}"
+rm \
+  --recursive \
+  --force \
+  "${UNPACKED}"
 
 ########## BUILD SUCCESSFUL ##########
 
