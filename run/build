@@ -66,6 +66,7 @@ touch \
 cd ${BUILDING}
 zip \
   --quiet \
+  -X \
   --recurse-paths \
   ./logbuddy.jar \
   ./*
