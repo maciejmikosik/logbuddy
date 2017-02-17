@@ -8,6 +8,7 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 import org.logbuddy.Renderer;
 import org.logbuddy.renderer.Html;
 
@@ -26,10 +27,10 @@ public class HtmlWritingLogger implements Logger {
     return new HtmlWritingLogger(renderer, writer);
   }
 
-  public void log(Object model) {
+  public void log(Message message) {
     try {
       writer.write("<span style=\"display: block; white-space: nowrap; font-family: monospace;\">");
-      writer.write(renderer.render(model).body);
+      writer.write(renderer.render(message).body);
       writer.write("</span>");
       writer.write("\n");
       writer.flush();

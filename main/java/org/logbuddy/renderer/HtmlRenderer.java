@@ -99,8 +99,7 @@ public class HtmlRenderer implements Renderer<Html> {
   }
 
   private Html renderImpl(Depth depth) {
-    String indentation = times(2 * depth.value, "&nbsp;");
-    return html(indentation + render(depth.model).body);
+    return html(times(2 * depth.value, "&nbsp;"));
   }
 
   private Html renderImpl(String prefix, List<?> list) {

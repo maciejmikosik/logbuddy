@@ -146,8 +146,8 @@ public class TestHtmlRenderer {
   @Test
   public void renders_stack_trace_depth() {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
-    when(htmlRenderer.render(depth(3, model)));
-    thenReturned(html(format("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s", model)));
+    when(htmlRenderer.render(depth(3)));
+    thenReturned(html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"));
   }
 
   @Test

@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 import org.logbuddy.Renderer;
 import org.logbuddy.renderer.Html;
 
@@ -29,7 +30,7 @@ public class TestHtmlWritingLogger {
   private Renderer<Html> renderer;
   private Logger logger;
   private Html rendered;
-  private Object model;
+  private Message message;
 
   @Before
   public void before() {
@@ -41,8 +42,8 @@ public class TestHtmlWritingLogger {
   @Test
   public void writes_line_to_writer() {
     given(logger = writing(renderer, writer));
-    given(willReturn(rendered), renderer).render(model);
-    when(() -> logger.log(model));
+    given(willReturn(rendered), renderer).render(message);
+    when(() -> logger.log(message));
     thenReturned();
     then(writer.toString(), containsString(rendered.body));
     then(writer.toString(), endsWith("\n"));
@@ -51,8 +52,8 @@ public class TestHtmlWritingLogger {
   @Test
   public void flushes_stream() {
     given(logger = writing(renderer, writer));
-    given(willReturn(rendered), renderer).render(model);
-    when(() -> logger.log(model));
+    given(willReturn(rendered), renderer).render(message);
+    when(() -> logger.log(message));
     thenReturned();
     thenCalled(writer).flush();
   }

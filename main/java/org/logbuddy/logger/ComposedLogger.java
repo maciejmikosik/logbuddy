@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class ComposedLogger implements Logger {
   private final List<Logger> loggers;
@@ -27,9 +28,9 @@ public class ComposedLogger implements Logger {
     return loggers;
   }
 
-  public void log(Object model) {
+  public void log(Message message) {
     for (Logger logger : loggers) {
-      logger.log(model);
+      logger.log(message);
     }
   }
 

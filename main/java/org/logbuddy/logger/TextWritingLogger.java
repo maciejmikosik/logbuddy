@@ -8,6 +8,7 @@ import java.io.Writer;
 
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 import org.logbuddy.Renderer;
 import org.logbuddy.renderer.Text;
 
@@ -26,9 +27,9 @@ public class TextWritingLogger implements Logger {
     return new TextWritingLogger(renderer, writer);
   }
 
-  public void log(Object model) {
+  public void log(Message message) {
     try {
-      writer.write(renderer.render(model).string);
+      writer.write(renderer.render(message).string);
       writer.write("\n");
       writer.flush();
     } catch (IOException e) {

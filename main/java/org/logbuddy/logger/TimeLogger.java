@@ -2,12 +2,12 @@ package org.logbuddy.logger;
 
 import static java.lang.String.format;
 import static org.logbuddy.LogBuddyException.check;
-import static org.logbuddy.model.Property.property;
 
 import java.time.Clock;
 import java.time.ZonedDateTime;
 
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class TimeLogger implements Logger {
   private final Clock clock;
@@ -24,8 +24,8 @@ public class TimeLogger implements Logger {
     return new TimeLogger(clock, logger);
   }
 
-  public void log(Object model) {
-    logger.log(property(ZonedDateTime.now(clock), model));
+  public void log(Message message) {
+    logger.log(message.attribute(ZonedDateTime.now(clock)));
   }
 
   public String toString() {

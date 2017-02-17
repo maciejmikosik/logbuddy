@@ -99,8 +99,7 @@ public class TextRenderer implements Renderer<Text> {
   }
 
   private Text renderImpl(Depth depth) {
-    String indentation = times(depth.value, "\t");
-    return text(indentation + render(depth.model).string);
+    return text(times(depth.value, "\t"));
   }
 
   private Text renderImpl(String prefix, List<?> list) {

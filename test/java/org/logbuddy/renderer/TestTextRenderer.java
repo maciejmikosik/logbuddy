@@ -140,8 +140,8 @@ public class TestTextRenderer {
 
   @Test
   public void renders_stack_trace_depth() {
-    when(renderer.render(depth(3, model)));
-    thenReturned(text(format("\t\t\t%s", model)));
+    when(renderer.render(depth(3)));
+    thenReturned(text("\t\t\t"));
   }
 
   @Test

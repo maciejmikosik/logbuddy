@@ -2,7 +2,6 @@ package org.logbuddy.logger;
 
 import static java.lang.String.format;
 import static org.logbuddy.logger.ThreadLogger.thread;
-import static org.logbuddy.model.Property.property;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalled;
@@ -14,9 +13,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class TestThreadLogger {
-  private Object model;
+  private Message message;
   private Logger logger, threadLogger;
 
   @Before
@@ -27,9 +27,9 @@ public class TestThreadLogger {
   @Test
   public void logs_current_thread() {
     given(threadLogger = thread(logger));
-    when(() -> threadLogger.log(model));
+    when(() -> threadLogger.log(message));
     thenReturned();
-    thenCalled(logger).log(property(Thread.currentThread(), model));
+    thenCalled(logger).log(message.attribute(Thread.currentThread()));
   }
 
   @Test

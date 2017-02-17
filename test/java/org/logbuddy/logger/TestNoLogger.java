@@ -9,10 +9,11 @@ import static org.testory.Testory.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class TestNoLogger {
   private Logger logger;
-  private Object model;
+  private Message message;
 
   @Before
   public void before() {
@@ -22,7 +23,7 @@ public class TestNoLogger {
   @Test
   public void does_nothing() {
     given(logger = noLogger());
-    when(() -> logger.log(model));
+    when(() -> logger.log(message));
     thenReturned();
   }
 

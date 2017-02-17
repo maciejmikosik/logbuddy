@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class AsynchronousLogger implements Logger {
   private final Logger logger;
@@ -26,8 +27,8 @@ public class AsynchronousLogger implements Logger {
     return new AsynchronousLogger(logger, newExecutor());
   }
 
-  public void log(Object model) {
-    executor.submit(() -> logger.log(model));
+  public void log(Message message) {
+    executor.submit(() -> logger.log(message));
   }
 
   public String toString() {
