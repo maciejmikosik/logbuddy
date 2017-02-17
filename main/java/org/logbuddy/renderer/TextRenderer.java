@@ -17,10 +17,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
+import org.logbuddy.Message;
 import org.logbuddy.Renderer;
 import org.logbuddy.model.Depth;
 import org.logbuddy.model.Invocation;
-import org.logbuddy.model.Property;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
 
@@ -45,6 +45,8 @@ public class TextRenderer implements Renderer<Text> {
   public Text render(Object model) {
     if (model == null) {
       return text("null");
+    } else if (model instanceof Message) {
+      return renderImpl((Message) model);
     } else if (model instanceof Invocation) {
       return renderImpl((Invocation) model);
     } else if (model instanceof Returned) {
@@ -53,8 +55,6 @@ public class TextRenderer implements Renderer<Text> {
       return renderImpl((Thrown) model);
     } else if (model instanceof Depth) {
       return renderImpl((Depth) model);
-    } else if (model instanceof Property) {
-      return renderImpl((Property) model);
     } else if (model instanceof ZonedDateTime) {
       return renderImpl((ZonedDateTime) model);
     } else if (model instanceof Thread) {
@@ -66,6 +66,15 @@ public class TextRenderer implements Renderer<Text> {
     } else {
       return text(String.valueOf(model));
     }
+  }
+
+  private Text renderImpl(Message message) {
+    StringBuilder builder = new StringBuilder();
+    for (Object attribute : message.attributes()) {
+      builder.append(render(attribute).string).append("\t");
+    }
+    builder.append(render(message.content()).string);
+    return text(builder.toString());
   }
 
   private Text renderImpl(Invocation invocation) {
@@ -87,20 +96,13 @@ public class TextRenderer implements Renderer<Text> {
   }
 
   private Text renderImpl(Depth depth) {
-    String indentation = times(depth.value, "\t");
-    return text(indentation + render(depth.model).string);
+    return text(times(depth.value, "\t"));
   }
 
   private Text renderImpl(String prefix, List<?> list) {
     return text(list.stream()
         .map(element -> render(element).string)
         .collect(joining(", ", prefix + "[", "]")));
-  }
-
-  private Text renderImpl(Property property) {
-    return text(format("%s\t%s",
-        render(property.value).string,
-        render(property.model).string));
   }
 
   private Text renderImpl(ZonedDateTime zonedDateTime) {

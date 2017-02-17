@@ -14,10 +14,10 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.logbuddy.Message;
 import org.logbuddy.Renderer;
 import org.logbuddy.model.Depth;
 import org.logbuddy.model.Invocation;
-import org.logbuddy.model.Property;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
 
@@ -30,7 +30,9 @@ public class HtmlRenderer implements Renderer<Html> {
   }
 
   public Html render(Object model) {
-    if (model instanceof Invocation) {
+    if (model instanceof Message) {
+      return renderImpl((Message) model);
+    } else if (model instanceof Invocation) {
       return renderImpl((Invocation) model);
     } else if (model instanceof Returned) {
       return renderImpl((Returned) model);
@@ -40,8 +42,6 @@ public class HtmlRenderer implements Renderer<Html> {
       return renderImpl((Throwable) model);
     } else if (model instanceof Depth) {
       return renderImpl((Depth) model);
-    } else if (model instanceof Property) {
-      return renderImpl((Property) model);
     } else if (model instanceof List) {
       return renderImpl("List", (List<?>) model);
     } else if (model != null && model.getClass().isArray()) {
@@ -53,6 +53,15 @@ public class HtmlRenderer implements Renderer<Html> {
     } else {
       return asHtml(textRenderer.render(model));
     }
+  }
+
+  private Html renderImpl(Message message) {
+    StringBuilder builder = new StringBuilder();
+    for (Object attribute : message.attributes()) {
+      builder.append(render(attribute).body).append("&nbsp;&nbsp;");
+    }
+    builder.append(render(message.content()).body);
+    return html(builder.toString());
   }
 
   private Html renderImpl(Invocation invocation) {
@@ -87,20 +96,13 @@ public class HtmlRenderer implements Renderer<Html> {
   }
 
   private Html renderImpl(Depth depth) {
-    String indentation = times(2 * depth.value, "&nbsp;");
-    return html(indentation + render(depth.model).body);
+    return html(times(2 * depth.value, "&nbsp;"));
   }
 
   private Html renderImpl(String prefix, List<?> list) {
     return html(list.stream()
         .map(element -> render(element).body)
         .collect(joining(escape(", "), escape(prefix + "["), escape("]"))));
-  }
-
-  private Html renderImpl(Property property) {
-    return html(format("%s&nbsp;&nbsp;%s",
-        render(property.value).body,
-        render(property.model).body));
   }
 
   private static Html asHtml(Text text) {

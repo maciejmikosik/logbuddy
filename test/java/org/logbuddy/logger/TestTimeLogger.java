@@ -2,7 +2,6 @@ package org.logbuddy.logger;
 
 import static java.lang.String.format;
 import static org.logbuddy.logger.TimeLogger.time;
-import static org.logbuddy.model.Property.property;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalled;
@@ -19,10 +18,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class TestTimeLogger {
   private Logger logger, timeLogger;
-  private Object model;
+  private Message message;
   private Instant instant;
   private ZoneOffset zone;
   private Clock clock;
@@ -39,9 +39,9 @@ public class TestTimeLogger {
     given(instant = Instant.ofEpochMilli(0));
     given(zone = ZoneOffset.UTC);
     given(timeLogger = time(Clock.fixed(instant, zone), logger));
-    when(() -> timeLogger.log(model));
+    when(() -> timeLogger.log(message));
     thenReturned();
-    thenCalled(logger).log(property(ZonedDateTime.ofInstant(instant, zone), model));
+    thenCalled(logger).log(message.attribute(ZonedDateTime.ofInstant(instant, zone)));
   }
 
   @Test
@@ -49,9 +49,9 @@ public class TestTimeLogger {
     given(instant = Instant.ofEpochMilli(0));
     given(zone = ZoneOffset.ofHours(2));
     given(timeLogger = time(Clock.fixed(instant, zone), logger));
-    when(() -> timeLogger.log(model));
+    when(() -> timeLogger.log(message));
     thenReturned();
-    thenCalled(logger).log(property(ZonedDateTime.ofInstant(instant, zone), model));
+    thenCalled(logger).log(message.attribute(ZonedDateTime.ofInstant(instant, zone)));
   }
 
   @Test

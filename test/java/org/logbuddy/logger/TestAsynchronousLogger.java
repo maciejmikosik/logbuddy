@@ -21,11 +21,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class TestAsynchronousLogger {
   private Logger logger, asynchronous;
   private List<Object> logged;
-  private Object model;
+  private Message message;
   private Thread thread;
   private final AtomicInteger counter = new AtomicInteger(0);
 
@@ -39,10 +40,10 @@ public class TestAsynchronousLogger {
   public void delegates_logging() {
     given(logger = model -> logged.add(model));
     given(asynchronous = asynchronous(logger));
-    when(() -> asynchronous.log(model));
+    when(() -> asynchronous.log(message));
     thenReturned();
     sleep();
-    thenEqual(logged, asList(model));
+    thenEqual(logged, asList(message));
   }
 
   @Test
@@ -52,7 +53,7 @@ public class TestAsynchronousLogger {
       counter.incrementAndGet();
     });
     given(asynchronous = asynchronous(logger));
-    when(() -> asynchronous.log(model));
+    when(() -> asynchronous.log(message));
     thenReturned();
     thenEqual(counter.get(), 0);
     sleep();
@@ -64,7 +65,7 @@ public class TestAsynchronousLogger {
   public void logs_using_other_thread() {
     given(logger = model -> thread = Thread.currentThread());
     given(asynchronous = asynchronous(logger));
-    when(() -> asynchronous.log(model));
+    when(() -> asynchronous.log(message));
     thenReturned();
     sleep();
     then(thread, not(sameInstance(Thread.currentThread())));

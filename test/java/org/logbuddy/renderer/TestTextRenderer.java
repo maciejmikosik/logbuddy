@@ -2,9 +2,9 @@ package org.logbuddy.renderer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.logbuddy.Message.message;
 import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
-import static org.logbuddy.model.Property.property;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
 import static org.logbuddy.renderer.Text.text;
@@ -33,8 +33,8 @@ public class TestTextRenderer {
   private Throwable throwable;
   private ZonedDateTime time;
   private Thread thread;
-  private Object model;
   private StringWriter buffer;
+  private Object attributeA, attributeB;
 
   @Before
   public void before() {
@@ -55,6 +55,20 @@ public class TestTextRenderer {
   public void renders_null() {
     when(renderer.render(null));
     thenReturned(text("null"));
+  }
+
+  @Test
+  public void renders_message() {
+    given(object = new Thread("content"));
+    given(attributeA = new Thread("attributeA"));
+    given(attributeB = new Thread("attributeB"));
+    when(renderer.render(message(object)
+        .attribute(attributeA)
+        .attribute(attributeB)));
+    thenReturned(text(format("%s\t%s\t%s",
+        renderer.render(attributeA).string,
+        renderer.render(attributeB).string,
+        renderer.render(object).string)));
   }
 
   @Test
@@ -124,8 +138,8 @@ public class TestTextRenderer {
 
   @Test
   public void renders_stack_trace_depth() {
-    when(renderer.render(depth(3, model)));
-    thenReturned(text(format("\t\t\t%s", model)));
+    when(renderer.render(depth(3)));
+    thenReturned(text("\t\t\t"));
   }
 
   @Test
@@ -156,21 +170,6 @@ public class TestTextRenderer {
   public void renders_primitive_array() {
     when(renderer.render(new int[] { 1, 2, 3 }));
     thenReturned(text(format("[%s, %s, %s]", 1, 2, 3)));
-  }
-
-  @Test
-  public void renders_property() {
-    given(renderer = new TextRenderer() {
-      public Text render(Object model) {
-        if (model == object) {
-          return text(string);
-        } else {
-          return super.render(model);
-        }
-      }
-    });
-    when(renderer.render(property(object, model)));
-    thenReturned(text(format("%s\t%s", string, model)));
   }
 
   @Test

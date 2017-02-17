@@ -13,11 +13,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class TestComposedLogger {
   private Logger loggerA, loggerB, loggerC;
   private Logger composed;
-  private Object model;
+  private Message message;
 
   @Before
   public void before() {
@@ -27,11 +28,11 @@ public class TestComposedLogger {
   @Test
   public void logs_using_all_loggers() {
     given(composed = compose(loggerA, loggerB, loggerC));
-    when(() -> composed.log(model));
+    when(() -> composed.log(message));
     thenReturned();
-    thenCalled(loggerA).log(model);
-    thenCalled(loggerB).log(model);
-    thenCalled(loggerC).log(model);
+    thenCalled(loggerA).log(message);
+    thenCalled(loggerB).log(message);
+    thenCalled(loggerC).log(message);
   }
 
   @Test

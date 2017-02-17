@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static org.logbuddy.LogBuddyException.check;
 
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class SynchronizedLogger implements Logger {
   private final Logger logger;
@@ -17,8 +18,8 @@ public class SynchronizedLogger implements Logger {
     return new SynchronizedLogger(logger);
   }
 
-  public synchronized void log(Object model) {
-    logger.log(model);
+  public synchronized void log(Message message) {
+    logger.log(message);
   }
 
   public String toString() {

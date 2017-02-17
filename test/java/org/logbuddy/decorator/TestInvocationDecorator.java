@@ -3,10 +3,12 @@ package org.logbuddy.decorator;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.logbuddy.Message.message;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
+import static org.logbuddy.testing.Matchers.withContent;
 import static org.logbuddy.testing.TestingAnonymous.anonymousAbstractList;
 import static org.logbuddy.testing.TestingAnonymous.anonymousArrayList;
 import static org.logbuddy.testing.TestingAnonymous.anonymousList;
@@ -25,6 +27,7 @@ import org.junit.Test;
 import org.logbuddy.Decorator;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 import org.logbuddy.model.Invocation;
 
 public class TestInvocationDecorator {
@@ -72,10 +75,10 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(decorable));
     when(() -> decorated.methodWithArguments(argumentA, argumentB));
-    thenCalled(logger).log(invocation(
+    thenCalled(logger).log(message(invocation(
         decorable,
         Decorable.class.getMethod("methodWithArguments", Object.class, Object.class),
-        asList(argumentA, argumentB)));
+        asList(argumentA, argumentB))));
   }
 
   @Test
@@ -83,7 +86,7 @@ public class TestInvocationDecorator {
     given(decorator = invocationDecorator(logger));
     given(decorated = decorator.decorate(new Decorable(decorator.decorate(new Decorable()))));
     when(() -> decorated.methodDelegating());
-    thenCalledTimes(2, logger).log(any(Invocation.class, instanceOf(Invocation.class)));
+    thenCalledTimes(2, logger).log(any(Message.class, withContent(instanceOf(Invocation.class))));
   }
 
   @Test
@@ -91,10 +94,10 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(decorable));
     when(() -> decorated.methodWithArguments(null, null));
-    thenCalled(logger).log(invocation(
+    thenCalled(logger).log(message(invocation(
         decorable,
         Decorable.class.getMethod("methodWithArguments", Object.class, Object.class),
-        asList(null, null)));
+        asList(null, null))));
   }
 
   @Test
@@ -102,7 +105,7 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(new Decorable(result)));
     when(() -> decorated.methodReturningField());
-    thenCalled(logger).log(returned(result));
+    thenCalled(logger).log(message(returned(result)));
   }
 
   @Test
@@ -110,7 +113,7 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(new Decorable(throwable)));
     when(() -> decorated.methodThrowingField());
-    thenCalled(logger).log(thrown(throwable));
+    thenCalled(logger).log(message(thrown(throwable)));
   }
 
   @Test
@@ -163,10 +166,10 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(decorable));
     when(() -> decorated.packagePrivateMethod());
-    thenCalled(logger).log(invocation(
+    thenCalled(logger).log(message(invocation(
         decorable,
         Decorable.class.getDeclaredMethod("packagePrivateMethod"),
-        asList()));
+        asList())));
   }
 
   /**
@@ -177,10 +180,10 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(decorable));
     when(() -> decorated.protectedMethod());
-    thenCalled(logger).log(invocation(
+    thenCalled(logger).log(message(invocation(
         decorable,
         Decorable.class.getDeclaredMethod("protectedMethod"),
-        asList()));
+        asList())));
   }
 
   @Test

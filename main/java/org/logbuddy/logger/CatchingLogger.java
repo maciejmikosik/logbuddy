@@ -2,9 +2,11 @@ package org.logbuddy.logger;
 
 import static java.lang.String.format;
 import static org.logbuddy.LogBuddyException.check;
+import static org.logbuddy.Message.message;
 
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class CatchingLogger implements Logger {
   private final Logger logger;
@@ -18,12 +20,12 @@ public class CatchingLogger implements Logger {
     return new CatchingLogger(logger);
   }
 
-  public void log(Object model) {
+  public void log(Message message) {
     try {
-      logger.log(model);
+      logger.log(message);
     } catch (Throwable throwable) {
       try {
-        logger.log(new LogBuddyException(throwable));
+        logger.log(message(new LogBuddyException(throwable)));
       } catch (Throwable e) {
         e.printStackTrace(System.err);
       }

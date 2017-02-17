@@ -13,10 +13,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class TestSynchronizedLogger {
   private Logger logger, synchronizedLogger;
-  private Object model;
+  private Message message;
 
   @Before
   public void before() {
@@ -26,9 +27,9 @@ public class TestSynchronizedLogger {
   @Test
   public void logs_original_model() {
     given(synchronizedLogger = synchronize(logger));
-    when(() -> synchronizedLogger.log(model));
+    when(() -> synchronizedLogger.log(message));
     thenReturned();
-    thenCalled(logger).log(model);
+    thenCalled(logger).log(message);
   }
 
   @Test

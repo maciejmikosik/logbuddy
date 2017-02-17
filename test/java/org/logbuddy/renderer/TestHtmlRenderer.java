@@ -2,9 +2,9 @@ package org.logbuddy.renderer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.logbuddy.Message.message;
 import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
-import static org.logbuddy.model.Property.property;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
 import static org.logbuddy.renderer.Html.html;
@@ -31,7 +31,6 @@ public class TestHtmlRenderer {
   private Method method;
   private Object instance, a, b, c;
   private Throwable throwable;
-  private Object model;
 
   @Before
   public void before() {
@@ -61,6 +60,19 @@ public class TestHtmlRenderer {
     given(willReturn(text("&_<_>_ _\t")), textRenderer).render(object);
     when(htmlRenderer.render(object));
     thenReturned(html("&amp;_&lt;_&gt;_&nbsp;_&nbsp;&nbsp;"));
+  }
+
+  @Test
+  public void renders_message() {
+    given(textRenderer = model -> text(format("rendered(%s)", model)));
+    given(htmlRenderer = new HtmlRenderer(textRenderer));
+    when(htmlRenderer.render(message(object)
+        .attribute(a)
+        .attribute(b)));
+    thenReturned(html(format("%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s",
+        htmlRenderer.render(a).body,
+        htmlRenderer.render(b).body,
+        htmlRenderer.render(object).body)));
   }
 
   @Test
@@ -132,8 +144,8 @@ public class TestHtmlRenderer {
   @Test
   public void renders_stack_trace_depth() {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
-    when(htmlRenderer.render(depth(3, model)));
-    thenReturned(html(format("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s", model)));
+    when(htmlRenderer.render(depth(3)));
+    thenReturned(html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"));
   }
 
   @Test
@@ -155,21 +167,6 @@ public class TestHtmlRenderer {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
     when(htmlRenderer.render(new Object[] { a, b, c }));
     thenReturned(html(format("[%s,&nbsp;%s,&nbsp;%s]", a, b, c)));
-  }
-
-  @Test
-  public void renders_property() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())) {
-      public Html render(Object model) {
-        if (model == object) {
-          return html(string);
-        } else {
-          return super.render(model);
-        }
-      }
-    });
-    when(htmlRenderer.render(property(object, model)));
-    thenReturned(html(format("%s&nbsp;&nbsp;%s", string, model)));
   }
 
   @Test

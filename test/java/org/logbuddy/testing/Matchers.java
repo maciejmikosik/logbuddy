@@ -7,6 +7,7 @@ import static org.testory.Testory.any;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.logbuddy.Message;
 
 public class Matchers {
   public static Matcher<Throwable> causedBy(Matcher<Throwable> causeMatcher) {
@@ -23,5 +24,17 @@ public class Matchers {
 
   public static <T> T anyInstanceOf(Class<T> type) {
     return any(type, instanceOf(type));
+  }
+
+  public static Matcher<Message> withContent(Matcher<?> contentMatcher) {
+    return new TypeSafeMatcher<Message>() {
+      public void describeTo(Description description) {
+        description.appendText(format("messageWithContent(%s)", contentMatcher));
+      }
+
+      protected boolean matchesSafely(Message item) {
+        return contentMatcher.matches(item.content());
+      }
+    };
   }
 }

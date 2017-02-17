@@ -20,11 +20,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 
 public class TestFuse {
   private Fuse fuse, otherFuse;
   private Logger logger, fused;
-  private Object model;
+  private Message message;
   private Throwable throwable;
 
   @Before
@@ -38,45 +39,45 @@ public class TestFuse {
   @Test
   public void delegates_logging() {
     given(fused = fuse.install(logger));
-    when(() -> fused.log(model));
+    when(() -> fused.log(message));
     thenReturned();
-    thenCalled(logger).log(model);
+    thenCalled(logger).log(message);
   }
 
   @Test
   public void ignores_recursive_invocation() {
     given(fused = fuse.install(logger));
     given(invocation -> {
-      fused.log(invocation.arguments.get(0));
+      fused.log((Message) invocation.arguments.get(0));
       return null;
-    }, logger).log(any(Object.class));
-    when(() -> fused.log(model));
+    }, logger).log(any(Message.class));
+    when(() -> fused.log(message));
     thenReturned();
-    thenCalledTimes(1, logger).log(any(Object.class));
+    thenCalledTimes(1, logger).log(any(Message.class));
   }
 
   @Test
   public void cannot_pass_through_same_fuse_twice() {
     given(fused = fuse.install(fuse.install(logger)));
-    when(() -> fused.log(model));
-    thenCalledNever(logger).log(any(Object.class));
+    when(() -> fused.log(message));
+    thenCalledNever(logger).log(any(Message.class));
   }
 
   @Test
   public void fuses_are_independent() {
     given(fused = fuse.install(otherFuse.install(logger)));
-    when(() -> fused.log(model));
-    thenCalled(logger).log(model);
+    when(() -> fused.log(message));
+    thenCalled(logger).log(message);
   }
 
   @Test
   public void recovers_from_exception() {
     given(fused = fuse.install(logger));
-    given(willThrow(throwable), logger).log(any(Object.class));
-    givenTry(fused).log(model);
-    when(() -> fused.log(model));
+    given(willThrow(throwable), logger).log(any(Message.class));
+    givenTry(fused).log(message);
+    when(() -> fused.log(message));
     thenThrown(throwable);
-    thenCalledTimes(2, logger).log(model);
+    thenCalledTimes(2, logger).log(message);
   }
 
   @Test

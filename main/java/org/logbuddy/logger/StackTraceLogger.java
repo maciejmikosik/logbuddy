@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static org.logbuddy.model.Depth.depth;
 
 import org.logbuddy.Logger;
+import org.logbuddy.Message;
 import org.logbuddy.model.Invocation;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
@@ -24,12 +25,12 @@ public class StackTraceLogger implements Logger {
     return new StackTraceLogger(logger);
   }
 
-  public void log(Object model) {
-    if (model instanceof Returned || model instanceof Thrown) {
+  public void log(Message message) {
+    if (message.content() instanceof Returned || message.content() instanceof Thrown) {
       numberOfInvocations.set(numberOfInvocations.get() - 1);
     }
-    logger.log(depth(numberOfInvocations.get(), model));
-    if (model instanceof Invocation) {
+    logger.log(message.attribute(depth(numberOfInvocations.get())));
+    if (message.content() instanceof Invocation) {
       numberOfInvocations.set(numberOfInvocations.get() + 1);
     }
   }
