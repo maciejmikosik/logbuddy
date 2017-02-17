@@ -65,7 +65,7 @@ public class TestTextRenderer {
     when(renderer.render(message(object)
         .attribute(attributeA)
         .attribute(attributeB)));
-    thenReturned(text(format("%s\t%s\t%s",
+    thenReturned(text(format("%s\t%s\t%s\n",
         renderer.render(attributeA).string,
         renderer.render(attributeB).string,
         renderer.render(object).string)));

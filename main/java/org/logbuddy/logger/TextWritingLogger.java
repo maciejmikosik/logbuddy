@@ -30,7 +30,6 @@ public class TextWritingLogger implements Logger {
   public void log(Message message) {
     try {
       writer.write(renderer.render(message).string);
-      writer.write("\n");
       writer.flush();
     } catch (IOException e) {
       throw new LogBuddyException(e);

@@ -74,6 +74,7 @@ public class TextRenderer implements Renderer<Text> {
       builder.append(render(attribute).string).append("\t");
     }
     builder.append(render(message.content()).string);
+    builder.append("\n");
     return text(builder.toString());
   }
 

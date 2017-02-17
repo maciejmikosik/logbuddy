@@ -43,7 +43,7 @@ public class TestTextWritingLogger {
     given(willReturn(rendered), renderer).render(message);
     when(() -> logger.log(message));
     thenReturned();
-    thenEqual(writer.toString(), rendered.string + "\n");
+    thenEqual(writer.toString(), rendered.string);
   }
 
   @Test
