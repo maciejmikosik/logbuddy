@@ -2,6 +2,7 @@ package org.logbuddy.renderer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.logbuddy.Message.message;
 import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Property.property;
@@ -61,6 +62,19 @@ public class TestHtmlRenderer {
     given(willReturn(text("&_<_>_ _\t")), textRenderer).render(object);
     when(htmlRenderer.render(object));
     thenReturned(html("&amp;_&lt;_&gt;_&nbsp;_&nbsp;&nbsp;"));
+  }
+
+  @Test
+  public void renders_message() {
+    given(textRenderer = model -> text(format("rendered(%s)", model)));
+    given(htmlRenderer = new HtmlRenderer(textRenderer));
+    when(htmlRenderer.render(message(object)
+        .attribute(a)
+        .attribute(b)));
+    thenReturned(html(format("%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s",
+        htmlRenderer.render(a).body,
+        htmlRenderer.render(b).body,
+        htmlRenderer.render(object).body)));
   }
 
   @Test

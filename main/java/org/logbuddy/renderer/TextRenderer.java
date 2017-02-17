@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
+import org.logbuddy.Message;
 import org.logbuddy.Renderer;
 import org.logbuddy.model.Depth;
 import org.logbuddy.model.Invocation;
@@ -45,6 +46,8 @@ public class TextRenderer implements Renderer<Text> {
   public Text render(Object model) {
     if (model == null) {
       return text("null");
+    } else if (model instanceof Message) {
+      return renderImpl((Message) model);
     } else if (model instanceof Invocation) {
       return renderImpl((Invocation) model);
     } else if (model instanceof Returned) {
@@ -66,6 +69,15 @@ public class TextRenderer implements Renderer<Text> {
     } else {
       return text(String.valueOf(model));
     }
+  }
+
+  private Text renderImpl(Message message) {
+    StringBuilder builder = new StringBuilder();
+    for (Object attribute : message.attributes()) {
+      builder.append(render(attribute).string).append("\t");
+    }
+    builder.append(render(message.content()).string);
+    return text(builder.toString());
   }
 
   private Text renderImpl(Invocation invocation) {

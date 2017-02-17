@@ -2,6 +2,7 @@ package org.logbuddy.renderer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.logbuddy.Message.message;
 import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Property.property;
@@ -35,6 +36,7 @@ public class TestTextRenderer {
   private Thread thread;
   private Object model;
   private StringWriter buffer;
+  private Object attributeA, attributeB;
 
   @Before
   public void before() {
@@ -55,6 +57,20 @@ public class TestTextRenderer {
   public void renders_null() {
     when(renderer.render(null));
     thenReturned(text("null"));
+  }
+
+  @Test
+  public void renders_message() {
+    given(object = new Thread("content"));
+    given(attributeA = new Thread("attributeA"));
+    given(attributeB = new Thread("attributeB"));
+    when(renderer.render(message(object)
+        .attribute(attributeA)
+        .attribute(attributeB)));
+    thenReturned(text(format("%s\t%s\t%s",
+        renderer.render(attributeA).string,
+        renderer.render(attributeB).string,
+        renderer.render(object).string)));
   }
 
   @Test
