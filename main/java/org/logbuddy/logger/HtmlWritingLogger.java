@@ -29,10 +29,7 @@ public class HtmlWritingLogger implements Logger {
 
   public void log(Message message) {
     try {
-      writer.write("<span style=\"display: block; white-space: nowrap; font-family: monospace;\">");
       writer.write(renderer.render(message).body);
-      writer.write("</span>");
-      writer.write("\n");
       writer.flush();
     } catch (IOException e) {
       throw new UncheckedIOException(e);

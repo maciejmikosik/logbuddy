@@ -69,7 +69,11 @@ public class TestHtmlRenderer {
     when(htmlRenderer.render(message(object)
         .attribute(a)
         .attribute(b)));
-    thenReturned(html(format("%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s",
+    thenReturned(html(format(""
+        + "<span style=\"display: block; white-space: nowrap; font-family: monospace;\">"
+        + "%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s"
+        + "</span>"
+        + "\n",
         htmlRenderer.render(a).body,
         htmlRenderer.render(b).body,
         htmlRenderer.render(object).body)));

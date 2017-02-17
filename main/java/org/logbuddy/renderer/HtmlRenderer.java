@@ -57,10 +57,12 @@ public class HtmlRenderer implements Renderer<Html> {
 
   private Html renderImpl(Message message) {
     StringBuilder builder = new StringBuilder();
+    builder.append("<span style=\"display: block; white-space: nowrap; font-family: monospace;\">");
     for (Object attribute : message.attributes()) {
       builder.append(render(attribute).body).append("&nbsp;&nbsp;");
     }
     builder.append(render(message.content()).body);
+    builder.append("</span>\n");
     return html(builder.toString());
   }
 
