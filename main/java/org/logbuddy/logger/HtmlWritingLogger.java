@@ -10,18 +10,17 @@ import java.io.Writer;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
 import org.logbuddy.Renderer;
-import org.logbuddy.renderer.Html;
 
 public class HtmlWritingLogger implements Logger {
-  private final Renderer<Html> renderer;
+  private final Renderer<String> renderer;
   private final Writer writer;
 
-  private HtmlWritingLogger(Renderer<Html> renderer, Writer writer) {
+  private HtmlWritingLogger(Renderer<String> renderer, Writer writer) {
     this.renderer = renderer;
     this.writer = writer;
   }
 
-  public static Logger writing(Renderer<Html> renderer, Writer writer) {
+  public static Logger writing(Renderer<String> renderer, Writer writer) {
     check(renderer != null);
     check(writer != null);
     return new HtmlWritingLogger(renderer, writer);
@@ -29,7 +28,7 @@ public class HtmlWritingLogger implements Logger {
 
   public void log(Message message) {
     try {
-      writer.write(renderer.render(message).body);
+      writer.write(renderer.render(message));
       writer.flush();
     } catch (IOException e) {
       throw new UncheckedIOException(e);

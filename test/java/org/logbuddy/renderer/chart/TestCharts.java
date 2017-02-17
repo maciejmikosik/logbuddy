@@ -12,7 +12,6 @@ import static org.quackery.report.AssertException.assertTrue;
 import java.util.List;
 
 import org.junit.runner.RunWith;
-import org.logbuddy.renderer.Html;
 import org.quackery.Case;
 import org.quackery.Quackery;
 import org.quackery.Suite;
@@ -30,8 +29,8 @@ public class TestCharts {
   private static Case testHtmlIsRenderedAsSingleLine(ChartRenderer chart) {
     return newCase(format("%s html is rendered as single line", chart), () -> {
       ChartModel model = chartModel(asList(1, 2, 3));
-      Html html = chart.render(model);
-      assertTrue(!html.body.contains("\n"));
+      String html = chart.render(model);
+      assertTrue(!html.contains("\n"));
     });
   }
 }

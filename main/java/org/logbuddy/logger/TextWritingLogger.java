@@ -10,18 +10,17 @@ import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
 import org.logbuddy.Renderer;
-import org.logbuddy.renderer.Text;
 
 public class TextWritingLogger implements Logger {
-  private final Renderer<Text> renderer;
+  private final Renderer<String> renderer;
   private final Writer writer;
 
-  private TextWritingLogger(Renderer<Text> renderer, Writer writer) {
+  private TextWritingLogger(Renderer<String> renderer, Writer writer) {
     this.renderer = renderer;
     this.writer = writer;
   }
 
-  public static Logger writing(Renderer<Text> renderer, Writer writer) {
+  public static Logger writing(Renderer<String> renderer, Writer writer) {
     check(renderer != null);
     check(writer != null);
     return new TextWritingLogger(renderer, writer);
@@ -29,7 +28,7 @@ public class TextWritingLogger implements Logger {
 
   public void log(Message message) {
     try {
-      writer.write(renderer.render(message).string);
+      writer.write(renderer.render(message));
       writer.flush();
     } catch (IOException e) {
       throw new LogBuddyException(e);

@@ -1,7 +1,6 @@
 package org.logbuddy.renderer.gallery;
 
 import static java.lang.String.format;
-import static org.logbuddy.renderer.Html.html;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -13,7 +12,6 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 
 import org.logbuddy.LogBuddyException;
-import org.logbuddy.renderer.Html;
 
 public class Gallery {
   private final Optional<Integer> width;
@@ -36,11 +34,11 @@ public class Gallery {
     return new Gallery(width, Optional.of(height));
   }
 
-  public Html paint(BufferedImage image) {
+  public String paint(BufferedImage image) {
     return paint(encode("png", image));
   }
 
-  public Html paint(byte[] image) {
+  public String paint(byte[] image) {
     String base64Image = utf8String(Base64.getEncoder().encode(image));
     String openImageInNewTab = format(""
         + "var w = window.open(); "
@@ -54,7 +52,7 @@ public class Gallery {
     builder.append(format(" src=data:/image;base64,%s", base64Image));
     builder.append(format(" onclick=\"%s\"", openImageInNewTab));
     builder.append("/>");
-    return html(builder.toString());
+    return builder.toString();
   }
 
   private static byte[] encode(String format, BufferedImage image) {

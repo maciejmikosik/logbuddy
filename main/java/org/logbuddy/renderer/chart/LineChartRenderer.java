@@ -1,14 +1,11 @@
 package org.logbuddy.renderer.chart;
 
-import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.chart.Canvas.canvas;
 import static org.logbuddy.renderer.chart.Translation.translation;
 
 import java.awt.Color;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
-
-import org.logbuddy.renderer.Html;
 
 public class LineChartRenderer implements ChartRenderer {
   private final Configuration configuration;
@@ -57,7 +54,7 @@ public class LineChartRenderer implements ChartRenderer {
     return new LineChartRenderer(configuration.dotSize(size));
   }
 
-  public Html render(ChartModel model) {
+  public String render(ChartModel model) {
     Translation translation = translation()
         .sourceX(model.points.firstKey(), model.points.lastKey())
         .sourceY(
@@ -72,7 +69,7 @@ public class LineChartRenderer implements ChartRenderer {
     drawAxis(model, canvas, translation);
     drawLine(model, canvas, translation);
     drawPoints(model, canvas, translation);
-    return html(canvas.toHtml().replace("\n", " "));
+    return canvas.toHtml().replace("\n", " ");
   }
 
   private void drawAxis(ChartModel model, Canvas canvas, Translation translation) {

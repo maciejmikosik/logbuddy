@@ -6,7 +6,6 @@ import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.common.Strings.lines;
 import static org.logbuddy.common.Strings.times;
 import static org.logbuddy.common.Throwables.stackTrace;
-import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.gallery.Gallery.gallery;
 
 import java.awt.image.BufferedImage;
@@ -21,15 +20,15 @@ import org.logbuddy.model.Invocation;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
 
-public class HtmlRenderer implements Renderer<Html> {
-  private final Renderer<Text> textRenderer;
+public class HtmlRenderer implements Renderer<String> {
+  private final Renderer<String> textRenderer;
 
-  public HtmlRenderer(Renderer<Text> textRenderer) {
+  public HtmlRenderer(Renderer<String> textRenderer) {
     check(textRenderer != null);
     this.textRenderer = textRenderer;
   }
 
-  public Html render(Object model) {
+  public String render(Object model) {
     if (model instanceof Message) {
       return renderImpl((Message) model);
     } else if (model instanceof Invocation) {
@@ -51,40 +50,40 @@ public class HtmlRenderer implements Renderer<Html> {
           .height(100)
           .paint((BufferedImage) model);
     } else {
-      return asHtml(textRenderer.render(model));
+      return escape(textRenderer.render(model));
     }
   }
 
-  private Html renderImpl(Message message) {
+  private String renderImpl(Message message) {
     StringBuilder builder = new StringBuilder();
     builder.append("<span style=\"display: block; white-space: nowrap; font-family: monospace;\">");
     for (Object attribute : message.attributes()) {
-      builder.append(render(attribute).body).append("&nbsp;&nbsp;");
+      builder.append(render(attribute)).append("&nbsp;&nbsp;");
     }
-    builder.append(render(message.content()).body);
+    builder.append(render(message.content()));
     builder.append("</span>\n");
-    return html(builder.toString());
+    return builder.toString();
   }
 
-  private Html renderImpl(Invocation invocation) {
+  private String renderImpl(Invocation invocation) {
     String renderedArguments = invocation.arguments.stream()
-        .map(argument -> render(argument).body)
+        .map(argument -> render(argument))
         .collect(joining(", "));
-    return html(format("%s.%s(%s)",
-        render(invocation.instance).body,
+    return format("%s.%s(%s)",
+        render(invocation.instance),
         invocation.method.getName(),
-        renderedArguments));
+        renderedArguments);
   }
 
-  private Html renderImpl(Returned returned) {
-    return html(format("returned %s", render(returned.object).body));
+  private String renderImpl(Returned returned) {
+    return format("returned %s", render(returned.object));
   }
 
-  private Html renderImpl(Thrown thrown) {
-    return html(format("thrown %s", render(thrown.throwable).body));
+  private String renderImpl(Thrown thrown) {
+    return format("thrown %s", render(thrown.throwable));
   }
 
-  private Html renderImpl(Throwable throwable) {
+  private String renderImpl(Throwable throwable) {
     String stackTrace = lines(stackTrace(throwable)).stream()
         .map(HtmlRenderer::escape)
         .map(line -> format("<code>%s</code><br/>", line))
@@ -94,21 +93,17 @@ public class HtmlRenderer implements Renderer<Html> {
         + "w.document.write('%s'); "
         + "w.document.close();",
         stackTrace);
-    return html(format("<a href=\"#\" onclick=\"%s\">%s</a>", openStackTraceInNewTab, throwable));
+    return format("<a href=\"#\" onclick=\"%s\">%s</a>", openStackTraceInNewTab, throwable);
   }
 
-  private Html renderImpl(Depth depth) {
-    return html(times(2 * depth.value, "&nbsp;"));
+  private String renderImpl(Depth depth) {
+    return times(2 * depth.value, "&nbsp;");
   }
 
-  private Html renderImpl(String prefix, List<?> list) {
-    return html(list.stream()
-        .map(element -> render(element).body)
-        .collect(joining(escape(", "), escape(prefix + "["), escape("]"))));
-  }
-
-  private static Html asHtml(Text text) {
-    return html(escape(text.string));
+  private String renderImpl(String prefix, List<?> list) {
+    return list.stream()
+        .map(element -> render(element))
+        .collect(joining(escape(", "), escape(prefix + "["), escape("]")));
   }
 
   private static String escape(String string) {

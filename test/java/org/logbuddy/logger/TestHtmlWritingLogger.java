@@ -2,7 +2,6 @@ package org.logbuddy.logger;
 
 import static java.lang.String.format;
 import static org.logbuddy.logger.HtmlWritingLogger.writing;
-import static org.logbuddy.renderer.Html.html;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.spy;
@@ -21,20 +20,19 @@ import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
 import org.logbuddy.Renderer;
-import org.logbuddy.renderer.Html;
 
 public class TestHtmlWritingLogger {
   private StringWriter writer;
-  private Renderer<Html> renderer;
+  private Renderer<String> renderer;
   private Logger logger;
-  private Html rendered;
+  private String rendered;
   private Message message;
 
   @Before
   public void before() {
     givenTest(this);
     given(writer = spy(new StringWriter()));
-    given(rendered = html("rendered.body"));
+    given(rendered = "rendered.body");
   }
 
   @Test
@@ -43,7 +41,7 @@ public class TestHtmlWritingLogger {
     given(willReturn(rendered), renderer).render(message);
     when(() -> logger.log(message));
     thenReturned();
-    thenEqual(writer.toString(), rendered.body);
+    thenEqual(writer.toString(), rendered);
   }
 
   @Test

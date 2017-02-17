@@ -7,7 +7,6 @@ import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
-import static org.logbuddy.renderer.Text.text;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenReturned;
@@ -26,7 +25,7 @@ import org.logbuddy.Renderer;
 
 public class TestTextRenderer {
   private Object object;
-  private Renderer<Text> renderer;
+  private Renderer<String> renderer;
   private Method method;
   private Object instance, a, b, c;
   private String string;
@@ -48,13 +47,13 @@ public class TestTextRenderer {
   @Test
   public void renders_object() {
     when(renderer.render(object));
-    thenReturned(text(object.toString()));
+    thenReturned(object.toString());
   }
 
   @Test
   public void renders_null() {
     when(renderer.render(null));
-    thenReturned(text("null"));
+    thenReturned("null");
   }
 
   @Test
@@ -65,67 +64,67 @@ public class TestTextRenderer {
     when(renderer.render(message(object)
         .attribute(attributeA)
         .attribute(attributeB)));
-    thenReturned(text(format("%s\t%s\t%s\n",
-        renderer.render(attributeA).string,
-        renderer.render(attributeB).string,
-        renderer.render(object).string)));
+    thenReturned(format("%s\t%s\t%s\n",
+        renderer.render(attributeA),
+        renderer.render(attributeB),
+        renderer.render(object)));
   }
 
   @Test
   public void renders_invocation_with_many_arguments() {
     when(renderer.render(invocation(instance, method, asList(a, b, c))));
-    thenReturned(text(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, b, c)));
+    thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, b, c));
   }
 
   @Test
   public void renders_invocation_with_no_arguments() {
     when(renderer.render(invocation(instance, method, asList())));
-    thenReturned(text(format("%s.%s()", instance, method.getName())));
+    thenReturned(format("%s.%s()", instance, method.getName()));
   }
 
   @Test
   public void renders_invocation_instance() {
     given(renderer = new TextRenderer() {
-      public Text render(Object model) {
+      public String render(Object model) {
         if (model == instance) {
-          return text(string);
+          return string;
         } else {
           return super.render(model);
         }
       }
     });
     when(renderer.render(invocation(instance, method, asList(a, b, c))));
-    thenReturned(text(format("%s.%s(%s, %s, %s)", string, method.getName(), a, b, c)));
+    thenReturned(format("%s.%s(%s, %s, %s)", string, method.getName(), a, b, c));
   }
 
   @Test
   public void renders_invocation_arguments() {
     given(renderer = new TextRenderer() {
-      public Text render(Object model) {
+      public String render(Object model) {
         if (model == b) {
-          return text(string);
+          return string;
         } else {
           return super.render(model);
         }
       }
     });
     when(renderer.render(invocation(instance, method, asList(a, b, c))));
-    thenReturned(text(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, string, c)));
+    thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, string, c));
   }
 
   @Test
   public void renders_returned() {
     given(renderer = new TextRenderer() {
-      public Text render(Object model) {
+      public String render(Object model) {
         if (model == object) {
-          return text(string);
+          return string;
         } else {
           return super.render(model);
         }
       }
     });
     when(renderer.render(returned(object)));
-    thenReturned(text(format("returned %s", string)));
+    thenReturned(format("returned %s", string));
   }
 
   @Test
@@ -133,63 +132,63 @@ public class TestTextRenderer {
     given(renderer = new TextRenderer());
     when(renderer.render(thrown(throwable)));
     throwable.printStackTrace(new PrintWriter(buffer));
-    thenReturned(text(format("thrown %s", buffer.toString())));
+    thenReturned(format("thrown %s", buffer.toString()));
   }
 
   @Test
   public void renders_stack_trace_depth() {
     when(renderer.render(depth(3)));
-    thenReturned(text("\t\t\t"));
+    thenReturned("\t\t\t");
   }
 
   @Test
   public void renders_empty_list() {
     when(renderer.render(asList()));
-    thenReturned(text(format("List[]")));
+    thenReturned(format("List[]"));
   }
 
   @Test
   public void renders_list() {
     when(renderer.render(asList(a, b, c)));
-    thenReturned(text(format("List[%s, %s, %s]", a, b, c)));
+    thenReturned(format("List[%s, %s, %s]", a, b, c));
   }
 
   @Test
   public void renders_empty_array() {
     when(renderer.render(new Object[] {}));
-    thenReturned(text("[]"));
+    thenReturned("[]");
   }
 
   @Test
   public void renders_array() {
     when(renderer.render(new Object[] { a, b, c }));
-    thenReturned(text(format("[%s, %s, %s]", a, b, c)));
+    thenReturned(format("[%s, %s, %s]", a, b, c));
   }
 
   @Test
   public void renders_primitive_array() {
     when(renderer.render(new int[] { 1, 2, 3 }));
-    thenReturned(text(format("[%s, %s, %s]", 1, 2, 3)));
+    thenReturned(format("[%s, %s, %s]", 1, 2, 3));
   }
 
   @Test
   public void renders_time_in_utc() {
     given(time = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneOffset.UTC));
     when(renderer.render(time));
-    thenReturned(text("1970-01-01T00:00:00.000Z"));
+    thenReturned("1970-01-01T00:00:00.000Z");
   }
 
   @Test
   public void renders_time_using_timezone() {
     given(time = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneOffset.ofHours(2)));
     when(renderer.render(time));
-    thenReturned(text("1970-01-01T02:00:00.000+02:00"));
+    thenReturned("1970-01-01T02:00:00.000+02:00");
   }
 
   @Test
   public void renders_thread() {
     given(thread = new Thread(string));
     when(renderer.render(thread));
-    thenReturned(text(format("Thread(%s)", string)));
+    thenReturned(format("Thread(%s)", string));
   }
 }

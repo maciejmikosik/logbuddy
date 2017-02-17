@@ -11,10 +11,9 @@ import java.nio.charset.Charset;
 
 import org.logbuddy.Logger;
 import org.logbuddy.Renderer;
-import org.logbuddy.renderer.Html;
 
 public class BrowserLogger {
-  public static Logger browserLogger(Renderer<Html> renderer) {
+  public static Logger browserLogger(Renderer<String> renderer) {
     check(renderer != null);
     try {
       Process process = new ProcessBuilder("bcat", "--html")
