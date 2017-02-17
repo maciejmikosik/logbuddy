@@ -5,7 +5,6 @@ import static java.util.Arrays.asList;
 import static org.logbuddy.Message.message;
 import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
-import static org.logbuddy.model.Property.property;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
 import static org.logbuddy.renderer.Html.html;
@@ -32,7 +31,6 @@ public class TestHtmlRenderer {
   private Method method;
   private Object instance, a, b, c;
   private Throwable throwable;
-  private Object model;
 
   @Before
   public void before() {
@@ -169,21 +167,6 @@ public class TestHtmlRenderer {
     given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
     when(htmlRenderer.render(new Object[] { a, b, c }));
     thenReturned(html(format("[%s,&nbsp;%s,&nbsp;%s]", a, b, c)));
-  }
-
-  @Test
-  public void renders_property() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())) {
-      public Html render(Object model) {
-        if (model == object) {
-          return html(string);
-        } else {
-          return super.render(model);
-        }
-      }
-    });
-    when(htmlRenderer.render(property(object, model)));
-    thenReturned(html(format("%s&nbsp;&nbsp;%s", string, model)));
   }
 
   @Test

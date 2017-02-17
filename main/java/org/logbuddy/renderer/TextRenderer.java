@@ -21,7 +21,6 @@ import org.logbuddy.Message;
 import org.logbuddy.Renderer;
 import org.logbuddy.model.Depth;
 import org.logbuddy.model.Invocation;
-import org.logbuddy.model.Property;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
 
@@ -56,8 +55,6 @@ public class TextRenderer implements Renderer<Text> {
       return renderImpl((Thrown) model);
     } else if (model instanceof Depth) {
       return renderImpl((Depth) model);
-    } else if (model instanceof Property) {
-      return renderImpl((Property) model);
     } else if (model instanceof ZonedDateTime) {
       return renderImpl((ZonedDateTime) model);
     } else if (model instanceof Thread) {
@@ -106,12 +103,6 @@ public class TextRenderer implements Renderer<Text> {
     return text(list.stream()
         .map(element -> render(element).string)
         .collect(joining(", ", prefix + "[", "]")));
-  }
-
-  private Text renderImpl(Property property) {
-    return text(format("%s\t%s",
-        render(property.value).string,
-        render(property.model).string));
   }
 
   private Text renderImpl(ZonedDateTime zonedDateTime) {

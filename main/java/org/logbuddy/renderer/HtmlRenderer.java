@@ -18,7 +18,6 @@ import org.logbuddy.Message;
 import org.logbuddy.Renderer;
 import org.logbuddy.model.Depth;
 import org.logbuddy.model.Invocation;
-import org.logbuddy.model.Property;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
 
@@ -43,8 +42,6 @@ public class HtmlRenderer implements Renderer<Html> {
       return renderImpl((Throwable) model);
     } else if (model instanceof Depth) {
       return renderImpl((Depth) model);
-    } else if (model instanceof Property) {
-      return renderImpl((Property) model);
     } else if (model instanceof List) {
       return renderImpl("List", (List<?>) model);
     } else if (model != null && model.getClass().isArray()) {
@@ -106,12 +103,6 @@ public class HtmlRenderer implements Renderer<Html> {
     return html(list.stream()
         .map(element -> render(element).body)
         .collect(joining(escape(", "), escape(prefix + "["), escape("]"))));
-  }
-
-  private Html renderImpl(Property property) {
-    return html(format("%s&nbsp;&nbsp;%s",
-        render(property.value).body,
-        render(property.model).body));
   }
 
   private static Html asHtml(Text text) {
