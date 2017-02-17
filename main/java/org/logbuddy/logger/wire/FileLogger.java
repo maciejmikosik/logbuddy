@@ -4,7 +4,7 @@ import static java.nio.file.Files.createFile;
 import static java.nio.file.Files.deleteIfExists;
 import static java.nio.file.Files.newBufferedWriter;
 import static org.logbuddy.LogBuddyException.check;
-import static org.logbuddy.logger.TextWritingLogger.writing;
+import static org.logbuddy.logger.WritingLogger.logger;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -19,7 +19,7 @@ public class FileLogger {
   public static Logger fileLogger(Path file, Renderer<String> renderer) {
     check(file != null);
     check(renderer != null);
-    return writing(renderer, writer(file));
+    return logger(writer(file), renderer);
   }
 
   private static Writer writer(Path file) {
