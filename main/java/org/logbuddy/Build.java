@@ -14,8 +14,8 @@ import org.logbuddy.logger.AsynchronousLogger;
 import org.logbuddy.logger.CatchingLogger;
 import org.logbuddy.logger.ComposedLogger;
 import org.logbuddy.logger.Fuse;
+import org.logbuddy.logger.InvocationDepthLogger;
 import org.logbuddy.logger.NoLogger;
-import org.logbuddy.logger.StackTraceLogger;
 import org.logbuddy.logger.SynchronizedLogger;
 import org.logbuddy.logger.ThreadLogger;
 import org.logbuddy.logger.TimeLogger;
@@ -31,7 +31,7 @@ import org.logbuddy.renderer.gallery.Gallery;
 
 public class Build {
   public List<Class<?>> loggers = asList(
-      StackTraceLogger.class,
+      InvocationDepthLogger.class,
       ThreadLogger.class,
       TimeLogger.class,
       SynchronizedLogger.class,

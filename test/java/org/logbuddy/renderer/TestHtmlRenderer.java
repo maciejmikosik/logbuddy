@@ -3,8 +3,8 @@ package org.logbuddy.renderer;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.Message.message;
-import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
+import static org.logbuddy.model.InvocationDepth.invocationDepth;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
 import static org.testory.Testory.given;
@@ -145,7 +145,7 @@ public class TestHtmlRenderer {
   @Test
   public void renders_stack_trace_depth() {
     given(htmlRenderer = new HtmlRenderer(Object::toString));
-    when(htmlRenderer.render(depth(3)));
+    when(htmlRenderer.render(invocationDepth(3)));
     thenReturned("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
   }
 

@@ -4,23 +4,23 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static org.logbuddy.LogBuddyException.check;
 
-public class Depth {
+public class InvocationDepth {
   public final int value;
 
-  private Depth(int value) {
+  private InvocationDepth(int value) {
     this.value = value;
   }
 
-  public static Depth depth(int value) {
+  public static InvocationDepth invocationDepth(int value) {
     check(value >= 0);
-    return new Depth(value);
+    return new InvocationDepth(value);
   }
 
   public boolean equals(Object object) {
-    return object instanceof Depth && equals((Depth) object);
+    return object instanceof InvocationDepth && equals((InvocationDepth) object);
   }
 
-  private boolean equals(Depth depth) {
+  private boolean equals(InvocationDepth depth) {
     return value == depth.value;
   }
 
@@ -29,6 +29,6 @@ public class Depth {
   }
 
   public String toString() {
-    return format("depth(%s)", value);
+    return format("invocationDepth(%s)", value);
   }
 }

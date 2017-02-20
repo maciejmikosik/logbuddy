@@ -3,8 +3,8 @@ package org.logbuddy.renderer;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.Message.message;
-import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
+import static org.logbuddy.model.InvocationDepth.invocationDepth;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
 import static org.testory.Testory.given;
@@ -137,7 +137,7 @@ public class TestTextRenderer {
 
   @Test
   public void renders_stack_trace_depth() {
-    when(renderer.render(depth(3)));
+    when(renderer.render(invocationDepth(3)));
     thenReturned("\t\t\t");
   }
 

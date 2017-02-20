@@ -18,8 +18,8 @@ import java.util.List;
 
 import org.logbuddy.Message;
 import org.logbuddy.Renderer;
-import org.logbuddy.model.Depth;
 import org.logbuddy.model.Invocation;
+import org.logbuddy.model.InvocationDepth;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
 
@@ -52,8 +52,8 @@ public class TextRenderer implements Renderer<String> {
       return renderImpl((Returned) model);
     } else if (model instanceof Thrown) {
       return renderImpl((Thrown) model);
-    } else if (model instanceof Depth) {
-      return renderImpl((Depth) model);
+    } else if (model instanceof InvocationDepth) {
+      return renderImpl((InvocationDepth) model);
     } else if (model instanceof ZonedDateTime) {
       return renderImpl((ZonedDateTime) model);
     } else if (model instanceof Thread) {
@@ -95,7 +95,7 @@ public class TextRenderer implements Renderer<String> {
     return format("thrown %s", stackTrace(thrown.throwable));
   }
 
-  private String renderImpl(Depth depth) {
+  private String renderImpl(InvocationDepth depth) {
     return times(depth.value, "\t");
   }
 

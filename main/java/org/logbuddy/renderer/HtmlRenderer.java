@@ -15,8 +15,8 @@ import java.util.List;
 
 import org.logbuddy.Message;
 import org.logbuddy.Renderer;
-import org.logbuddy.model.Depth;
 import org.logbuddy.model.Invocation;
+import org.logbuddy.model.InvocationDepth;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
 
@@ -39,8 +39,8 @@ public class HtmlRenderer implements Renderer<String> {
       return renderImpl((Thrown) model);
     } else if (model instanceof Throwable) {
       return renderImpl((Throwable) model);
-    } else if (model instanceof Depth) {
-      return renderImpl((Depth) model);
+    } else if (model instanceof InvocationDepth) {
+      return renderImpl((InvocationDepth) model);
     } else if (model instanceof List) {
       return renderImpl("List", (List<?>) model);
     } else if (model != null && model.getClass().isArray()) {
@@ -96,7 +96,7 @@ public class HtmlRenderer implements Renderer<String> {
     return format("<a href=\"#\" onclick=\"%s\">%s</a>", openStackTraceInNewTab, throwable);
   }
 
-  private String renderImpl(Depth depth) {
+  private String renderImpl(InvocationDepth depth) {
     return times(2 * depth.value, "&nbsp;");
   }
 
