@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.joining;
 import static org.logbuddy.common.Collections.arrayToList;
 import static org.logbuddy.common.Strings.times;
 import static org.logbuddy.common.Throwables.stackTrace;
-import static org.logbuddy.renderer.Text.text;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +23,7 @@ import org.logbuddy.model.Invocation;
 import org.logbuddy.model.Returned;
 import org.logbuddy.model.Thrown;
 
-public class TextRenderer implements Renderer<Text> {
+public class TextRenderer implements Renderer<String> {
   private final DateTimeFormatter dateTimeFormatter;
 
   public TextRenderer() {
@@ -42,9 +41,9 @@ public class TextRenderer implements Renderer<Text> {
         .toFormatter();
   }
 
-  public Text render(Object model) {
+  public String render(Object model) {
     if (model == null) {
-      return text("null");
+      return "null";
     } else if (model instanceof Message) {
       return renderImpl((Message) model);
     } else if (model instanceof Invocation) {
@@ -64,52 +63,53 @@ public class TextRenderer implements Renderer<Text> {
     } else if (model.getClass().isArray()) {
       return renderImpl("", arrayToList(model));
     } else {
-      return text(String.valueOf(model));
+      return String.valueOf(model);
     }
   }
 
-  private Text renderImpl(Message message) {
+  private String renderImpl(Message message) {
     StringBuilder builder = new StringBuilder();
     for (Object attribute : message.attributes()) {
-      builder.append(render(attribute).string).append("\t");
+      builder.append(render(attribute)).append("\t");
     }
-    builder.append(render(message.content()).string);
-    return text(builder.toString());
+    builder.append(render(message.content()));
+    builder.append("\n");
+    return builder.toString();
   }
 
-  private Text renderImpl(Invocation invocation) {
+  private String renderImpl(Invocation invocation) {
     String renderedArguments = invocation.arguments.stream()
-        .map(argument -> render(argument).string)
+        .map(argument -> render(argument))
         .collect(joining(", "));
-    return text(format("%s.%s(%s)",
-        render(invocation.instance).string,
+    return format("%s.%s(%s)",
+        render(invocation.instance),
         invocation.method.getName(),
-        renderedArguments));
+        renderedArguments);
   }
 
-  private Text renderImpl(Returned returned) {
-    return text(format("returned %s", render(returned.object).string));
+  private String renderImpl(Returned returned) {
+    return format("returned %s", render(returned.object));
   }
 
-  private Text renderImpl(Thrown thrown) {
-    return text(format("thrown %s", stackTrace(thrown.throwable)));
+  private String renderImpl(Thrown thrown) {
+    return format("thrown %s", stackTrace(thrown.throwable));
   }
 
-  private Text renderImpl(Depth depth) {
-    return text(times(depth.value, "\t"));
+  private String renderImpl(Depth depth) {
+    return times(depth.value, "\t");
   }
 
-  private Text renderImpl(String prefix, List<?> list) {
-    return text(list.stream()
-        .map(element -> render(element).string)
-        .collect(joining(", ", prefix + "[", "]")));
+  private String renderImpl(String prefix, List<?> list) {
+    return list.stream()
+        .map(element -> render(element))
+        .collect(joining(", ", prefix + "[", "]"));
   }
 
-  private Text renderImpl(ZonedDateTime zonedDateTime) {
-    return text(dateTimeFormatter.format(zonedDateTime));
+  private String renderImpl(ZonedDateTime zonedDateTime) {
+    return dateTimeFormatter.format(zonedDateTime);
   }
 
-  private Text renderImpl(Thread thread) {
-    return text(format("Thread(%s)", thread.getName()));
+  private String renderImpl(Thread thread) {
+    return format("Thread(%s)", thread.getName());
   }
 }

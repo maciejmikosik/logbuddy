@@ -1,13 +1,11 @@
 package org.logbuddy.renderer.chart;
 
 import static java.awt.Color.BLUE;
-import static org.logbuddy.renderer.Html.html;
 import static org.logbuddy.renderer.chart.Canvas.canvas;
 import static org.logbuddy.renderer.chart.Translation.translation;
 
 import java.awt.Color;
 
-import org.logbuddy.renderer.Html;
 import org.logbuddy.renderer.chart.Canvas.LinearGradient;
 
 public class SaturationChartRenderer implements ChartRenderer {
@@ -41,7 +39,7 @@ public class SaturationChartRenderer implements ChartRenderer {
     return new SaturationChartRenderer(configuration.color(color));
   }
 
-  public Html render(ChartModel model) {
+  public String render(ChartModel model) {
     Double min = configuration.minimum()
         .orElseGet(() -> model.points.values().stream().min(Double::compareTo).get());
     Double max = configuration.maximum()
@@ -62,7 +60,7 @@ public class SaturationChartRenderer implements ChartRenderer {
         });
     canvas.fillStyle(gradient);
     canvas.fillRect(0, 0, canvas.width, canvas.height);
-    return html(canvas.toHtml().replace("\n", " "));
+    return canvas.toHtml().replace("\n", " ");
   }
 
   private static double phase(double begin, double value, double end) {

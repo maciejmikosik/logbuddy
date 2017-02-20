@@ -7,8 +7,6 @@ import static org.logbuddy.model.Depth.depth;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.Returned.returned;
 import static org.logbuddy.model.Thrown.thrown;
-import static org.logbuddy.renderer.Html.html;
-import static org.logbuddy.renderer.Text.text;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenReturned;
@@ -24,8 +22,7 @@ import org.logbuddy.LogBuddyException;
 import org.logbuddy.Renderer;
 
 public class TestHtmlRenderer {
-  private Renderer<Html> htmlRenderer;
-  private Renderer<Text> textRenderer;
+  private Renderer<String> htmlRenderer, textRenderer;
   private Object object;
   private String string;
   private Method method;
@@ -41,132 +38,136 @@ public class TestHtmlRenderer {
   @Test
   public void delegates_rendering_object() {
     given(htmlRenderer = new HtmlRenderer(textRenderer));
-    given(willReturn(text(string)), textRenderer).render(object);
+    given(willReturn(string), textRenderer).render(object);
     when(htmlRenderer.render(object));
-    thenReturned(html(string));
+    thenReturned(string);
   }
 
   @Test
   public void delegates_rendering_null() {
     given(htmlRenderer = new HtmlRenderer(textRenderer));
-    given(willReturn(text(string)), textRenderer).render(null);
+    given(willReturn(string), textRenderer).render(null);
     when(htmlRenderer.render(null));
-    thenReturned(html(string));
+    thenReturned(string);
   }
 
   @Test
   public void escapes_html_characters() {
     given(htmlRenderer = new HtmlRenderer(textRenderer));
-    given(willReturn(text("&_<_>_ _\t")), textRenderer).render(object);
+    given(willReturn("&_<_>_ _\t"), textRenderer).render(object);
     when(htmlRenderer.render(object));
-    thenReturned(html("&amp;_&lt;_&gt;_&nbsp;_&nbsp;&nbsp;"));
+    thenReturned("&amp;_&lt;_&gt;_&nbsp;_&nbsp;&nbsp;");
   }
 
   @Test
   public void renders_message() {
-    given(textRenderer = model -> text(format("rendered(%s)", model)));
+    given(textRenderer = model -> format("rendered(%s)", model));
     given(htmlRenderer = new HtmlRenderer(textRenderer));
     when(htmlRenderer.render(message(object)
         .attribute(a)
         .attribute(b)));
-    thenReturned(html(format("%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s",
-        htmlRenderer.render(a).body,
-        htmlRenderer.render(b).body,
-        htmlRenderer.render(object).body)));
+    thenReturned(format(""
+        + "<span style=\"display: block; white-space: nowrap; font-family: monospace;\">"
+        + "%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s"
+        + "</span>"
+        + "\n",
+        htmlRenderer.render(a),
+        htmlRenderer.render(b),
+        htmlRenderer.render(object)));
   }
 
   @Test
   public void renders_invocation_with_many_arguments() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    given(htmlRenderer = new HtmlRenderer(Object::toString));
     when(htmlRenderer.render(invocation(instance, method, asList(a, b, c))));
-    thenReturned(html(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, b, c)));
+    thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, b, c));
   }
 
   @Test
   public void renders_invocation_with_no_arguments() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    given(htmlRenderer = new HtmlRenderer(Object::toString));
     when(htmlRenderer.render(invocation(instance, method, asList())));
-    thenReturned(html(format("%s.%s()", instance, method.getName())));
+    thenReturned(format("%s.%s()", instance, method.getName()));
   }
 
   @Test
   public void renders_invocation_instance() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())) {
-      public Html render(Object model) {
+    given(htmlRenderer = new HtmlRenderer(Object::toString) {
+      public String render(Object model) {
         if (model == instance) {
-          return html(string);
+          return string;
         } else {
           return super.render(model);
         }
       }
     });
     when(htmlRenderer.render(invocation(instance, method, asList(a, b, c))));
-    thenReturned(html(format("%s.%s(%s, %s, %s)", string, method.getName(), a, b, c)));
+    thenReturned(format("%s.%s(%s, %s, %s)", string, method.getName(), a, b, c));
   }
 
   @Test
   public void renders_invocation_arguments() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())) {
-      public Html render(Object model) {
+    given(htmlRenderer = new HtmlRenderer(Object::toString) {
+      public String render(Object model) {
         if (model == b) {
-          return html(string);
+          return string;
         } else {
           return super.render(model);
         }
       }
     });
     when(htmlRenderer.render(invocation(instance, method, asList(a, b, c))));
-    thenReturned(html(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, string, c)));
+    thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, string, c));
   }
 
   @Test
   public void renders_returned() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())) {
-      public Html render(Object model) {
+    given(htmlRenderer = new HtmlRenderer(Object::toString) {
+      public String render(Object model) {
         if (model == object) {
-          return html(string);
+          return string;
         } else {
           return super.render(model);
         }
       }
     });
     when(htmlRenderer.render(returned(object)));
-    thenReturned(html(format("returned %s", string)));
+    thenReturned(format("returned %s", string));
   }
 
   @Test
   public void renders_thrown() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    given(htmlRenderer = new HtmlRenderer(Object::toString));
     when(htmlRenderer.render(thrown(throwable)));
-    thenReturned(html(format("thrown %s", htmlRenderer.render(throwable).body)));
+    thenReturned(format("thrown %s", htmlRenderer.render(throwable)));
   }
 
   @Test
   public void renders_stack_trace_depth() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    given(htmlRenderer = new HtmlRenderer(Object::toString));
     when(htmlRenderer.render(depth(3)));
-    thenReturned(html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"));
+    thenReturned("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
   }
 
   @Test
   public void renders_empty_list() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    given(htmlRenderer = new HtmlRenderer(Object::toString));
     when(htmlRenderer.render(asList()));
-    thenReturned(html("List[]"));
+    thenReturned("List[]");
   }
 
   @Test
   public void renders_list() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    given(htmlRenderer = new HtmlRenderer(Object::toString));
     when(htmlRenderer.render(asList(a, b, c)));
-    thenReturned(html(format("List[%s,&nbsp;%s,&nbsp;%s]", a, b, c)));
+    thenReturned(format("List[%s,&nbsp;%s,&nbsp;%s]", a, b, c));
   }
 
   @Test
   public void renders_array() {
-    given(htmlRenderer = new HtmlRenderer(model -> text(model.toString())));
+    given(htmlRenderer = new HtmlRenderer(Object::toString));
     when(htmlRenderer.render(new Object[] { a, b, c }));
-    thenReturned(html(format("[%s,&nbsp;%s,&nbsp;%s]", a, b, c)));
+    thenReturned(format("[%s,&nbsp;%s,&nbsp;%s]", a, b, c));
   }
 
   @Test

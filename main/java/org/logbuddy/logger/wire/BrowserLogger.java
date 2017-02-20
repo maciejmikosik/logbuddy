@@ -2,7 +2,7 @@ package org.logbuddy.logger.wire;
 
 import static java.lang.ProcessBuilder.Redirect.INHERIT;
 import static org.logbuddy.LogBuddyException.check;
-import static org.logbuddy.logger.HtmlWritingLogger.writing;
+import static org.logbuddy.logger.WritingLogger.logger;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -11,10 +11,9 @@ import java.nio.charset.Charset;
 
 import org.logbuddy.Logger;
 import org.logbuddy.Renderer;
-import org.logbuddy.renderer.Html;
 
 public class BrowserLogger {
-  public static Logger browserLogger(Renderer<Html> renderer) {
+  public static Logger browserLogger(Renderer<String> renderer) {
     check(renderer != null);
     try {
       Process process = new ProcessBuilder("bcat", "--html")
@@ -23,7 +22,7 @@ public class BrowserLogger {
       OutputStreamWriter writer = new OutputStreamWriter(
           process.getOutputStream(),
           Charset.forName("utf8"));
-      return writing(renderer, writer);
+      return logger(writer, renderer);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
