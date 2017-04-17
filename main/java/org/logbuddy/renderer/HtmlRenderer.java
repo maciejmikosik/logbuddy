@@ -8,7 +8,7 @@ import static org.logbuddy.common.Strings.times;
 import static org.logbuddy.common.Throwables.stackTrace;
 import static org.logbuddy.renderer.gallery.Gallery.gallery;
 
-import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +48,10 @@ public class HtmlRenderer implements Renderer<String> {
       return renderImpl("List", (List<?>) model);
     } else if (model != null && model.getClass().isArray()) {
       return renderImpl("", arrayToList(model));
-    } else if (model instanceof BufferedImage) {
+    } else if (model instanceof RenderedImage) {
       return gallery()
           .height(100)
-          .paint((BufferedImage) model);
+          .paint((RenderedImage) model);
     } else {
       return escape(textRenderer.render(model));
     }
