@@ -61,6 +61,8 @@ public class TextRenderer implements Renderer<String> {
       return renderImpl((ZonedDateTime) model);
     } else if (model instanceof Thread) {
       return renderImpl((Thread) model);
+    } else if (model instanceof Class) {
+      return renderImpl((Class) model);
     } else if (model instanceof List) {
       return renderImpl("List", (List<?>) model);
     } else if (model.getClass().isArray()) {
@@ -118,5 +120,9 @@ public class TextRenderer implements Renderer<String> {
 
   private String renderImpl(Thread thread) {
     return format("Thread(%s)", thread.getName());
+  }
+
+  private String renderImpl(Class type) {
+    return type.getName();
   }
 }

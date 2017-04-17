@@ -198,4 +198,11 @@ public class TestTextRenderer {
     when(renderer.render(thread));
     thenReturned(format("Thread(%s)", string));
   }
+
+  @Test
+  public void renders_class() {
+    given(object = Object.class);
+    when(renderer.render(object));
+    thenReturned("java.lang.Object");
+  }
 }
