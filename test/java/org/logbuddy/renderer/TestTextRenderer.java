@@ -64,7 +64,7 @@ public class TestTextRenderer {
     when(renderer.render(message(object)
         .attribute(attributeA)
         .attribute(attributeB)));
-    thenReturned(format("%s\t%s\t%s\n",
+    thenReturned(format("%s  %s  %s",
         renderer.render(attributeA),
         renderer.render(attributeB),
         renderer.render(object)));
@@ -145,7 +145,7 @@ public class TestTextRenderer {
   @Test
   public void renders_stack_trace_depth() {
     when(renderer.render(invocationDepth(3)));
-    thenReturned("\t\t\t");
+    thenReturned("      ");
   }
 
   @Test

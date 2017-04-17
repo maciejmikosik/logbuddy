@@ -45,6 +45,8 @@ public class TextRenderer implements Renderer<String> {
   public String render(Object model) {
     if (model == null) {
       return "null";
+    } else if (model instanceof String) {
+      return escape((String) model);
     } else if (model instanceof Message) {
       return renderImpl((Message) model);
     } else if (model instanceof Invoked) {
@@ -72,57 +74,62 @@ public class TextRenderer implements Renderer<String> {
     }
   }
 
+  protected String escape(String string) {
+    return string;
+  }
+
   private String renderImpl(Message message) {
     StringBuilder builder = new StringBuilder();
     for (Object attribute : message.attributes()) {
-      builder.append(render(attribute)).append("\t");
+      builder.append(render(attribute)).append(escape("  "));
     }
     builder.append(render(message.content()));
-    builder.append("\n");
     return builder.toString();
   }
 
   private String renderImpl(Invoked invoked) {
-    String renderedArguments = invoked.arguments.stream()
-        .map(argument -> render(argument))
-        .collect(joining(", "));
-    return format("%s.%s(%s)",
-        render(invoked.instance),
-        invoked.method.getName(),
-        renderedArguments);
+    return ""
+        + render(invoked.instance)
+        + escape(".")
+        + escape(invoked.method.getName())
+        + escape("(")
+        + invoked.arguments.stream()
+            .map(this::render)
+            .collect(joining(escape(", ")))
+        + escape(")");
   }
 
   private String renderImpl(ReturnedObject returned) {
-    return format("returned %s", render(returned.object));
+    return escape("returned ") + render(returned.object);
   }
 
   private String renderImpl(ReturnedVoid returned) {
-    return "returned";
+    return escape("returned");
   }
 
   private String renderImpl(Thrown thrown) {
-    return format("thrown %s", stackTrace(thrown.throwable));
+    return escape("thrown ") + escape(stackTrace(thrown.throwable));
   }
 
   private String renderImpl(InvocationDepth depth) {
-    return times(depth.value, "\t");
+    return escape(times(2 * depth.value, " "));
   }
 
   private String renderImpl(String prefix, List<?> list) {
     return list.stream()
-        .map(element -> render(element))
-        .collect(joining(", ", prefix + "[", "]"));
+        .map(this::render)
+        .collect(joining(escape(", "), escape(prefix + "["), escape("]")));
   }
 
   private String renderImpl(ZonedDateTime zonedDateTime) {
-    return dateTimeFormatter.format(zonedDateTime);
+    return escape(dateTimeFormatter.format(zonedDateTime));
   }
 
   private String renderImpl(Thread thread) {
-    return format("Thread(%s)", thread.getName());
+    return escape(format("Thread(%s)", thread.getName()));
   }
 
   private String renderImpl(Class type) {
-    return type.getName();
+    return escape(type.getName());
   }
 }
