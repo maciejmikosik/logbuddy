@@ -3,10 +3,10 @@ package org.logbuddy.renderer;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.Message.message;
-import static org.logbuddy.model.Invocation.invocation;
+import static org.logbuddy.model.Completed.returned;
+import static org.logbuddy.model.Completed.thrown;
 import static org.logbuddy.model.InvocationDepth.invocationDepth;
-import static org.logbuddy.model.Returned.returned;
-import static org.logbuddy.model.Thrown.thrown;
+import static org.logbuddy.model.Invoked.invoked;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenReturned;
@@ -54,9 +54,9 @@ public class TestHtmlRenderer {
   @Test
   public void escapes_html_characters() {
     given(htmlRenderer = new HtmlRenderer(textRenderer));
-    given(willReturn("&_<_>_ _\t"), textRenderer).render(object);
+    given(willReturn("&_<_>_ _\t_\""), textRenderer).render(object);
     when(htmlRenderer.render(object));
-    thenReturned("&amp;_&lt;_&gt;_&nbsp;_&nbsp;&nbsp;");
+    thenReturned("&amp;_&lt;_&gt;_&nbsp;_&nbsp;&nbsp;_&quot;");
   }
 
   @Test
@@ -77,21 +77,21 @@ public class TestHtmlRenderer {
   }
 
   @Test
-  public void renders_invocation_with_many_arguments() {
+  public void renders_invoked_with_many_arguments() {
     given(htmlRenderer = new HtmlRenderer(Object::toString));
-    when(htmlRenderer.render(invocation(instance, method, asList(a, b, c))));
+    when(htmlRenderer.render(invoked(instance, method, asList(a, b, c))));
     thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, b, c));
   }
 
   @Test
-  public void renders_invocation_with_no_arguments() {
+  public void renders_invoked_with_no_arguments() {
     given(htmlRenderer = new HtmlRenderer(Object::toString));
-    when(htmlRenderer.render(invocation(instance, method, asList())));
+    when(htmlRenderer.render(invoked(instance, method, asList())));
     thenReturned(format("%s.%s()", instance, method.getName()));
   }
 
   @Test
-  public void renders_invocation_instance() {
+  public void renders_invoked_instance() {
     given(htmlRenderer = new HtmlRenderer(Object::toString) {
       public String render(Object model) {
         if (model == instance) {
@@ -101,12 +101,12 @@ public class TestHtmlRenderer {
         }
       }
     });
-    when(htmlRenderer.render(invocation(instance, method, asList(a, b, c))));
+    when(htmlRenderer.render(invoked(instance, method, asList(a, b, c))));
     thenReturned(format("%s.%s(%s, %s, %s)", string, method.getName(), a, b, c));
   }
 
   @Test
-  public void renders_invocation_arguments() {
+  public void renders_invoked_arguments() {
     given(htmlRenderer = new HtmlRenderer(Object::toString) {
       public String render(Object model) {
         if (model == b) {
@@ -116,12 +116,12 @@ public class TestHtmlRenderer {
         }
       }
     });
-    when(htmlRenderer.render(invocation(instance, method, asList(a, b, c))));
+    when(htmlRenderer.render(invoked(instance, method, asList(a, b, c))));
     thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, string, c));
   }
 
   @Test
-  public void renders_returned() {
+  public void renders_returned_object() {
     given(htmlRenderer = new HtmlRenderer(Object::toString) {
       public String render(Object model) {
         if (model == object) {
@@ -133,6 +133,13 @@ public class TestHtmlRenderer {
     });
     when(htmlRenderer.render(returned(object)));
     thenReturned(format("returned %s", string));
+  }
+
+  @Test
+  public void renders_returned_void() {
+    given(htmlRenderer = new HtmlRenderer(Object::toString));
+    when(htmlRenderer.render(returned()));
+    thenReturned("returned");
   }
 
   @Test

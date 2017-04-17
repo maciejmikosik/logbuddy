@@ -2,7 +2,7 @@ package org.logbuddy.renderer.gallery;
 
 import static java.lang.String.format;
 
-import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -34,8 +34,8 @@ public class Gallery {
     return new Gallery(width, Optional.of(height));
   }
 
-  public String paint(BufferedImage image) {
-    return paint(encode("png", image));
+  public String paint(RenderedImage image) {
+    return paint(encode("jpeg", image));
   }
 
   public String paint(byte[] image) {
@@ -55,7 +55,7 @@ public class Gallery {
     return builder.toString();
   }
 
-  private static byte[] encode(String format, BufferedImage image) {
+  private static byte[] encode(String format, RenderedImage image) {
     try {
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
       ImageIO.write(image, format, stream);

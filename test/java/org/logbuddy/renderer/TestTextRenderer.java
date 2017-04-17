@@ -3,10 +3,10 @@ package org.logbuddy.renderer;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.Message.message;
-import static org.logbuddy.model.Invocation.invocation;
+import static org.logbuddy.model.Completed.returned;
+import static org.logbuddy.model.Completed.thrown;
 import static org.logbuddy.model.InvocationDepth.invocationDepth;
-import static org.logbuddy.model.Returned.returned;
-import static org.logbuddy.model.Thrown.thrown;
+import static org.logbuddy.model.Invoked.invoked;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenReturned;
@@ -71,19 +71,19 @@ public class TestTextRenderer {
   }
 
   @Test
-  public void renders_invocation_with_many_arguments() {
-    when(renderer.render(invocation(instance, method, asList(a, b, c))));
+  public void renders_invoked_with_many_arguments() {
+    when(renderer.render(invoked(instance, method, asList(a, b, c))));
     thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, b, c));
   }
 
   @Test
-  public void renders_invocation_with_no_arguments() {
-    when(renderer.render(invocation(instance, method, asList())));
+  public void renders_invoked_with_no_arguments() {
+    when(renderer.render(invoked(instance, method, asList())));
     thenReturned(format("%s.%s()", instance, method.getName()));
   }
 
   @Test
-  public void renders_invocation_instance() {
+  public void renders_invoked_instance() {
     given(renderer = new TextRenderer() {
       public String render(Object model) {
         if (model == instance) {
@@ -93,12 +93,12 @@ public class TestTextRenderer {
         }
       }
     });
-    when(renderer.render(invocation(instance, method, asList(a, b, c))));
+    when(renderer.render(invoked(instance, method, asList(a, b, c))));
     thenReturned(format("%s.%s(%s, %s, %s)", string, method.getName(), a, b, c));
   }
 
   @Test
-  public void renders_invocation_arguments() {
+  public void renders_invoked_arguments() {
     given(renderer = new TextRenderer() {
       public String render(Object model) {
         if (model == b) {
@@ -108,12 +108,12 @@ public class TestTextRenderer {
         }
       }
     });
-    when(renderer.render(invocation(instance, method, asList(a, b, c))));
+    when(renderer.render(invoked(instance, method, asList(a, b, c))));
     thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, string, c));
   }
 
   @Test
-  public void renders_returned() {
+  public void renders_returned_object() {
     given(renderer = new TextRenderer() {
       public String render(Object model) {
         if (model == object) {
@@ -125,6 +125,13 @@ public class TestTextRenderer {
     });
     when(renderer.render(returned(object)));
     thenReturned(format("returned %s", string));
+  }
+
+  @Test
+  public void renders_returned_void() {
+    given(renderer = new TextRenderer());
+    when(renderer.render(returned()));
+    thenReturned("returned");
   }
 
   @Test
@@ -190,5 +197,12 @@ public class TestTextRenderer {
     given(thread = new Thread(string));
     when(renderer.render(thread));
     thenReturned(format("Thread(%s)", string));
+  }
+
+  @Test
+  public void renders_class() {
+    given(object = Object.class);
+    when(renderer.render(object));
+    thenReturned("java.lang.Object");
   }
 }

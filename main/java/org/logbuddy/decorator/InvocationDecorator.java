@@ -5,9 +5,9 @@ import static java.util.Arrays.asList;
 import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.Message.message;
 import static org.logbuddy.common.Classes.makeAccessible;
-import static org.logbuddy.model.Invocation.invocation;
-import static org.logbuddy.model.Returned.returned;
-import static org.logbuddy.model.Thrown.thrown;
+import static org.logbuddy.model.Completed.returned;
+import static org.logbuddy.model.Completed.thrown;
+import static org.logbuddy.model.Invoked.invoked;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -71,10 +71,14 @@ public class InvocationDecorator implements Decorator {
 
     @RuntimeType
     public Object handle(@Origin Method method, @AllArguments Object[] arguments) throws Throwable {
-      logger.log(message(invocation(original, method, asList(arguments))));
+      logger.log(message(invoked(original, method, asList(arguments))));
       try {
         Object result = makeAccessible(method).invoke(original, arguments);
-        logger.log(message(returned(result)));
+        if (method.getReturnType() == void.class) {
+          logger.log(message(returned()));
+        } else {
+          logger.log(message(returned(result)));
+        }
         return result;
       } catch (InvocationTargetException e) {
         Throwable cause = e.getCause();

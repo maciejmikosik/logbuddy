@@ -10,29 +10,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Invocation {
+public class Invoked {
   public final Object instance;
   public final Method method;
   public final List<Object> arguments;
 
-  public Invocation(Object instance, Method method, List<Object> arguments) {
+  public Invoked(Object instance, Method method, List<Object> arguments) {
     this.instance = instance;
     this.method = method;
     this.arguments = arguments;
   }
 
-  public static Invocation invocation(Object instance, Method method, List<Object> arguments) {
+  public static Invoked invoked(Object instance, Method method, List<Object> arguments) {
     check(instance != null);
     check(method != null);
     check(arguments != null);
-    return new Invocation(instance, method, unmodifiableList(new ArrayList<>(arguments)));
+    return new Invoked(instance, method, unmodifiableList(new ArrayList<>(arguments)));
   }
 
   public boolean equals(Object object) {
-    return object instanceof Invocation && equals((Invocation) object);
+    return object instanceof Invoked && equals((Invoked) object);
   }
 
-  private boolean equals(Invocation invocation) {
+  private boolean equals(Invoked invocation) {
     return instance == invocation.instance
         && Objects.equals(method, invocation.method)
         && Objects.equals(arguments, invocation.arguments);
@@ -43,6 +43,6 @@ public class Invocation {
   }
 
   public String toString() {
-    return format("invocation(%s, %s, %s)", instance, method, arguments);
+    return format("invoked(%s, %s, %s)", instance, method, arguments);
   }
 }
