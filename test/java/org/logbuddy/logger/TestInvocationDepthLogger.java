@@ -1,6 +1,7 @@
 package org.logbuddy.logger;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedList;
 import static org.logbuddy.Message.message;
 import static org.logbuddy.logger.InvocationDepthLogger.invocationDepth;
@@ -9,7 +10,6 @@ import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledInOrder;
-import static org.testory.Testory.thenEqual;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
 
@@ -30,6 +30,7 @@ public class TestInvocationDepthLogger {
   private Invocation invocation;
   private Returned returned;
   private Thrown thrown;
+  private List<Object> messages;
 
   @Before
   public void before() {
@@ -98,12 +99,14 @@ public class TestInvocationDepthLogger {
 
   @Test
   public void threads_keep_separate_depths() {
-    List<Message> messages = synchronizedList(new ArrayList<>());
+    given(messages = synchronizedList(new ArrayList<>()));
     given(invocationDepthLogger = invocationDepth(message -> messages.add(message)));
-    given(new Thread(() -> invocationDepthLogger.log(message(invocation)))).start();
-    when(() -> invocationDepthLogger.log(message(invocation)));
-    thenEqual(messages.get(0), message(invocation).attribute(invocationDepth(0)));
-    thenEqual(messages.get(1), message(invocation).attribute(invocationDepth(0)));
+    given(startAndJoin(new Thread(() -> invocationDepthLogger.log(message(invocation)))));
+    given(startAndJoin(new Thread(() -> invocationDepthLogger.log(message(invocation)))));
+    when(messages);
+    thenReturned(asList(
+        message(invocation).attribute(invocationDepth(0)),
+        message(invocation).attribute(invocationDepth(0))));
   }
 
   @Test
@@ -111,5 +114,15 @@ public class TestInvocationDepthLogger {
     given(invocationDepthLogger = invocationDepth(logger));
     when(invocationDepthLogger.toString());
     thenReturned(format("invocationDepth(%s)", logger));
+  }
+
+  private static Void startAndJoin(Thread thread) {
+    try {
+      thread.start();
+      thread.join();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+    return null;
   }
 }
