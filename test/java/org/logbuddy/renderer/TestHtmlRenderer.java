@@ -3,10 +3,10 @@ package org.logbuddy.renderer;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.Message.message;
+import static org.logbuddy.model.Completed.returned;
+import static org.logbuddy.model.Completed.thrown;
 import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.InvocationDepth.invocationDepth;
-import static org.logbuddy.model.Returned.returned;
-import static org.logbuddy.model.Thrown.thrown;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenReturned;
@@ -121,7 +121,7 @@ public class TestHtmlRenderer {
   }
 
   @Test
-  public void renders_returned() {
+  public void renders_returned_object() {
     given(htmlRenderer = new HtmlRenderer(Object::toString) {
       public String render(Object model) {
         if (model == object) {
@@ -133,6 +133,13 @@ public class TestHtmlRenderer {
     });
     when(htmlRenderer.render(returned(object)));
     thenReturned(format("returned %s", string));
+  }
+
+  @Test
+  public void renders_returned_void() {
+    given(htmlRenderer = new HtmlRenderer(Object::toString));
+    when(htmlRenderer.render(returned()));
+    thenReturned("returned");
   }
 
   @Test

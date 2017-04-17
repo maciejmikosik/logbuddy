@@ -5,9 +5,9 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.logbuddy.Message.message;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
+import static org.logbuddy.model.Completed.returned;
+import static org.logbuddy.model.Completed.thrown;
 import static org.logbuddy.model.Invocation.invocation;
-import static org.logbuddy.model.Returned.returned;
-import static org.logbuddy.model.Thrown.thrown;
 import static org.logbuddy.testing.Matchers.withContent;
 import static org.logbuddy.testing.TestingAnonymous.anonymousAbstractList;
 import static org.logbuddy.testing.TestingAnonymous.anonymousArrayList;
@@ -101,11 +101,19 @@ public class TestInvocationDecorator {
   }
 
   @Test
-  public void logs_returned() {
+  public void logs_returned_object() {
     given(decorated = invocationDecorator(logger)
         .decorate(new Decorable(result)));
     when(() -> decorated.methodReturningField());
     thenCalled(logger).log(message(returned(result)));
+  }
+
+  @Test
+  public void logs_returned_void() {
+    given(decorated = invocationDecorator(logger)
+        .decorate(new Decorable(result)));
+    when(() -> decorated.methodReturningVoid());
+    thenCalled(logger).log(message(returned()));
   }
 
   @Test
@@ -213,7 +221,7 @@ public class TestInvocationDecorator {
       this.field = field;
     }
 
-    public void method() {}
+    public void methodReturningVoid() {}
 
     public Object methodReturningField() {
       return field;

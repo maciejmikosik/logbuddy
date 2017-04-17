@@ -18,10 +18,11 @@ import java.util.List;
 
 import org.logbuddy.Message;
 import org.logbuddy.Renderer;
+import org.logbuddy.model.Completed.ReturnedObject;
+import org.logbuddy.model.Completed.ReturnedVoid;
+import org.logbuddy.model.Completed.Thrown;
 import org.logbuddy.model.Invocation;
 import org.logbuddy.model.InvocationDepth;
-import org.logbuddy.model.Returned;
-import org.logbuddy.model.Thrown;
 
 public class TextRenderer implements Renderer<String> {
   private final DateTimeFormatter dateTimeFormatter;
@@ -48,8 +49,10 @@ public class TextRenderer implements Renderer<String> {
       return renderImpl((Message) model);
     } else if (model instanceof Invocation) {
       return renderImpl((Invocation) model);
-    } else if (model instanceof Returned) {
-      return renderImpl((Returned) model);
+    } else if (model instanceof ReturnedObject) {
+      return renderImpl((ReturnedObject) model);
+    } else if (model instanceof ReturnedVoid) {
+      return renderImpl((ReturnedVoid) model);
     } else if (model instanceof Thrown) {
       return renderImpl((Thrown) model);
     } else if (model instanceof InvocationDepth) {
@@ -87,8 +90,12 @@ public class TextRenderer implements Renderer<String> {
         renderedArguments);
   }
 
-  private String renderImpl(Returned returned) {
+  private String renderImpl(ReturnedObject returned) {
     return format("returned %s", render(returned.object));
+  }
+
+  private String renderImpl(ReturnedVoid returned) {
+    return "returned";
   }
 
   private String renderImpl(Thrown thrown) {

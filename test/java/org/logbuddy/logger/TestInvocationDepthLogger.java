@@ -20,15 +20,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
+import org.logbuddy.model.Completed.ReturnedObject;
+import org.logbuddy.model.Completed.Thrown;
 import org.logbuddy.model.Invocation;
-import org.logbuddy.model.Returned;
-import org.logbuddy.model.Thrown;
 
 public class TestInvocationDepthLogger {
   private Logger logger, invocationDepthLogger;
   private Message message;
   private Invocation invocation;
-  private Returned returned;
+  private ReturnedObject returned;
   private Thrown thrown;
   private List<Object> messages;
 
