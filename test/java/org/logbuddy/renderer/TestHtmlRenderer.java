@@ -5,8 +5,8 @@ import static java.util.Arrays.asList;
 import static org.logbuddy.Message.message;
 import static org.logbuddy.model.Completed.returned;
 import static org.logbuddy.model.Completed.thrown;
-import static org.logbuddy.model.Invocation.invocation;
 import static org.logbuddy.model.InvocationDepth.invocationDepth;
+import static org.logbuddy.model.Invoked.invoked;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenReturned;
@@ -77,21 +77,21 @@ public class TestHtmlRenderer {
   }
 
   @Test
-  public void renders_invocation_with_many_arguments() {
+  public void renders_invoked_with_many_arguments() {
     given(htmlRenderer = new HtmlRenderer(Object::toString));
-    when(htmlRenderer.render(invocation(instance, method, asList(a, b, c))));
+    when(htmlRenderer.render(invoked(instance, method, asList(a, b, c))));
     thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, b, c));
   }
 
   @Test
-  public void renders_invocation_with_no_arguments() {
+  public void renders_invoked_with_no_arguments() {
     given(htmlRenderer = new HtmlRenderer(Object::toString));
-    when(htmlRenderer.render(invocation(instance, method, asList())));
+    when(htmlRenderer.render(invoked(instance, method, asList())));
     thenReturned(format("%s.%s()", instance, method.getName()));
   }
 
   @Test
-  public void renders_invocation_instance() {
+  public void renders_invoked_instance() {
     given(htmlRenderer = new HtmlRenderer(Object::toString) {
       public String render(Object model) {
         if (model == instance) {
@@ -101,12 +101,12 @@ public class TestHtmlRenderer {
         }
       }
     });
-    when(htmlRenderer.render(invocation(instance, method, asList(a, b, c))));
+    when(htmlRenderer.render(invoked(instance, method, asList(a, b, c))));
     thenReturned(format("%s.%s(%s, %s, %s)", string, method.getName(), a, b, c));
   }
 
   @Test
-  public void renders_invocation_arguments() {
+  public void renders_invoked_arguments() {
     given(htmlRenderer = new HtmlRenderer(Object::toString) {
       public String render(Object model) {
         if (model == b) {
@@ -116,7 +116,7 @@ public class TestHtmlRenderer {
         }
       }
     });
-    when(htmlRenderer.render(invocation(instance, method, asList(a, b, c))));
+    when(htmlRenderer.render(invoked(instance, method, asList(a, b, c))));
     thenReturned(format("%s.%s(%s, %s, %s)", instance, method.getName(), a, string, c));
   }
 

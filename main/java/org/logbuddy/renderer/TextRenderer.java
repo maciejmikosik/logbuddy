@@ -21,8 +21,8 @@ import org.logbuddy.Renderer;
 import org.logbuddy.model.Completed.ReturnedObject;
 import org.logbuddy.model.Completed.ReturnedVoid;
 import org.logbuddy.model.Completed.Thrown;
-import org.logbuddy.model.Invocation;
 import org.logbuddy.model.InvocationDepth;
+import org.logbuddy.model.Invoked;
 
 public class TextRenderer implements Renderer<String> {
   private final DateTimeFormatter dateTimeFormatter;
@@ -47,8 +47,8 @@ public class TextRenderer implements Renderer<String> {
       return "null";
     } else if (model instanceof Message) {
       return renderImpl((Message) model);
-    } else if (model instanceof Invocation) {
-      return renderImpl((Invocation) model);
+    } else if (model instanceof Invoked) {
+      return renderImpl((Invoked) model);
     } else if (model instanceof ReturnedObject) {
       return renderImpl((ReturnedObject) model);
     } else if (model instanceof ReturnedVoid) {
@@ -80,13 +80,13 @@ public class TextRenderer implements Renderer<String> {
     return builder.toString();
   }
 
-  private String renderImpl(Invocation invocation) {
-    String renderedArguments = invocation.arguments.stream()
+  private String renderImpl(Invoked invoked) {
+    String renderedArguments = invoked.arguments.stream()
         .map(argument -> render(argument))
         .collect(joining(", "));
     return format("%s.%s(%s)",
-        render(invocation.instance),
-        invocation.method.getName(),
+        render(invoked.instance),
+        invoked.method.getName(),
         renderedArguments);
   }
 

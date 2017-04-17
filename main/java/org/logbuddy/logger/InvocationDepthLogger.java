@@ -5,8 +5,8 @@ import static java.lang.String.format;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
 import org.logbuddy.model.Completed;
-import org.logbuddy.model.Invocation;
 import org.logbuddy.model.InvocationDepth;
+import org.logbuddy.model.Invoked;
 
 public class InvocationDepthLogger implements Logger {
   private final Logger logger;
@@ -25,7 +25,7 @@ public class InvocationDepthLogger implements Logger {
       numberOfInvocations.set(numberOfInvocations.get() - 1);
     }
     logger.log(message.attribute(InvocationDepth.invocationDepth(numberOfInvocations.get())));
-    if (message.content() instanceof Invocation) {
+    if (message.content() instanceof Invoked) {
       numberOfInvocations.set(numberOfInvocations.get() + 1);
     }
   }

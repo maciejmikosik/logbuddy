@@ -7,7 +7,7 @@ import static org.logbuddy.Message.message;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
 import static org.logbuddy.model.Completed.returned;
 import static org.logbuddy.model.Completed.thrown;
-import static org.logbuddy.model.Invocation.invocation;
+import static org.logbuddy.model.Invoked.invoked;
 import static org.logbuddy.testing.Matchers.withContent;
 import static org.logbuddy.testing.TestingAnonymous.anonymousAbstractList;
 import static org.logbuddy.testing.TestingAnonymous.anonymousArrayList;
@@ -28,7 +28,7 @@ import org.logbuddy.Decorator;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
-import org.logbuddy.model.Invocation;
+import org.logbuddy.model.Invoked;
 
 public class TestInvocationDecorator {
   private Decorator decorator;
@@ -75,7 +75,7 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(decorable));
     when(() -> decorated.methodWithArguments(argumentA, argumentB));
-    thenCalled(logger).log(message(invocation(
+    thenCalled(logger).log(message(invoked(
         decorable,
         Decorable.class.getMethod("methodWithArguments", Object.class, Object.class),
         asList(argumentA, argumentB))));
@@ -86,7 +86,7 @@ public class TestInvocationDecorator {
     given(decorator = invocationDecorator(logger));
     given(decorated = decorator.decorate(new Decorable(decorator.decorate(new Decorable()))));
     when(() -> decorated.methodDelegating());
-    thenCalledTimes(2, logger).log(any(Message.class, withContent(instanceOf(Invocation.class))));
+    thenCalledTimes(2, logger).log(any(Message.class, withContent(instanceOf(Invoked.class))));
   }
 
   @Test
@@ -94,7 +94,7 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(decorable));
     when(() -> decorated.methodWithArguments(null, null));
-    thenCalled(logger).log(message(invocation(
+    thenCalled(logger).log(message(invoked(
         decorable,
         Decorable.class.getMethod("methodWithArguments", Object.class, Object.class),
         asList(null, null))));
@@ -174,7 +174,7 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(decorable));
     when(() -> decorated.packagePrivateMethod());
-    thenCalled(logger).log(message(invocation(
+    thenCalled(logger).log(message(invoked(
         decorable,
         Decorable.class.getDeclaredMethod("packagePrivateMethod"),
         asList())));
@@ -188,7 +188,7 @@ public class TestInvocationDecorator {
     given(decorated = invocationDecorator(logger)
         .decorate(decorable));
     when(() -> decorated.protectedMethod());
-    thenCalled(logger).log(message(invocation(
+    thenCalled(logger).log(message(invoked(
         decorable,
         Decorable.class.getDeclaredMethod("protectedMethod"),
         asList())));

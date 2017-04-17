@@ -22,12 +22,12 @@ import org.logbuddy.Logger;
 import org.logbuddy.Message;
 import org.logbuddy.model.Completed.ReturnedObject;
 import org.logbuddy.model.Completed.Thrown;
-import org.logbuddy.model.Invocation;
+import org.logbuddy.model.Invoked;
 
 public class TestInvocationDepthLogger {
   private Logger logger, invocationDepthLogger;
   private Message message;
-  private Invocation invocation;
+  private Invoked invoked;
   private ReturnedObject returned;
   private Thrown thrown;
   private List<Object> messages;
@@ -50,11 +50,11 @@ public class TestInvocationDepthLogger {
   public void increases_depth_during_returning_invocation() {
     given(invocationDepthLogger = invocationDepth(logger));
     when(() -> {
-      invocationDepthLogger.log(message(invocation));
+      invocationDepthLogger.log(message(invoked));
       invocationDepthLogger.log(message);
       invocationDepthLogger.log(message(returned));
     });
-    thenCalledInOrder(logger).log(message(invocation).attribute(invocationDepth(0)));
+    thenCalledInOrder(logger).log(message(invoked).attribute(invocationDepth(0)));
     thenCalledInOrder(logger).log(message.attribute(invocationDepth(1)));
     thenCalledInOrder(logger).log(message(returned).attribute(invocationDepth(0)));
   }
@@ -63,11 +63,11 @@ public class TestInvocationDepthLogger {
   public void increases_depth_during_throwing_invocation() {
     given(invocationDepthLogger = invocationDepth(logger));
     when(() -> {
-      invocationDepthLogger.log(message(invocation));
+      invocationDepthLogger.log(message(invoked));
       invocationDepthLogger.log(message);
       invocationDepthLogger.log(message(thrown));
     });
-    thenCalledInOrder(logger).log(message(invocation).attribute(invocationDepth(0)));
+    thenCalledInOrder(logger).log(message(invoked).attribute(invocationDepth(0)));
     thenCalledInOrder(logger).log(message.attribute(invocationDepth(1)));
     thenCalledInOrder(logger).log(message(thrown).attribute(invocationDepth(0)));
   }
@@ -76,20 +76,20 @@ public class TestInvocationDepthLogger {
   public void increases_depth_recursively() {
     given(invocationDepthLogger = invocationDepth(logger));
     when(() -> {
-      invocationDepthLogger.log(message(invocation));
-      invocationDepthLogger.log(message(invocation));
-      invocationDepthLogger.log(message(invocation));
-      invocationDepthLogger.log(message(invocation));
+      invocationDepthLogger.log(message(invoked));
+      invocationDepthLogger.log(message(invoked));
+      invocationDepthLogger.log(message(invoked));
+      invocationDepthLogger.log(message(invoked));
       invocationDepthLogger.log(message);
       invocationDepthLogger.log(message(returned));
       invocationDepthLogger.log(message(thrown));
       invocationDepthLogger.log(message(returned));
       invocationDepthLogger.log(message(thrown));
     });
-    thenCalledInOrder(logger).log(message(invocation).attribute(invocationDepth(0)));
-    thenCalledInOrder(logger).log(message(invocation).attribute(invocationDepth(1)));
-    thenCalledInOrder(logger).log(message(invocation).attribute(invocationDepth(2)));
-    thenCalledInOrder(logger).log(message(invocation).attribute(invocationDepth(3)));
+    thenCalledInOrder(logger).log(message(invoked).attribute(invocationDepth(0)));
+    thenCalledInOrder(logger).log(message(invoked).attribute(invocationDepth(1)));
+    thenCalledInOrder(logger).log(message(invoked).attribute(invocationDepth(2)));
+    thenCalledInOrder(logger).log(message(invoked).attribute(invocationDepth(3)));
     thenCalledInOrder(logger).log(message.attribute(invocationDepth(4)));
     thenCalledInOrder(logger).log(message(returned).attribute(invocationDepth(3)));
     thenCalledInOrder(logger).log(message(thrown).attribute(invocationDepth(2)));
@@ -101,12 +101,12 @@ public class TestInvocationDepthLogger {
   public void threads_keep_separate_depths() {
     given(messages = synchronizedList(new ArrayList<>()));
     given(invocationDepthLogger = invocationDepth(message -> messages.add(message)));
-    given(startAndJoin(new Thread(() -> invocationDepthLogger.log(message(invocation)))));
-    given(startAndJoin(new Thread(() -> invocationDepthLogger.log(message(invocation)))));
+    given(startAndJoin(new Thread(() -> invocationDepthLogger.log(message(invoked)))));
+    given(startAndJoin(new Thread(() -> invocationDepthLogger.log(message(invoked)))));
     when(messages);
     thenReturned(asList(
-        message(invocation).attribute(invocationDepth(0)),
-        message(invocation).attribute(invocationDepth(0))));
+        message(invoked).attribute(invocationDepth(0)),
+        message(invoked).attribute(invocationDepth(0))));
   }
 
   @Test
