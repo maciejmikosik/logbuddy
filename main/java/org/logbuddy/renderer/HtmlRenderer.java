@@ -119,7 +119,8 @@ public class HtmlRenderer implements Renderer<String> {
         .replace("<", "&lt;")
         .replace(">", "&gt;")
         .replace(" ", "&nbsp;")
-        .replace("\t", "&nbsp;&nbsp;");
+        .replace("\t", "&nbsp;&nbsp;")
+        .replace("\"", "&quot;");
   }
 
   private static List<Object> arrayToList(Object array) {

@@ -54,9 +54,9 @@ public class TestHtmlRenderer {
   @Test
   public void escapes_html_characters() {
     given(htmlRenderer = new HtmlRenderer(textRenderer));
-    given(willReturn("&_<_>_ _\t"), textRenderer).render(object);
+    given(willReturn("&_<_>_ _\t_\""), textRenderer).render(object);
     when(htmlRenderer.render(object));
-    thenReturned("&amp;_&lt;_&gt;_&nbsp;_&nbsp;&nbsp;");
+    thenReturned("&amp;_&lt;_&gt;_&nbsp;_&nbsp;&nbsp;_&quot;");
   }
 
   @Test
