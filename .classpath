@@ -9,6 +9,6 @@
 	<classpathentry kind="lib" path="test/jar/hamcrest-library-1.3.jar" sourcepath="test/jar/hamcrest-library-1.3-sources.jar"/>
 	<classpathentry kind="lib" path="test/jar/junit-4.12.jar" sourcepath="test/jar/junit-4.12-sources.jar"/>
 	<classpathentry kind="lib" path="test/jar/quackery-0.13.2.jar"/>
-	<classpathentry kind="lib" path="test/jar/testory-1.1.1.jar"/>
+	<classpathentry kind="lib" path="test/jar/testory-1.2.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
