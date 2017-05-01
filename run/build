@@ -11,6 +11,10 @@ PROJECT=`pwd`
 		JAVA="${MAIN}/java"
 		JAR="${MAIN}/jar"
 
+	SLF4J="${PROJECT}/slf4j"
+		SLF4J_JAVA="${SLF4J}/java"
+		SLF4J_JAR="${SLF4J}/jar"
+
 ########## CLEANUP ##########
 rm \
   --recursive \
@@ -128,11 +132,74 @@ rm \
   --force \
   "${UNPACKED}"
 
+###########################
+########## SLF4J ##########
+###########################
+
+########## PREPARE ##########
+mkdir \
+  --parents \
+  "${UNPACKED}"
+
+########## COMPILE SOURCES ##########
+javac \
+  -classpath "${SLF4J_JAR}/*:${BUILDING}/logbuddy.jar" \
+  -sourcepath "${SLF4J_JAVA}" \
+  -source 1.8 \
+  -target 1.8 \
+  -d "${UNPACKED}" \
+  "${SLF4J_JAVA}/org/logbuddy/bind/Slf4jBinder.java"
+
+########## COPY SOURCES ##########
+cp \
+  --recursive \
+  "${SLF4J_JAVA}/." \
+  "${UNPACKED}"
+
+########## COPY LICENSE ##########
+cp \
+  "${RUN}"/*license* \
+  "${UNPACKED}"
+cp \
+  "${PROJECT}"/LICENSE.txt \
+  "${UNPACKED}"
+
+########## RESET TIMESTAMPS IN UNPACKED ##########
+find "${UNPACKED}" | xargs touch --date=@0
+cd "${UNPACKED}"
+zip \
+  --quiet \
+  -X \
+  --recurse-paths \
+  "${BUILDING}/logbuddy-slf4j.jar" \
+  ./*
+cd "${PROJECT}"
+
+########## ZIP JAR ##########
+cd "${UNPACKED}"
+zip \
+  --quiet \
+  -X \
+  --recurse-paths \
+  "${BUILDING}/logbuddy-slf4j.jar" \
+  ./*
+cd "${PROJECT}"
+
+########## CLEAN UNPACKED ##########
+rm \
+  --recursive \
+  --force \
+  "${UNPACKED}"
+
+######################################
 ########## BUILD SUCCESSFUL ##########
+######################################
 
 echo ""
 echo "BUILD SUCCESSFUL"
 echo "created ${BUILDING}/logbuddy.jar"
 echo "sha1sum=`sha1sum ${BUILDING}/logbuddy.jar | cut -f1 -d' '`"
+echo "created ${BUILDING}/logbuddy-slf4j.jar"
+echo "sha1sum=`sha1sum ${BUILDING}/logbuddy-slf4j.jar | cut -f1 -d' '`"
 
 
