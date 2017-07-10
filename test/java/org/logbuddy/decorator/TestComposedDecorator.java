@@ -1,6 +1,7 @@
 package org.logbuddy.decorator;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.logbuddy.decorator.ComposedDecorator.compose;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
@@ -25,11 +26,21 @@ public class TestComposedDecorator {
   }
 
   @Test
-  public void composes_many_decorators() {
+  public void composes_many_decorators_in_array() {
     given(willReturn(serviceA), decoratorA).decorate(service);
     given(willReturn(serviceB), decoratorB).decorate(serviceA);
     given(willReturn(serviceC), decoratorC).decorate(serviceB);
     given(composed = compose(decoratorC, decoratorB, decoratorA));
+    when(composed.decorate(service));
+    thenReturned(serviceC);
+  }
+
+  @Test
+  public void composes_many_decorators_in_list() {
+    given(willReturn(serviceA), decoratorA).decorate(service);
+    given(willReturn(serviceB), decoratorB).decorate(serviceA);
+    given(willReturn(serviceC), decoratorC).decorate(serviceB);
+    given(composed = compose(asList(decoratorC, decoratorB, decoratorA)));
     when(composed.decorate(service));
     thenReturned(serviceC);
   }
