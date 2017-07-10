@@ -1,31 +1,35 @@
 package org.logbuddy.logger;
 
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
-import static org.logbuddy.LogBuddyException.check;
+import static org.logbuddy.common.Varargs.varargs;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
 
 public class ComposedLogger implements Logger {
-  private final List<Logger> loggers;
+  private final List<? extends Logger> loggers;
 
-  private ComposedLogger(List<Logger> loggers) {
+  private ComposedLogger(List<? extends Logger> loggers) {
     this.loggers = loggers;
   }
 
   public static Logger compose(Logger... loggers) {
-    return new ComposedLogger(validate(loggers));
+    return new ComposedLogger(varargs(loggers)
+        .defensiveCopy()
+        .forbidNullElements()
+        .onErrorThrow(LogBuddyException::new)
+        .toList());
   }
 
-  private static List<Logger> validate(Logger[] unvalidatedLoggers) {
-    check(unvalidatedLoggers != null);
-    List<Logger> loggers = new ArrayList<>(asList(unvalidatedLoggers));
-    check(!loggers.contains(null));
-    return loggers;
+  public static Logger compose(List<? extends Logger> loggers) {
+    return new ComposedLogger(varargs(loggers)
+        .defensiveCopy()
+        .forbidNullElements()
+        .onErrorThrow(LogBuddyException::new)
+        .toList());
   }
 
   public void log(Message message) {
