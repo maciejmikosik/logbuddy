@@ -1,6 +1,7 @@
 package org.logbuddy.logger;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.logbuddy.logger.ComposedLogger.compose;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
@@ -26,8 +27,18 @@ public class TestComposedLogger {
   }
 
   @Test
-  public void logs_using_all_loggers() {
+  public void logs_using_all_loggers_in_array() {
     given(composed = compose(loggerA, loggerB, loggerC));
+    when(() -> composed.log(message));
+    thenReturned();
+    thenCalled(loggerA).log(message);
+    thenCalled(loggerB).log(message);
+    thenCalled(loggerC).log(message);
+  }
+
+  @Test
+  public void logs_using_all_loggers_in_list() {
+    given(composed = compose(asList(loggerA, loggerB, loggerC)));
     when(() -> composed.log(message));
     thenReturned();
     thenCalled(loggerA).log(message);
