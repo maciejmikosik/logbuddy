@@ -36,73 +36,63 @@ public class TestTraversingDecorator {
   public void before() {
     givenTest(this);
     given(allFields = field -> true);
+    given(invocation -> decorated((Node) invocation.arguments.get(0)),
+        decorator).decorate(anyInstanceOf(Node.class));
   }
 
   @Test
   public void decorates_starting_decorable() {
     given(traversing = traversing(allFields, decorator));
-    given(invocation -> decorated((Node) invocation.arguments.get(0)),
-        decorator).decorate(anyInstanceOf(Node.class));
     when(traversing.decorate(node));
-    thenReturned(decorated(node));
+    thenReturned(decorator.decorate(node));
   }
 
   @Test
   public void decorates_field_of_starting_decorable() {
     given(traversing = traversing(allFields, decorator));
-    given(invocation -> decorated((Node) invocation.arguments.get(0)),
-        decorator).decorate(anyInstanceOf(Node.class));
     given(node = node(otherNode));
     when(traversed = traversing.decorate(node));
-    thenEqual(traversed.child(), decorated(otherNode));
+    thenEqual(traversed.child(), decorator.decorate(otherNode));
   }
 
   @Test
   public void decorates_fields_recursively() {
     given(traversing = traversing(allFields, decorator));
-    given(invocation -> decorated((Node) invocation.arguments.get(0)),
-        decorator).decorate(anyInstanceOf(Node.class));
     given(node = node(node(otherNode)));
     when(traversed = traversing.decorate(node));
-    thenEqual(traversed.child().child(), decorated(otherNode));
+    thenEqual(traversed.child().child(), decorator.decorate(otherNode));
   }
 
   @Test
   public void decorates_once_even_if_node_has_two_parents() {
     given(traversing = traversing(allFields, decorator));
-    given(invocation -> decorated((Node) invocation.arguments.get(0)),
-        decorator).decorate(anyInstanceOf(Node.class));
     given(nexus = node(nodeA));
     given(nodeB = node(nexus));
     given(nodeC = node(nexus));
     given(node = node(nodeB, nodeC));
     when(traversed = traversing.decorate(node));
-    thenEqual(traversed.child().child().child(), decorated(nodeA));
-    thenEqual(traversed.secondChild().child().child(), decorated(nodeA));
+    thenEqual(traversed.child().child().child(), decorator.decorate(nodeA));
+    thenEqual(traversed.secondChild().child().child(), decorator.decorate(nodeA));
   }
 
   @Test
   public void handles_circular_referencing() {
     given(traversing = traversing(allFields, decorator));
-    given(invocation -> decorated((Node) invocation.arguments.get(0)),
-        decorator).decorate(anyInstanceOf(Node.class));
     given(node = node());
     given(otherNode = node(node));
     given(node.child = otherNode);
     when(traversed = traversing.decorate(node));
-    thenReturned(decorated(node));
-    thenEqual(node.child(), decorated(otherNode));
-    thenEqual(node.child().child(), decorated(node));
+    thenReturned(decorator.decorate(node));
+    thenEqual(node.child(), decorator.decorate(otherNode));
+    thenEqual(node.child().child(), decorator.decorate(node));
   }
 
   @Test
   public void filters_fields() {
-    given(invocation -> decorated((Node) invocation.arguments.get(0)),
-        decorator).decorate(anyInstanceOf(Node.class));
     given(node = node(nodeA, nodeB));
     given(traversing = traversing(field -> field.getName().equals("child"), decorator));
     when(traversing.decorate(node));
-    thenEqual(node.child(), decorated(nodeA));
+    thenEqual(node.child(), decorator.decorate(nodeA));
     thenEqual(node.secondChild(), nodeB);
   }
 
