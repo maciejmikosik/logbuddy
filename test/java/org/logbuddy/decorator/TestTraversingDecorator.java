@@ -122,6 +122,17 @@ public class TestTraversingDecorator {
   }
 
   @Test
+  public void ignores_null_fields() {
+    class Decorable {
+      @SuppressWarnings("unused")
+      Object field = null;
+    }
+    given(traversing = traversing(allFields, decorator));
+    when(traversing.decorate(new Decorable()));
+    thenCalledNever(decorator).decorate(null);
+  }
+
+  @Test
   public void implements_to_string() {
     given(traversing = traversing(filter, decorator));
     when(traversing.toString());

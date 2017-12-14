@@ -53,10 +53,12 @@ public class TraversingDecorator implements Decorator {
           .filter(filter)
           .forEach(field -> {
             Object value = read(decorable, field);
-            if (value != null && !decorateds.contains(value)) {
-              decorables.add(value);
+            if (value != null) {
+              if (!decorateds.contains(value)) {
+                decorables.add(value);
+              }
+              set(decorable, field, decorator.decorate(value));
             }
-            set(decorable, field, decorator.decorate(value));
           });
     }
     return decorator.decorate(startingDecorable);
