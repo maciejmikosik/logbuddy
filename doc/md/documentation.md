@@ -234,7 +234,6 @@ This attribute is recognized by `TextRenderer` and rendered as intendation which
 `TraversingDecorator` helps you decorate whole dependency graph at once.
 It will crawl through all instances reachable from original instance.
 Those instance's fields will be injected with decorated instances.
-You can restrict this recursion by providing `Preidicate<Field>`.
 Original instance is also decorated.
 
 Let's assume all dependencies are reachable through `app` instance.
@@ -261,7 +260,7 @@ Let's assume all dependencies are reachable through `app` instance.
     }
 
     Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
-    Decorator decorator = traversing(field -> true, invocationDecorator(logger));
+    Decorator decorator = traversing(invocationDecorator(logger));
 
     decorator.decorate(new App()).start();
     -------------- prints --------------
@@ -271,6 +270,12 @@ Let's assume all dependencies are reachable through `app` instance.
         Service#1682463303.serve()
         returned
       returned
+
+Optionally, you can restrict this recursion and skip some fields by providing `Predicate<Field>`.
+
+    traversing(decorator)
+        .filter(field -> !field.getType().isArray());
+
 
 `InjectingLoggerDecorator` allows you to manually log messages in production code.
 It injects given `Logger` to fields of matching type.

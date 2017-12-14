@@ -26,7 +26,7 @@ Quick example.
     }
 
     Logger logger = thread(time(Clock.systemUTC(), invocationDepth(consoleLogger(new TextRenderer()))));
-    Decorator decorator = traversing(field -> true, invocationDecorator(logger));
+    Decorator decorator = traversing(invocationDecorator(logger));
     decorator.decorate(new App()).start();
 
 prints

@@ -15,9 +15,6 @@ import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 
-import java.lang.reflect.Field;
-import java.util.function.Predicate;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.Decorator;
@@ -28,26 +25,24 @@ import org.logbuddy.Renderer;
 public class TestTraversingDecorator {
   private Decorator decorator, traversing;
   private Node node, otherNode, nodeA, nodeB, nodeC, nexus, traversed;
-  private Predicate<Field> allFields, filter;
 
   @Before
   public void before() {
     givenTest(this);
-    given(allFields = field -> true);
     given(invocation -> decorated((Node) invocation.arguments.get(0)),
         decorator).decorate(anyInstanceOf(Node.class));
   }
 
   @Test
   public void decorates_starting_decorable() {
-    given(traversing = traversing(allFields, decorator));
+    given(traversing = traversing(decorator));
     when(traversing.decorate(node));
     thenReturned(decorator.decorate(node));
   }
 
   @Test
   public void decorates_field_of_starting_decorable() {
-    given(traversing = traversing(allFields, decorator));
+    given(traversing = traversing(decorator));
     given(node = node(otherNode));
     when(traversed = traversing.decorate(node));
     thenEqual(traversed.child(), decorator.decorate(otherNode));
@@ -55,7 +50,7 @@ public class TestTraversingDecorator {
 
   @Test
   public void decorates_fields_recursively() {
-    given(traversing = traversing(allFields, decorator));
+    given(traversing = traversing(decorator));
     given(node = node(node(otherNode)));
     when(traversed = traversing.decorate(node));
     thenEqual(traversed.child().child(), decorator.decorate(otherNode));
@@ -63,7 +58,7 @@ public class TestTraversingDecorator {
 
   @Test
   public void decorates_once_even_if_node_has_two_parents() {
-    given(traversing = traversing(allFields, decorator));
+    given(traversing = traversing(decorator));
     given(nexus = node(nodeA));
     given(nodeB = node(nexus));
     given(nodeC = node(nexus));
@@ -75,7 +70,7 @@ public class TestTraversingDecorator {
 
   @Test
   public void handles_circular_referencing() {
-    given(traversing = traversing(allFields, decorator));
+    given(traversing = traversing(decorator));
     given(node = node());
     given(otherNode = node(node));
     given(node.child = otherNode);
@@ -86,22 +81,13 @@ public class TestTraversingDecorator {
   }
 
   @Test
-  public void filters_fields() {
-    given(node = node(nodeA, nodeB));
-    given(traversing = traversing(field -> field.getName().equals("child"), decorator));
-    when(traversing.decorate(node));
-    thenEqual(node.child(), decorator.decorate(nodeA));
-    thenEqual(node.secondChild(), nodeB);
-  }
-
-  @Test
   public void includes_fields_from_superclass() {
     class SuperDecorable {
       @SuppressWarnings("unused")
       private final Node superField = node;
     }
     class Decorable extends SuperDecorable {}
-    given(traversing = traversing(allFields, decorator));
+    given(traversing = traversing(decorator));
     when(traversing.decorate(new Decorable()));
     thenCalled(decorator).decorate(node);
   }
@@ -114,7 +100,7 @@ public class TestTraversingDecorator {
       Decorator decoratorField = mock(Decorator.class);
       Renderer rendererField = mock(Renderer.class);
     }
-    given(traversing = traversing(allFields, decorator));
+    given(traversing = traversing(decorator));
     when(traversing.decorate(new Decorable()));
     thenCalledNever(decorator).decorate(anyInstanceOf(Logger.class));
     thenCalledNever(decorator).decorate(anyInstanceOf(Decorator.class));
@@ -127,34 +113,69 @@ public class TestTraversingDecorator {
       @SuppressWarnings("unused")
       Object field = null;
     }
-    given(traversing = traversing(allFields, decorator));
+    given(traversing = traversing(decorator));
     when(traversing.decorate(new Decorable()));
     thenCalledNever(decorator).decorate(null);
   }
 
   @Test
+  public void filters_fields() {
+    class Decorable {
+      Object a = nodeA;
+      Object b = nodeB;
+      Object c = nodeC;
+    }
+    Decorable decorable = new Decorable();
+
+    given(traversing = traversing(decorator)
+        .filter(field -> field.getName().contains("b")));
+    when(traversing.decorate(decorable));
+    thenEqual(decorable.a, nodeA);
+    thenEqual(decorable.b, decorator.decorate(nodeB));
+    thenEqual(decorable.c, nodeC);
+  }
+
+  @Test
+  public void filters_are_joined() {
+    class Decorable {
+      Object a = nodeA;
+      Object b = nodeB;
+      Object ab = nodeC;
+    }
+    Decorable decorable = new Decorable();
+
+    given(traversing = traversing(decorator)
+        .filter(field -> field.getName().startsWith("a"))
+        .filter(field -> field.getName().endsWith("b")));
+    when(traversing.decorate(decorable));
+    thenEqual(decorable.a, nodeA);
+    thenEqual(decorable.b, nodeB);
+    thenEqual(decorable.ab, decorator.decorate(nodeC));
+  }
+
+  @Test
   public void implements_to_string() {
-    given(traversing = traversing(filter, decorator));
+    given(traversing = traversing(decorator));
     when(traversing.toString());
-    thenReturned(format("traversing(%s, %s)", filter, decorator));
+    thenReturned(format("traversing(%s)", decorator));
   }
 
   @Test
   public void checks_null_decorator() {
     given(decorator = null);
-    when(() -> traversing(allFields, decorator));
+    when(() -> traversing(decorator));
     thenThrown(LogBuddyException.class);
   }
 
   @Test
   public void checks_null_filter() {
-    when(() -> traversing(null, decorator));
+    when(() -> traversing(decorator).filter(null));
     thenThrown(LogBuddyException.class);
   }
 
   @Test
   public void checks_null_decorable() {
-    given(decorator = traversing(allFields, decorator));
+    given(decorator = traversing(decorator));
     when(() -> decorator.decorate(null));
     thenThrown(LogBuddyException.class);
   }
