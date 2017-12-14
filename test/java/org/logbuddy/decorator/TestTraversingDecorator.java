@@ -1,9 +1,8 @@
 package org.logbuddy.decorator;
 
 import static java.lang.String.format;
-import static java.util.Objects.hash;
-import static org.logbuddy.decorator.TestTraversingDecorator.DecoratedNode.decorated;
-import static org.logbuddy.decorator.TestTraversingDecorator.Node.node;
+import static org.logbuddy.decorator.DecoratedNode.decorated;
+import static org.logbuddy.decorator.Node.node;
 import static org.logbuddy.decorator.TraversingDecorator.traversing;
 import static org.logbuddy.testing.Matchers.anyInstanceOf;
 import static org.testory.Testory.given;
@@ -17,7 +16,6 @@ import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.junit.Before;
@@ -148,93 +146,5 @@ public class TestTraversingDecorator {
     given(decorator = traversing(allFields, decorator));
     when(() -> decorator.decorate(null));
     thenThrown(LogBuddyException.class);
-  }
-
-  public static class Node {
-    private Node child;
-    private final Node secondChild;
-
-    private Node(Node child, Node secondChild) {
-      this.child = child;
-      this.secondChild = secondChild;
-    }
-
-    public Node child() {
-      return child;
-    }
-
-    public Node secondChild() {
-      return secondChild;
-    }
-
-    public static Node node() {
-      return new Node(null, null);
-    }
-
-    public static Node node(Node child) {
-      return new Node(child, null);
-    }
-
-    public static Node node(Node child, Node secondChild) {
-      return new Node(child, secondChild);
-    }
-
-    ThreadLocal<Boolean> antiLoop;
-
-    public String toString() {
-      if (antiLoop == null) {
-        antiLoop = ThreadLocal.withInitial(() -> false);
-      }
-      if (!antiLoop.get()) {
-        antiLoop.set(true);
-        try {
-          return secondChild != null
-              ? format("node(%s, %s)", child, secondChild)
-              : child != null
-                  ? format("node(%s)", child)
-                  : "node()";
-        } finally {
-          antiLoop.set(false);
-        }
-      }
-      return "LOOP";
-    }
-  }
-
-  public static class DecoratedNode extends Node {
-    private final Node decorable;
-
-    private DecoratedNode(Node decorable) {
-      super(null, null);
-      this.decorable = decorable;
-    }
-
-    public static Node decorated(Node decorable) {
-      return new DecoratedNode(decorable);
-    }
-
-    public Node child() {
-      return decorable.child();
-    }
-
-    public Node secondChild() {
-      return decorable.secondChild;
-    }
-
-    public boolean equals(Object object) {
-      return object instanceof DecoratedNode && equals((DecoratedNode) object);
-    }
-
-    private boolean equals(DecoratedNode node) {
-      return Objects.equals(decorable, node.decorable);
-    }
-
-    public int hashCode() {
-      return hash(decorable.hashCode());
-    }
-
-    public String toString() {
-      return format("decorated(%s)", decorable);
-    }
   }
 }
