@@ -4,7 +4,7 @@ import static java.lang.String.format;
 import static org.logbuddy.decorator.DecoratedNode.decorated;
 import static org.logbuddy.decorator.Node.node;
 import static org.logbuddy.decorator.TraversingDecorator.traversing;
-import static org.logbuddy.testing.Matchers.anyInstanceOf;
+import static org.testory.Testory.anyInstanceOf;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.mock;

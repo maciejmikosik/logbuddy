@@ -1,8 +1,6 @@
 package org.logbuddy.testing;
 
 import static java.lang.String.format;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.testory.Testory.any;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -20,10 +18,6 @@ public class Matchers {
         return item != null && causeMatcher.matches(item.getCause());
       }
     };
-  }
-
-  public static <T> T anyInstanceOf(Class<T> type) {
-    return any(type, instanceOf(type));
   }
 
   public static Matcher<Message> withContent(Matcher<?> contentMatcher) {
