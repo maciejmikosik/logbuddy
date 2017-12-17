@@ -29,10 +29,14 @@ public class TraversingDecorator implements Decorator {
     this.decorator = decorator;
   }
 
-  public static Decorator traversing(Predicate<Field> filter, Decorator decorator) {
-    check(filter != null);
+  public static TraversingDecorator traversing(Decorator decorator) {
     check(decorator != null);
-    return new TraversingDecorator(filter, decorator);
+    return new TraversingDecorator(field -> true, decorator);
+  }
+
+  public TraversingDecorator filter(Predicate<Field> filter) {
+    check(filter != null);
+    return new TraversingDecorator(this.filter.and(filter), decorator);
   }
 
   public <T> T decorate(T startingDecorable) {
@@ -53,10 +57,12 @@ public class TraversingDecorator implements Decorator {
           .filter(filter)
           .forEach(field -> {
             Object value = read(decorable, field);
-            if (value != null && !decorateds.contains(value)) {
-              decorables.add(value);
+            if (value != null) {
+              if (!decorateds.contains(value)) {
+                decorables.add(value);
+              }
+              set(decorable, field, decorator.decorate(value));
             }
-            set(decorable, field, decorator.decorate(value));
           });
     }
     return decorator.decorate(startingDecorable);
@@ -69,6 +75,6 @@ public class TraversingDecorator implements Decorator {
   }
 
   public String toString() {
-    return format("traversing(%s, %s)", filter, decorator);
+    return format("traversing(%s)", decorator);
   }
 }

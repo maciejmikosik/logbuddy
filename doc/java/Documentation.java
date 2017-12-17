@@ -72,7 +72,7 @@ public class Documentation {
     }
 
     Logger logger = thread(time(Clock.systemUTC(), invocationDepth(consoleLogger(new TextRenderer()))));
-    Decorator decorator = traversing(field -> true, invocationDecorator(logger));
+    Decorator decorator = traversing(invocationDecorator(logger));
     decorator.decorate(new App()).start();
   }
 
@@ -236,9 +236,14 @@ public class Documentation {
     }
 
     Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
-    Decorator decorator = traversing(field -> true, invocationDecorator(logger));
+    Decorator decorator = traversing(invocationDecorator(logger));
 
     decorator.decorate(new App()).start();
+  }
+
+  public static void decorator_traversing_filter(Decorator decorator) {
+    traversing(decorator)
+        .filter(field -> !field.getType().isArray());
   }
 
   public static void decorator_inject_logger() {
