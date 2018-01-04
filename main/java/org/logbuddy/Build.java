@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.logbuddy.bind.LoggingStream;
 import org.logbuddy.bind.StdioBinder;
+import org.logbuddy.decorator.CachingDecorator;
 import org.logbuddy.decorator.ComposedDecorator;
 import org.logbuddy.decorator.InjectingDecoratorDecorator;
 import org.logbuddy.decorator.InjectingLoggerDecorator;
@@ -61,7 +62,8 @@ public class Build {
       NoDecorator.class,
       InjectingLoggerDecorator.class,
       InjectingDecoratorDecorator.class,
-      TraversingDecorator.class);
+      TraversingDecorator.class,
+      CachingDecorator.class);
   public List<Class<?>> bind = asList(
       LoggingStream.class,
       StdioBinder.class);

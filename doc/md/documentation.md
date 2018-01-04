@@ -276,6 +276,13 @@ Optionally, you can restrict this recursion and skip some fields by providing `P
     traversing(decorator)
         .filter(field -> !field.getType().isArray());
 
+`CachingDecorator` remembers objects you already decorated.
+If you decorate same object again, it returns same result as first time.
+
+    Decorator cachingDecorator = caching(decorator);
+    assertSame(
+        cachingDecorator.decorate(object),
+        cachingDecorator.decorate(object));
 
 `InjectingLoggerDecorator` allows you to manually log messages in production code.
 It injects given `Logger` to fields of matching type.

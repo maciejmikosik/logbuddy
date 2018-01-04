@@ -3,9 +3,11 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
+import static org.junit.Assert.assertSame;
 import static org.logbuddy.Message.message;
 import static org.logbuddy.bind.Slf4jBinder.slf4jBinder;
 import static org.logbuddy.bind.StdioBinder.stdioBinder;
+import static org.logbuddy.decorator.CachingDecorator.caching;
 import static org.logbuddy.decorator.ComposedDecorator.compose;
 import static org.logbuddy.decorator.InjectingLoggerDecorator.injecting;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
@@ -244,6 +246,14 @@ public class Documentation {
   public static void decorator_traversing_filter(Decorator decorator) {
     traversing(decorator)
         .filter(field -> !field.getType().isArray());
+  }
+
+  public static void decorator_caching(Decorator decorator, Object object) {
+    Decorator cachingDecorator = caching(decorator);
+    assertSame(
+        cachingDecorator.decorate(object),
+        cachingDecorator.decorate(object));
+
   }
 
   public static void decorator_inject_logger() {
