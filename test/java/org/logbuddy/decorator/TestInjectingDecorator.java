@@ -1,7 +1,7 @@
 package org.logbuddy.decorator;
 
 import static java.lang.String.format;
-import static org.logbuddy.decorator.InjectingLoggerDecorator.injecting;
+import static org.logbuddy.decorator.InjectingDecorator.injecting;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenEqual;
@@ -15,7 +15,7 @@ import org.logbuddy.Decorator;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 
-public class TestInjectingLoggerDecorator {
+public class TestInjectingDecorator {
   private Decorable decorable;
   private Decorator injecting;
   private Logger logger;

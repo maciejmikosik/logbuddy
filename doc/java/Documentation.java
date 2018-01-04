@@ -9,7 +9,7 @@ import static org.logbuddy.bind.Slf4jBinder.slf4jBinder;
 import static org.logbuddy.bind.StdioBinder.stdioBinder;
 import static org.logbuddy.decorator.CachingDecorator.caching;
 import static org.logbuddy.decorator.ComposedDecorator.compose;
-import static org.logbuddy.decorator.InjectingLoggerDecorator.injecting;
+import static org.logbuddy.decorator.InjectingDecorator.injecting;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
 import static org.logbuddy.decorator.TraversingDecorator.traversing;
 import static org.logbuddy.logger.AsynchronousLogger.asynchronous;
@@ -256,7 +256,7 @@ public class Documentation {
 
   }
 
-  public static void decorator_inject_logger() {
+  public static void decorator_injecting() {
     class Service {
       Logger logger = noLogger();
 

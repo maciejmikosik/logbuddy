@@ -284,8 +284,8 @@ If you decorate same object again, it returns same result as first time.
         cachingDecorator.decorate(object),
         cachingDecorator.decorate(object));
 
-`InjectingLoggerDecorator` allows you to manually log messages in production code.
-It injects given `Logger` to fields of matching type.
+`InjectingDecorator` allows you to manually log messages in production code.
+It injects given `Logger` to fields of that type.
 It is wise to initialize this field with instance of `NoLogger` to prevent `NullPointerException` in case instance is not decorated.
 
     class Service {

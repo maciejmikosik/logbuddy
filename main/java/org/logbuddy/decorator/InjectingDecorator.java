@@ -10,16 +10,16 @@ import static org.logbuddy.common.Fields.set;
 import org.logbuddy.Decorator;
 import org.logbuddy.Logger;
 
-public class InjectingLoggerDecorator implements Decorator {
+public class InjectingDecorator implements Decorator {
   private final Logger logger;
 
-  private InjectingLoggerDecorator(Logger logger) {
+  private InjectingDecorator(Logger logger) {
     this.logger = logger;
   }
 
   public static Decorator injecting(Logger logger) {
     check(logger != null);
-    return new InjectingLoggerDecorator(logger);
+    return new InjectingDecorator(logger);
   }
 
   public <T> T decorate(T decorable) {

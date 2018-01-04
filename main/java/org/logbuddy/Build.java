@@ -8,7 +8,7 @@ import org.logbuddy.bind.LoggingStream;
 import org.logbuddy.bind.StdioBinder;
 import org.logbuddy.decorator.CachingDecorator;
 import org.logbuddy.decorator.ComposedDecorator;
-import org.logbuddy.decorator.InjectingLoggerDecorator;
+import org.logbuddy.decorator.InjectingDecorator;
 import org.logbuddy.decorator.InvocationDecorator;
 import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.decorator.TraversingDecorator;
@@ -59,7 +59,7 @@ public class Build {
       InvocationDecorator.class,
       ComposedDecorator.class,
       NoDecorator.class,
-      InjectingLoggerDecorator.class,
+      InjectingDecorator.class,
       TraversingDecorator.class,
       CachingDecorator.class);
   public List<Class<?>> bind = asList(
