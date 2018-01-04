@@ -303,8 +303,6 @@ It is wise to initialize this field with instance of `NoLogger` to prevent `Null
     -------------- prints --------------
     adhoc message
 
-`InjectingDecoratorDecorator` does similar thing, injecting given `Decorator`.
-
 `ComposedDecorator` lets you combine two decorators into one.
 For example you want to combine functionality of `InvocationDecorator` with `InjectingLoggerDecorator`.
 
