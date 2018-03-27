@@ -22,9 +22,7 @@ import org.logbuddy.model.Completed.Thrown;
 public class TestCompleted {
   private Object object, otherObject;
   private Throwable throwable, otherThrowable;
-  private ReturnedObject returned;
-  private ReturnedVoid returnedVoid;
-  private Thrown thrown;
+  private Completed returned, returnedVoid, thrown;
 
   @Before
   public void before() {
@@ -34,14 +32,14 @@ public class TestCompleted {
   @Test
   public void creates_returned_object() {
     given(returned = returned(object));
-    when(returned.object);
+    when(((ReturnedObject) returned).object);
     thenReturned(sameInstance(object));
   }
 
   @Test
   public void creates_returned_null() {
     given(returned = returned(null));
-    when(returned.object);
+    when(((ReturnedObject) returned).object);
     thenReturned(null);
   }
 
@@ -54,7 +52,7 @@ public class TestCompleted {
   @Test
   public void creates_thrown_throwable() {
     given(thrown = thrown(throwable));
-    when(thrown.throwable);
+    when(((Thrown) thrown).throwable);
     thenReturned(throwable);
   }
 
