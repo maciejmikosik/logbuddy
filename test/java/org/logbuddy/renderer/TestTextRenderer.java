@@ -59,8 +59,8 @@ public class TestTextRenderer {
   @Test
   public void renders_message() {
     given(object = new Thread("content"));
-    given(attributeA = new Thread("attributeA"));
-    given(attributeB = new Thread("attributeB"));
+    given(attributeA = Object.class);
+    given(attributeB = String.class);
     when(renderer.render(message(object)
         .attribute(attributeA)
         .attribute(attributeB)));
@@ -197,6 +197,13 @@ public class TestTextRenderer {
     given(thread = new Thread(string));
     when(renderer.render(thread));
     thenReturned(format("Thread(%s)", string));
+  }
+
+  @Test
+  public void renders_thread_as_attribute() {
+    given(thread = new Thread(string));
+    when(renderer.render(message(object).attribute(thread)));
+    thenReturned(thread.getName() + "  " + renderer.render(object));
   }
 
   @Test

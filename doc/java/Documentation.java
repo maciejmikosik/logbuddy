@@ -48,7 +48,7 @@ import org.slf4j.event.Level;
 
 public class Documentation {
   public static void main(String[] args) {
-    readme_html();
+    readme_text();
   }
 
   public static void readme_text() {
