@@ -1,10 +1,10 @@
-package org.logbuddy.model;
+package org.logbuddy.message;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.logbuddy.model.Completed.returned;
-import static org.logbuddy.model.Completed.thrown;
+import static org.logbuddy.message.Completed.returned;
+import static org.logbuddy.message.Completed.thrown;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.then;
@@ -15,9 +15,9 @@ import static org.testory.Testory.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.LogBuddyException;
-import org.logbuddy.model.Completed.ReturnedObject;
-import org.logbuddy.model.Completed.ReturnedVoid;
-import org.logbuddy.model.Completed.Thrown;
+import org.logbuddy.message.Completed.ReturnedObject;
+import org.logbuddy.message.Completed.ReturnedVoid;
+import org.logbuddy.message.Completed.Thrown;
 
 public class TestCompleted {
   private Object object, otherObject;

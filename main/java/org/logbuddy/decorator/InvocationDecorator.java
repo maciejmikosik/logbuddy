@@ -5,9 +5,9 @@ import static java.util.Arrays.asList;
 import static org.logbuddy.LogBuddyException.check;
 import static org.logbuddy.Message.message;
 import static org.logbuddy.common.Classes.makeAccessible;
-import static org.logbuddy.model.Completed.returned;
-import static org.logbuddy.model.Completed.thrown;
-import static org.logbuddy.model.Invoked.invoked;
+import static org.logbuddy.message.Completed.returned;
+import static org.logbuddy.message.Completed.thrown;
+import static org.logbuddy.message.Invoked.invoked;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

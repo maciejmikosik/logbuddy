@@ -1,4 +1,4 @@
-package org.logbuddy.model;
+package org.logbuddy.message;
 
 import static java.lang.String.format;
 import static java.util.Objects.hash;

@@ -18,11 +18,11 @@ import java.util.List;
 
 import org.logbuddy.Message;
 import org.logbuddy.Renderer;
-import org.logbuddy.model.Completed.ReturnedObject;
-import org.logbuddy.model.Completed.ReturnedVoid;
-import org.logbuddy.model.Completed.Thrown;
-import org.logbuddy.model.InvocationDepth;
-import org.logbuddy.model.Invoked;
+import org.logbuddy.message.Completed.ReturnedObject;
+import org.logbuddy.message.Completed.ReturnedVoid;
+import org.logbuddy.message.Completed.Thrown;
+import org.logbuddy.message.InvocationDepth;
+import org.logbuddy.message.Invoked;
 
 public class TextRenderer implements Renderer<String> {
   private final DateTimeFormatter dateTimeFormatter;

@@ -9,7 +9,7 @@ import static org.logbuddy.renderer.gallery.Gallery.gallery;
 import java.awt.image.RenderedImage;
 
 import org.logbuddy.Message;
-import org.logbuddy.model.Completed.Thrown;
+import org.logbuddy.message.Completed.Thrown;
 
 public class HtmlRenderer extends TextRenderer {
   public HtmlRenderer() {}

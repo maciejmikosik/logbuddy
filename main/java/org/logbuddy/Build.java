@@ -32,7 +32,7 @@ import org.logbuddy.renderer.chart.SaturationChartRenderer;
 import org.logbuddy.renderer.gallery.Gallery;
 
 public class Build {
-  public List<Class<?>> model = asList(Message.class);
+  public List<Class<?>> message = asList(Message.class);
 
   public List<Class<?>> loggers = asList(
       InvocationDepthLogger.class,
