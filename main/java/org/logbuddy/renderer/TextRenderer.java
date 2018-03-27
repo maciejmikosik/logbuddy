@@ -46,7 +46,7 @@ public class TextRenderer implements Renderer<String> {
     if (model == null) {
       return "null";
     } else if (model instanceof String) {
-      return escape((String) model);
+      return renderImpl((String) model);
     } else if (model instanceof Message) {
       return renderImpl((Message) model);
     } else if (model instanceof Invoked) {
@@ -76,6 +76,10 @@ public class TextRenderer implements Renderer<String> {
 
   protected String escape(String string) {
     return string;
+  }
+
+  private String renderImpl(String string) {
+    return escape(string);
   }
 
   private String renderImpl(Message message) {
