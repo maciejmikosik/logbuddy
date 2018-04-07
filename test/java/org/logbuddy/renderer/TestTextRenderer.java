@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.Renderer;
+import org.logbuddy.message.Attribute;
 
 public class TestTextRenderer {
   private Object object;
@@ -58,9 +59,12 @@ public class TestTextRenderer {
 
   @Test
   public void renders_message() {
-    given(object = new Thread("content"));
-    given(attributeA = Object.class);
-    given(attributeB = String.class);
+    when(renderer.render(message(object)));
+    thenReturned(renderer.render(object));
+  }
+
+  @Test
+  public void renders_message_with_attributes() {
     when(renderer.render(message(object)
         .attribute(attributeA)
         .attribute(attributeB)));
@@ -68,6 +72,19 @@ public class TestTextRenderer {
         renderer.render(attributeA),
         renderer.render(attributeB),
         renderer.render(object)));
+  }
+
+  @Test
+  public void renders_attribute() {
+    given(renderer = new TextRenderer() {
+      public String render(Object model) {
+        return model instanceof Attribute
+            ? string
+            : super.render(model);
+      }
+    });
+    when(renderer.render(message(object).attribute(attributeA)));
+    thenReturned(renderer.render(message(object).attribute(string)));
   }
 
   @Test
