@@ -1,10 +1,10 @@
-package org.logbuddy.model;
+package org.logbuddy.message;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.logbuddy.model.Completed.returned;
-import static org.logbuddy.model.Completed.thrown;
+import static org.logbuddy.message.Completed.returned;
+import static org.logbuddy.message.Completed.thrown;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.then;
@@ -15,16 +15,14 @@ import static org.testory.Testory.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.LogBuddyException;
-import org.logbuddy.model.Completed.ReturnedObject;
-import org.logbuddy.model.Completed.ReturnedVoid;
-import org.logbuddy.model.Completed.Thrown;
+import org.logbuddy.message.Completed.ReturnedObject;
+import org.logbuddy.message.Completed.ReturnedVoid;
+import org.logbuddy.message.Completed.Thrown;
 
 public class TestCompleted {
   private Object object, otherObject;
   private Throwable throwable, otherThrowable;
-  private ReturnedObject returned;
-  private ReturnedVoid returnedVoid;
-  private Thrown thrown;
+  private Completed returned, returnedVoid, thrown;
 
   @Before
   public void before() {
@@ -34,14 +32,14 @@ public class TestCompleted {
   @Test
   public void creates_returned_object() {
     given(returned = returned(object));
-    when(returned.object);
+    when(((ReturnedObject) returned).object);
     thenReturned(sameInstance(object));
   }
 
   @Test
   public void creates_returned_null() {
     given(returned = returned(null));
-    when(returned.object);
+    when(((ReturnedObject) returned).object);
     thenReturned(null);
   }
 
@@ -54,7 +52,7 @@ public class TestCompleted {
   @Test
   public void creates_thrown_throwable() {
     given(thrown = thrown(throwable));
-    when(thrown.throwable);
+    when(((Thrown) thrown).throwable);
     thenReturned(throwable);
   }
 

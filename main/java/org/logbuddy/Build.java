@@ -25,6 +25,7 @@ import org.logbuddy.logger.WritingLogger;
 import org.logbuddy.logger.wire.BrowserLogger;
 import org.logbuddy.logger.wire.ConsoleLogger;
 import org.logbuddy.logger.wire.FileLogger;
+import org.logbuddy.message.Attribute;
 import org.logbuddy.renderer.HtmlRenderer;
 import org.logbuddy.renderer.TextRenderer;
 import org.logbuddy.renderer.chart.LineChartRenderer;
@@ -32,7 +33,9 @@ import org.logbuddy.renderer.chart.SaturationChartRenderer;
 import org.logbuddy.renderer.gallery.Gallery;
 
 public class Build {
-  public List<Class<?>> model = asList(Message.class);
+  public List<Class<?>> message = asList(
+      Message.class,
+      Attribute.class);
 
   public List<Class<?>> loggers = asList(
       InvocationDepthLogger.class,

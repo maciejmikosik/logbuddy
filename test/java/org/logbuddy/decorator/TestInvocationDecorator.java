@@ -5,9 +5,9 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.logbuddy.Message.message;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
-import static org.logbuddy.model.Completed.returned;
-import static org.logbuddy.model.Completed.thrown;
-import static org.logbuddy.model.Invoked.invoked;
+import static org.logbuddy.message.Completed.returned;
+import static org.logbuddy.message.Completed.thrown;
+import static org.logbuddy.message.Invoked.invoked;
 import static org.logbuddy.testing.Matchers.withContent;
 import static org.logbuddy.testing.TestingAnonymous.anonymousAbstractList;
 import static org.logbuddy.testing.TestingAnonymous.anonymousArrayList;
@@ -28,7 +28,7 @@ import org.logbuddy.Decorator;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
-import org.logbuddy.model.Invoked;
+import org.logbuddy.message.Invoked;
 
 public class TestInvocationDecorator {
   private Decorator decorator;

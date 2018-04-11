@@ -5,7 +5,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedList;
 import static org.logbuddy.Message.message;
 import static org.logbuddy.logger.InvocationDepthLogger.invocationDepth;
-import static org.logbuddy.model.InvocationDepth.invocationDepth;
+import static org.logbuddy.message.InvocationDepth.invocationDepth;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalled;
@@ -20,9 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
-import org.logbuddy.model.Completed.ReturnedObject;
-import org.logbuddy.model.Completed.Thrown;
-import org.logbuddy.model.Invoked;
+import org.logbuddy.message.Completed.ReturnedObject;
+import org.logbuddy.message.Completed.Thrown;
+import org.logbuddy.message.Invoked;
 
 public class TestInvocationDepthLogger {
   private Logger logger, invocationDepthLogger;

@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.joining;
 import static org.logbuddy.common.Collections.arrayToList;
 import static org.logbuddy.common.Strings.times;
 import static org.logbuddy.common.Throwables.stackTrace;
+import static org.logbuddy.message.Attribute.attribute;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,11 +19,12 @@ import java.util.List;
 
 import org.logbuddy.Message;
 import org.logbuddy.Renderer;
-import org.logbuddy.model.Completed.ReturnedObject;
-import org.logbuddy.model.Completed.ReturnedVoid;
-import org.logbuddy.model.Completed.Thrown;
-import org.logbuddy.model.InvocationDepth;
-import org.logbuddy.model.Invoked;
+import org.logbuddy.message.Attribute;
+import org.logbuddy.message.Completed.ReturnedObject;
+import org.logbuddy.message.Completed.ReturnedVoid;
+import org.logbuddy.message.Completed.Thrown;
+import org.logbuddy.message.InvocationDepth;
+import org.logbuddy.message.Invoked;
 
 public class TextRenderer implements Renderer<String> {
   private final DateTimeFormatter dateTimeFormatter;
@@ -46,9 +48,11 @@ public class TextRenderer implements Renderer<String> {
     if (model == null) {
       return "null";
     } else if (model instanceof String) {
-      return escape((String) model);
+      return renderImpl((String) model);
     } else if (model instanceof Message) {
       return renderImpl((Message) model);
+    } else if (model instanceof Attribute) {
+      return renderImpl((Attribute) model);
     } else if (model instanceof Invoked) {
       return renderImpl((Invoked) model);
     } else if (model instanceof ReturnedObject) {
@@ -78,13 +82,25 @@ public class TextRenderer implements Renderer<String> {
     return string;
   }
 
+  private String renderImpl(String string) {
+    return escape(string);
+  }
+
   private String renderImpl(Message message) {
     StringBuilder builder = new StringBuilder();
     for (Object attribute : message.attributes()) {
-      builder.append(render(attribute)).append(escape("  "));
+      builder.append(render(attribute(attribute))).append(escape("  "));
     }
     builder.append(render(message.content()));
     return builder.toString();
+  }
+
+  private String renderImpl(Attribute attribute) {
+    if (attribute.model instanceof Thread) {
+      return render(((Thread) attribute.model).getName());
+    } else {
+      return render(attribute.model);
+    }
   }
 
   private String renderImpl(Invoked invoked) {

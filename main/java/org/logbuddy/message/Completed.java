@@ -1,4 +1,4 @@
-package org.logbuddy.model;
+package org.logbuddy.message;
 
 import static java.lang.String.format;
 import static java.util.Objects.hash;
@@ -7,15 +7,15 @@ import static org.logbuddy.LogBuddyException.check;
 import java.util.Objects;
 
 public class Completed {
-  public static ReturnedObject returned(Object object) {
+  public static Completed returned(Object object) {
     return new ReturnedObject(object);
   }
 
-  public static ReturnedVoid returned() {
+  public static Completed returned() {
     return new ReturnedVoid();
   }
 
-  public static Thrown thrown(Throwable throwable) {
+  public static Completed thrown(Throwable throwable) {
     return new Thrown(throwable);
   }
 

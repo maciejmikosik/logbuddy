@@ -31,12 +31,14 @@ Quick example.
 
 prints
 
-    Thread(main)  2017-07-10T08:19:15.195Z    App.start()
-    Thread(main)  2017-07-10T08:19:15.204Z      Service#1521118594.serve()
-    Thread(main)  2017-07-10T08:19:15.205Z      returned
-    Thread(main)  2017-07-10T08:19:15.205Z      Service#1682463303.serve()
-    Thread(main)  2017-07-10T08:19:15.205Z      returned
-    Thread(main)  2017-07-10T08:19:15.205Z    returned
+```
+main  2018-03-27T11:57:27.493Z    App.start()
+main  2018-03-27T11:57:27.502Z      Service#1404928347.serve()
+main  2018-03-27T11:57:27.502Z      returned
+main  2018-03-27T11:57:27.502Z      Service#949057310.serve()
+main  2018-03-27T11:57:27.502Z      returned
+main  2018-03-27T11:57:27.503Z    returned
+```
 
 Logbuddy offers possibility to generate html logs that contain images, graphs etc.
 

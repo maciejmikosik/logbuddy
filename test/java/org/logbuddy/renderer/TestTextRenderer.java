@@ -3,10 +3,10 @@ package org.logbuddy.renderer;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.logbuddy.Message.message;
-import static org.logbuddy.model.Completed.returned;
-import static org.logbuddy.model.Completed.thrown;
-import static org.logbuddy.model.InvocationDepth.invocationDepth;
-import static org.logbuddy.model.Invoked.invoked;
+import static org.logbuddy.message.Completed.returned;
+import static org.logbuddy.message.Completed.thrown;
+import static org.logbuddy.message.InvocationDepth.invocationDepth;
+import static org.logbuddy.message.Invoked.invoked;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenReturned;
@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.logbuddy.Renderer;
+import org.logbuddy.message.Attribute;
 
 public class TestTextRenderer {
   private Object object;
@@ -58,9 +59,12 @@ public class TestTextRenderer {
 
   @Test
   public void renders_message() {
-    given(object = new Thread("content"));
-    given(attributeA = new Thread("attributeA"));
-    given(attributeB = new Thread("attributeB"));
+    when(renderer.render(message(object)));
+    thenReturned(renderer.render(object));
+  }
+
+  @Test
+  public void renders_message_with_attributes() {
     when(renderer.render(message(object)
         .attribute(attributeA)
         .attribute(attributeB)));
@@ -68,6 +72,19 @@ public class TestTextRenderer {
         renderer.render(attributeA),
         renderer.render(attributeB),
         renderer.render(object)));
+  }
+
+  @Test
+  public void renders_attribute() {
+    given(renderer = new TextRenderer() {
+      public String render(Object model) {
+        return model instanceof Attribute
+            ? string
+            : super.render(model);
+      }
+    });
+    when(renderer.render(message(object).attribute(attributeA)));
+    thenReturned(renderer.render(message(object).attribute(string)));
   }
 
   @Test
@@ -197,6 +214,13 @@ public class TestTextRenderer {
     given(thread = new Thread(string));
     when(renderer.render(thread));
     thenReturned(format("Thread(%s)", string));
+  }
+
+  @Test
+  public void renders_thread_as_attribute() {
+    given(thread = new Thread(string));
+    when(renderer.render(message(object).attribute(thread)));
+    thenReturned(thread.getName() + "  " + renderer.render(object));
   }
 
   @Test
