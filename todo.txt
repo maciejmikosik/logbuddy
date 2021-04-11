@@ -1,0 +1,9 @@
+ documentation
+ - split code block to 2
+Some loggers can add extra attributes to each passing Message.
+- decorator is functional interface
+- Composed decorator - no need #
+-  are dependent only to - depends only on
+- you already use - you are already using
+
+- thread renderer
