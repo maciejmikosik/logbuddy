@@ -8,7 +8,7 @@
 	<classpathentry kind="lib" path="main/jar/objenesis-2.4.jar" sourcepath="main/jar/objenesis-2.4-sources.jar"/>
 
 	<classpathentry kind="src" path="slf4j/java"/>
-	<classpathentry kind="lib" path="slf4j/jar/slf4j-api-1.7.21.jar" sourcepath="main/jar/slf4j-api-1.7.21-sources.jar"/>
+	<classpathentry kind="lib" path="slf4j/jar/slf4j-api-2.0.6.jar" sourcepath="main/jar/slf4j-api-2.0.6-sources.jar"/>
 
 	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="lib" path="test/jar/hamcrest-core-1.3.jar" sourcepath="test/jar/hamcrest-core-1.3-sources.jar"/>
