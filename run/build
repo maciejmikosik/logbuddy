@@ -15,7 +15,7 @@ PROJECT=`pwd`
 		SLF4J_JAVA="${SLF4J}/java"
 		SLF4J_JAR="${SLF4J}/jar"
 
-    JMODS="/usr/lib/jvm/java-19-openjdk/jmods"
+    JMODS="/usr/lib/jvm/default/jmods"
 
 ########## CLEANUP ##########
 rm \
