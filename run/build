@@ -32,7 +32,7 @@ mkdir \
 
 ########## COMPILE SOURCES ##########
 javac \
-  -classpath "${JAR}/byte-buddy-1.12.21.jar:${JAR}/objenesis-3.3.jar" \
+  -classpath "${JAR}/byte-buddy-1.14.9.jar:${JAR}/objenesis-3.3.jar" \
   -sourcepath "${JAVA}" \
   -source 11 \
   -target 11 \
@@ -48,7 +48,7 @@ cp \
 ########## COPY DEPENDENCIES ##########
 unzip \
   -q \
-  "${JAR}/byte-buddy-1.12.21.jar" \
+  "${JAR}/byte-buddy-1.14.9.jar" \
   -d "${UNPACKED}" \
   net/*
 unzip \
