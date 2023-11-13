@@ -12,9 +12,9 @@ import static org.quackery.report.AssertException.assertTrue;
 import java.util.List;
 
 import org.junit.runner.RunWith;
-import org.quackery.Case;
 import org.quackery.Quackery;
 import org.quackery.Suite;
+import org.quackery.Test;
 import org.quackery.junit.QuackeryRunner;
 
 @RunWith(QuackeryRunner.class)
@@ -26,7 +26,7 @@ public class TestCharts {
         .addAll(charts, TestCharts::testHtmlIsRenderedAsSingleLine);
   }
 
-  private static Case testHtmlIsRenderedAsSingleLine(ChartRenderer chart) {
+  private static Test testHtmlIsRenderedAsSingleLine(ChartRenderer chart) {
     return newCase(format("%s html is rendered as single line", chart), () -> {
       ChartModel model = chartModel(asList(1, 2, 3));
       String html = chart.render(model);

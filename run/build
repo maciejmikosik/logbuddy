@@ -15,7 +15,7 @@ PROJECT=`pwd`
 		SLF4J_JAVA="${SLF4J}/java"
 		SLF4J_JAR="${SLF4J}/jar"
 
-    JMODS="/usr/lib/jvm/java-19-openjdk/jmods"
+    JMODS="/usr/lib/jvm/default/jmods"
 
 ########## CLEANUP ##########
 rm \
@@ -32,7 +32,7 @@ mkdir \
 
 ########## COMPILE SOURCES ##########
 javac \
-  -classpath "${JAR}/byte-buddy-1.12.21.jar:${JAR}/objenesis-3.3.jar" \
+  -classpath "${JAR}/byte-buddy-1.14.9.jar:${JAR}/objenesis-3.3.jar" \
   -sourcepath "${JAVA}" \
   -source 11 \
   -target 11 \
@@ -48,7 +48,7 @@ cp \
 ########## COPY DEPENDENCIES ##########
 unzip \
   -q \
-  "${JAR}/byte-buddy-1.12.21.jar" \
+  "${JAR}/byte-buddy-1.14.9.jar" \
   -d "${UNPACKED}" \
   net/*
 unzip \
@@ -91,7 +91,7 @@ jar tf ${BUILDING}/logbuddy.jar \
   > "${BUILDING}/shading_map.txt"
 
 java \
-  -cp "${RUN}/proguard-7.3.0.jar" \
+  -cp "${RUN}/proguard-7.4.0.jar" \
   proguard.ProGuard \
   -injars "${BUILDING}/logbuddy.jar" \
   -outjars "${BUILDING}/logbuddy-shaded.jar" \

@@ -1,18 +1,11 @@
 package org.logbuddy.common;
 
 import java.lang.reflect.AccessibleObject;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Iterator;
 
 public class Classes {
   public static <A extends AccessibleObject> A makeAccessible(A accessibleObject) {
-    AccessController.doPrivileged(new PrivilegedAction<Void>() {
-      public Void run() {
-        accessibleObject.setAccessible(true);
-        return null;
-      }
-    });
+    accessibleObject.setAccessible(true);
     return accessibleObject;
   }
 
