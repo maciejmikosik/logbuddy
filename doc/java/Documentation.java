@@ -11,6 +11,7 @@ import static org.logbuddy.decorator.CachingDecorator.caching;
 import static org.logbuddy.decorator.ComposedDecorator.compose;
 import static org.logbuddy.decorator.InjectingDecorator.injecting;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
+import static org.logbuddy.decorator.JdkDecorator.jdk;
 import static org.logbuddy.decorator.TraversingDecorator.traversing;
 import static org.logbuddy.logger.AsynchronousLogger.asynchronous;
 import static org.logbuddy.logger.CatchingLogger.catching;
@@ -36,6 +37,7 @@ import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.logbuddy.Decorator;
@@ -213,6 +215,21 @@ public class Documentation {
     Color green = decorator.decorate(Color.GREEN);
     List<Object> list = decorator.decorate(new ArrayList<>(asList(red, green)));
     list.contains(green);
+  }
+
+  public static void decorator_jdk_fail() {
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = invocationDecorator(logger);
+    List<String> decorable = Arrays.asList("string");
+    decorator.decorate(decorable);
+  }
+
+  public static void decorator_jdk() {
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = jdk(invocationDecorator(logger));
+    List<String> decorable = Arrays.asList("string");
+    List<String> decorated = decorator.decorate(decorable);
+    decorated.get(0);
   }
 
   public static void decorator_traversing() {

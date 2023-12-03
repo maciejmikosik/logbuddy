@@ -231,6 +231,44 @@ This attribute is recognized by `TextRenderer` and rendered as intendation which
         returned true
       returned true
 
+`JdkDecorator` helps you decorate non-public classes from `java.` package. When ByteBuddy creates proxy for an object of non-public class, it defines proxy class in the same package as non-public class in order to access it. This is not possible for classes from `java.` package due to security checks. ByteBuddy is forced to define class in different package which makes superclass invisible.
+
+```
+Logger logger = consoleLogger(new TextRenderer());
+Decorator decorator = invocationDecorator(logger);
+List<String> decorable = Arrays.asList("string");
+decorator.decorate(decorable);
+
+-------------- prints --------------
+
+Exception in thread "main" java.lang.IllegalStateException: Invisible super type class java.util.Arrays$ArrayList for class net.bytebuddy.renamed.java.util.Arrays$ArrayList$ByteBuddy$RBH9CXJA
+	at net.bytebuddy.dynamic.scaffold.InstrumentedType$Default.validated(InstrumentedType.java:1566)
+	at net.bytebuddy.dynamic.scaffold.MethodRegistry$Default.prepare(MethodRegistry.java:519)
+	at net.bytebuddy.dynamic.scaffold.subclass.SubclassDynamicTypeBuilder.toTypeWriter(SubclassDynamicTypeBuilder.java:212)
+	at net.bytebuddy.dynamic.scaffold.subclass.SubclassDynamicTypeBuilder.toTypeWriter(SubclassDynamicTypeBuilder.java:203)
+	at net.bytebuddy.dynamic.DynamicType$Builder$AbstractBase$UsingTypeWriter.make(DynamicType.java:4055)
+	at net.bytebuddy.dynamic.DynamicType$Builder$AbstractBase.make(DynamicType.java:3739)
+	at net.bytebuddy.dynamic.DynamicType$Builder$AbstractBase$Delegator.make(DynamicType.java:3991)
+	at org.logbuddy.decorator.InvocationDecorator.decorate(InvocationDecorator.java:49)
+	at Documentation.decorator_jdk_fail(Documentation.java:224)
+	at Documentation.main(Documentation.java:53)
+```
+
+`JdkDecorator` solves it by wrapping object being decorated in extra proxy first, before delegating decoration to another `Decorator`. This proxy, instead of being of non-public type, is defined as subclass of nearest public superclass and implements interfaces that were peeled of from non-public classes.
+
+For example `Arrays.asList("")` returns instance of non-public class `java.util.Arrays$ArrayList`. `JdkDecorator` wraps it in proxy extending `AbstractList` and implementing interfaces `RandomAccess` and `Serializable`.
+
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = jdk(invocationDecorator(logger));
+    List<String> decorable = Arrays.asList("string");
+    List<String> decorated = decorator.decorate(decorable);
+    decorated.get(0);
+    -------------- prints --------------
+    List[string].get(0)
+    returned string
+
+This works as long as you cast that proxy only to public superclass and peeled interfaces. Trying to cast proxy to original non-public class causes `ClassCastException`.
+
 `TraversingDecorator` helps you decorate whole dependency graph at once.
 It will crawl through all instances reachable from original instance.
 Those instance's fields will be injected with decorated instances.

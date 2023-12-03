@@ -10,6 +10,7 @@ import org.logbuddy.decorator.CachingDecorator;
 import org.logbuddy.decorator.ComposedDecorator;
 import org.logbuddy.decorator.InjectingDecorator;
 import org.logbuddy.decorator.InvocationDecorator;
+import org.logbuddy.decorator.JdkDecorator;
 import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.decorator.TraversingDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
@@ -60,6 +61,7 @@ public class Build {
       Gallery.class);
   public List<Class<?>> decorators = asList(
       InvocationDecorator.class,
+      JdkDecorator.class,
       ComposedDecorator.class,
       NoDecorator.class,
       InjectingDecorator.class,
