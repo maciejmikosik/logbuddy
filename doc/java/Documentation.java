@@ -8,6 +8,7 @@ import static org.logbuddy.Message.message;
 import static org.logbuddy.bind.Slf4jBinder.slf4jBinder;
 import static org.logbuddy.bind.StdioBinder.stdioBinder;
 import static org.logbuddy.decorator.CachingDecorator.caching;
+import static org.logbuddy.decorator.ComponentsDecorator.components;
 import static org.logbuddy.decorator.ComposedDecorator.compose;
 import static org.logbuddy.decorator.InjectingDecorator.injecting;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
@@ -230,6 +231,23 @@ public class Documentation {
     List<String> decorable = Arrays.asList("string");
     List<String> decorated = decorator.decorate(decorable);
     decorated.get(0);
+  }
+
+  public static void decorator_components() {
+    class Service {
+      private final Color red = Color.RED;
+      private final Color green = Color.GREEN;
+      private final Color blue = Color.BLUE;
+
+      public String toString() {
+        return "" + red + green + blue;
+      }
+    }
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = components(invocationDecorator(logger));
+    Service service = new Service();
+    decorator.decorate(service);
+    service.toString();
   }
 
   public static void decorator_traversing() {
