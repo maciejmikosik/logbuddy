@@ -346,9 +346,7 @@ If you decorate same object again, it returns same result as first time.
         cachingDecorator.decorate(object),
         cachingDecorator.decorate(object));
 
-`InjectingDecorator` allows you to manually log messages in production code.
-It injects given `Logger` to fields of that type.
-It is wise to initialize this field with instance of `NoLogger` to prevent `NullPointerException` in case instance is not decorated.
+`ConnectingLoggerDecorator` allows you to manually log messages in production code. It replaces instance of `NoLogger` by the one provided. Other instances of `Logger` manually assigned by client are ignored. Decoration of all other objects is delegated to provided `Decorator`. It works best in combination with `ComponentsDecorator`.
 
     class Service {
       Logger logger = noLogger();
@@ -357,16 +355,15 @@ It is wise to initialize this field with instance of `NoLogger` to prevent `Null
         logger.log(message("adhoc message"));
       }
     }
-
     Logger logger = consoleLogger(new TextRenderer());
-    Decorator decorator = injecting(logger);
+    Decorator decorator = components(connecting(logger, noDecorator()));
 
     decorator.decorate(new Service()).serve();
     -------------- prints --------------
     adhoc message
 
 `ComposedDecorator` lets you combine two decorators into one.
-For example you want to combine functionality of `InvocationDecorator` with `InjectingLoggerDecorator`.
+For example you want to combine functionality of `InvocationDecorator` with `ConnectingLoggerDecorator`.
 
     class Service {
       Logger logger = noLogger();
@@ -383,7 +380,7 @@ For example you want to combine functionality of `InvocationDecorator` with `Inj
     Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
     Decorator decorator = compose(
         invocationDecorator(logger),
-        injecting(logger));
+        components(connecting(logger, noDecorator())));
 
     decorator.decorate(new Service()).serve();
     -------------- prints --------------

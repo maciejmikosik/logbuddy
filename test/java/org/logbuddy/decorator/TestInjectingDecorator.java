@@ -15,6 +15,7 @@ import org.logbuddy.Decorator;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 
+@SuppressWarnings("deprecation")
 public class TestInjectingDecorator {
   private Decorable decorable;
   private Decorator injecting;
