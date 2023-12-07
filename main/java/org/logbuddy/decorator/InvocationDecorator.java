@@ -43,23 +43,13 @@ public class InvocationDecorator implements Decorator {
   public <T> T decorate(T decorable) {
     check(decorable != null);
     Class<?> decorableType = byteBuddy
-        .subclass(peel(decorable.getClass()))
+        .subclass(decorable.getClass())
         .method(ElementMatchers.any())
         .intercept(MethodDelegation.to(new DecorateHandler(decorable)))
         .make()
         .load(Thread.currentThread().getContextClassLoader(), ClassLoadingStrategy.Default.INJECTION)
         .getLoaded();
     return (T) objenesis.newInstance(decorableType);
-  }
-
-  private static Class<?> peel(Class<?> type) {
-    return type.isAnonymousClass()
-        ? type.getSuperclass() != Object.class
-            ? type.getSuperclass()
-            : type.getInterfaces().length > 0
-                ? type.getInterfaces()[0]
-                : Object.class
-        : type;
   }
 
   public class DecorateHandler {

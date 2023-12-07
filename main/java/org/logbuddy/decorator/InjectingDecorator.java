@@ -10,6 +10,7 @@ import static org.logbuddy.common.Fields.set;
 import org.logbuddy.Decorator;
 import org.logbuddy.Logger;
 
+@Deprecated
 public class InjectingDecorator implements Decorator {
   private final Logger logger;
 

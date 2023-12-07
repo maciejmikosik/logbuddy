@@ -8,10 +8,17 @@ import static org.logbuddy.Message.message;
 import static org.logbuddy.bind.Slf4jBinder.slf4jBinder;
 import static org.logbuddy.bind.StdioBinder.stdioBinder;
 import static org.logbuddy.decorator.CachingDecorator.caching;
+import static org.logbuddy.decorator.ComponentsDecorator.components;
 import static org.logbuddy.decorator.ComposedDecorator.compose;
-import static org.logbuddy.decorator.InjectingDecorator.injecting;
+import static org.logbuddy.decorator.ConnectingLoggerDecorator.connecting;
+import static org.logbuddy.decorator.DefaultDecomposer.decomposer;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
-import static org.logbuddy.decorator.TraversingDecorator.traversing;
+import static org.logbuddy.decorator.JdkDecorator.jdk;
+import static org.logbuddy.decorator.NoDecorator.noDecorator;
+import static org.logbuddy.decorator.RecursiveDecomposer.recursive;
+import static org.logbuddy.decorator.Rich.rich;
+import static org.logbuddy.decorator.Rich.richDecorator;
+import static org.logbuddy.decorator.Rich.traversing;
 import static org.logbuddy.logger.AsynchronousLogger.asynchronous;
 import static org.logbuddy.logger.CatchingLogger.catching;
 import static org.logbuddy.logger.ComposedLogger.compose;
@@ -36,6 +43,7 @@ import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.logbuddy.Decorator;
@@ -215,37 +223,36 @@ public class Documentation {
     list.contains(green);
   }
 
-  public static void decorator_traversing() {
-    class Service {
-      void serve() {}
-
-      public String toString() {
-        return "Service#" + hashCode();
-      }
-    }
-    class App {
-      Service serviceA = new Service();
-      Service serviceB = new Service();
-
-      void start() {
-        serviceA.serve();
-        serviceB.serve();
-      }
-
-      public String toString() {
-        return "App";
-      }
-    }
-
-    Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
-    Decorator decorator = traversing(invocationDecorator(logger));
-
-    decorator.decorate(new App()).start();
+  public static void decorator_jdk_fail() {
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = invocationDecorator(logger);
+    List<String> decorable = Arrays.asList("string");
+    decorator.decorate(decorable);
   }
 
-  public static void decorator_traversing_filter(Decorator decorator) {
-    traversing(decorator)
-        .filter(field -> !field.getType().isArray());
+  public static void decorator_jdk() {
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = jdk(invocationDecorator(logger));
+    List<String> decorable = Arrays.asList("string");
+    List<String> decorated = decorator.decorate(decorable);
+    decorated.get(0);
+  }
+
+  public static void decorator_components() {
+    class Service {
+      private final Color red = Color.RED;
+      private final Color green = Color.GREEN;
+      private final Color blue = Color.BLUE;
+
+      public String toString() {
+        return "" + red + green + blue;
+      }
+    }
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = components(invocationDecorator(logger));
+    Service service = new Service();
+    decorator.decorate(service);
+    service.toString();
   }
 
   public static void decorator_caching(Decorator decorator, Object object) {
@@ -256,7 +263,7 @@ public class Documentation {
 
   }
 
-  public static void decorator_injecting() {
+  public static void decorator_connecting() {
     class Service {
       Logger logger = noLogger();
 
@@ -264,9 +271,8 @@ public class Documentation {
         logger.log(message("adhoc message"));
       }
     }
-
     Logger logger = consoleLogger(new TextRenderer());
-    Decorator decorator = injecting(logger);
+    Decorator decorator = components(connecting(logger, noDecorator()));
 
     decorator.decorate(new Service()).serve();
   }
@@ -287,9 +293,47 @@ public class Documentation {
     Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
     Decorator decorator = compose(
         invocationDecorator(logger),
-        injecting(logger));
+        components(connecting(logger, noDecorator())));
 
     decorator.decorate(new Service()).serve();
+  }
+
+  public static void decomposer_default() {
+    class Service {
+      void serve() {}
+
+      public String toString() {
+        return "Service#" + hashCode();
+      }
+    }
+    class App {
+      Service serviceA = new Service();
+      Service serviceB = new Service();
+
+      void start() {
+        serviceA.serve();
+        serviceB.serve();
+      }
+
+      public String toString() {
+        return "App";
+      }
+    }
+    App app = new App();
+
+    Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
+    Decorator decorator = invocationDecorator(logger);
+    recursive(decomposer())
+        .decompose(app)
+        .forEach(components(decorator)::decorate);
+
+    decorator.decorate(app).start();
+  }
+
+  @SuppressWarnings("unused")
+  public static void configured_rich() {
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = traversing(richDecorator(rich(logger)));
   }
 
   public static void custom_render_color_original() {

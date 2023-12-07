@@ -7,11 +7,18 @@ import java.util.List;
 import org.logbuddy.bind.LoggingStream;
 import org.logbuddy.bind.StdioBinder;
 import org.logbuddy.decorator.CachingDecorator;
+import org.logbuddy.decorator.ComponentsDecorator;
 import org.logbuddy.decorator.ComposedDecorator;
+import org.logbuddy.decorator.DefaultDecomposer;
 import org.logbuddy.decorator.InjectingDecorator;
 import org.logbuddy.decorator.InvocationDecorator;
+import org.logbuddy.decorator.JdkDecorator;
 import org.logbuddy.decorator.NoDecorator;
+import org.logbuddy.decorator.RecursiveDecomposer;
+import org.logbuddy.decorator.Rich;
+import org.logbuddy.decorator.SkipPrimitivesDecomposer;
 import org.logbuddy.decorator.TraversingDecorator;
+import org.logbuddy.decorator.TryingDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
 import org.logbuddy.logger.CatchingLogger;
 import org.logbuddy.logger.ComposedLogger;
@@ -32,6 +39,7 @@ import org.logbuddy.renderer.chart.LineChartRenderer;
 import org.logbuddy.renderer.chart.SaturationChartRenderer;
 import org.logbuddy.renderer.gallery.Gallery;
 
+@SuppressWarnings("deprecation")
 public class Build {
   public List<Class<?>> message = asList(
       Message.class,
@@ -60,11 +68,20 @@ public class Build {
       Gallery.class);
   public List<Class<?>> decorators = asList(
       InvocationDecorator.class,
+      ComponentsDecorator.class,
+      JdkDecorator.class,
+      TryingDecorator.class,
       ComposedDecorator.class,
       NoDecorator.class,
       InjectingDecorator.class,
       TraversingDecorator.class,
       CachingDecorator.class);
+  public List<Class<?>> decomposers = asList(
+      DefaultDecomposer.class,
+      RecursiveDecomposer.class,
+      SkipPrimitivesDecomposer.class);
+  public List<Class<?>> rich = asList(
+      Rich.class);
   public List<Class<?>> bind = asList(
       LoggingStream.class,
       StdioBinder.class);
