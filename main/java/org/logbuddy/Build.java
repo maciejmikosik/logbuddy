@@ -35,6 +35,7 @@ import org.logbuddy.renderer.chart.LineChartRenderer;
 import org.logbuddy.renderer.chart.SaturationChartRenderer;
 import org.logbuddy.renderer.gallery.Gallery;
 
+@SuppressWarnings("deprecation")
 public class Build {
   public List<Class<?>> message = asList(
       Message.class,

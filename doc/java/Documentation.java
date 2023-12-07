@@ -10,9 +10,10 @@ import static org.logbuddy.bind.StdioBinder.stdioBinder;
 import static org.logbuddy.decorator.CachingDecorator.caching;
 import static org.logbuddy.decorator.ComponentsDecorator.components;
 import static org.logbuddy.decorator.ComposedDecorator.compose;
-import static org.logbuddy.decorator.InjectingDecorator.injecting;
+import static org.logbuddy.decorator.ConnectingLoggerDecorator.connecting;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
 import static org.logbuddy.decorator.JdkDecorator.jdk;
+import static org.logbuddy.decorator.NoDecorator.noDecorator;
 import static org.logbuddy.decorator.TraversingDecorator.traversing;
 import static org.logbuddy.logger.AsynchronousLogger.asynchronous;
 import static org.logbuddy.logger.CatchingLogger.catching;
@@ -291,7 +292,7 @@ public class Documentation {
 
   }
 
-  public static void decorator_injecting() {
+  public static void decorator_connecting() {
     class Service {
       Logger logger = noLogger();
 
@@ -299,9 +300,8 @@ public class Documentation {
         logger.log(message("adhoc message"));
       }
     }
-
     Logger logger = consoleLogger(new TextRenderer());
-    Decorator decorator = injecting(logger);
+    Decorator decorator = components(connecting(logger, noDecorator()));
 
     decorator.decorate(new Service()).serve();
   }
@@ -322,7 +322,7 @@ public class Documentation {
     Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
     Decorator decorator = compose(
         invocationDecorator(logger),
-        injecting(logger));
+        components(connecting(logger, noDecorator())));
 
     decorator.decorate(new Service()).serve();
   }
