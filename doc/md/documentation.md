@@ -269,6 +269,30 @@ For example `Arrays.asList("")` returns instance of non-public class `java.util.
 
 This works as long as you cast that proxy only to public superclass and peeled interfaces. Trying to cast proxy to original non-public class causes `ClassCastException`.
 
+`ComponentsDecorator` allows you to decorate fields of an object and elements of an array. It uses reflection to read value of each field/element, decorate it using provided `Decorator` and sets it back.
+
+    class Service {
+      private final Color red = Color.RED;
+      private final Color green = Color.GREEN;
+      private final Color blue = Color.BLUE;
+
+      public String toString() {
+        return "" + red + green + blue;
+      }
+    }
+
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = components(invocationDecorator(logger));
+    Service service = new Service();
+    decorator.decorate(service).toString();
+    -------------- prints --------------
+    java.awt.Color[r=255,g=0,b=0].toString()
+    returned java.awt.Color[r=255,g=0,b=0]
+    java.awt.Color[r=0,g=255,b=0].toString()
+    returned java.awt.Color[r=0,g=255,b=0]
+    java.awt.Color[r=0,g=0,b=255].toString()
+    returned java.awt.Color[r=0,g=0,b=255]
+
 `TraversingDecorator` helps you decorate whole dependency graph at once.
 It will crawl through all instances reachable from original instance.
 Those instance's fields will be injected with decorated instances.

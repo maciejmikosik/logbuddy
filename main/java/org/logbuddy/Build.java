@@ -8,6 +8,7 @@ import org.logbuddy.bind.LoggingStream;
 import org.logbuddy.bind.StdioBinder;
 import org.logbuddy.decorator.CachingDecorator;
 import org.logbuddy.decorator.ComposedDecorator;
+import org.logbuddy.decorator.ComponentsDecorator;
 import org.logbuddy.decorator.InjectingDecorator;
 import org.logbuddy.decorator.InvocationDecorator;
 import org.logbuddy.decorator.JdkDecorator;
@@ -61,6 +62,7 @@ public class Build {
       Gallery.class);
   public List<Class<?>> decorators = asList(
       InvocationDecorator.class,
+      ComponentsDecorator.class,
       JdkDecorator.class,
       ComposedDecorator.class,
       NoDecorator.class,
