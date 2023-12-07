@@ -15,6 +15,7 @@ import org.logbuddy.decorator.InvocationDecorator;
 import org.logbuddy.decorator.JdkDecorator;
 import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.decorator.RecursiveDecomposer;
+import org.logbuddy.decorator.Rich;
 import org.logbuddy.decorator.TraversingDecorator;
 import org.logbuddy.decorator.TryingDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
@@ -77,6 +78,8 @@ public class Build {
   public List<Class<?>> decomposers = asList(
       DefaultDecomposer.class,
       RecursiveDecomposer.class);
+  public List<Class<?>> rich = asList(
+      Rich.class);
   public List<Class<?>> bind = asList(
       LoggingStream.class,
       StdioBinder.class);

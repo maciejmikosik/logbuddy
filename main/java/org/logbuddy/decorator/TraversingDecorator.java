@@ -20,6 +20,7 @@ import org.logbuddy.Decorator;
 import org.logbuddy.Logger;
 import org.logbuddy.Renderer;
 
+@Deprecated
 public class TraversingDecorator implements Decorator {
   private final Decorator decorator;
   private final Predicate<Field> filter;

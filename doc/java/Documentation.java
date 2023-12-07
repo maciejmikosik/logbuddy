@@ -16,7 +16,9 @@ import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
 import static org.logbuddy.decorator.JdkDecorator.jdk;
 import static org.logbuddy.decorator.NoDecorator.noDecorator;
 import static org.logbuddy.decorator.RecursiveDecomposer.recursive;
-import static org.logbuddy.decorator.TraversingDecorator.traversing;
+import static org.logbuddy.decorator.Rich.rich;
+import static org.logbuddy.decorator.Rich.richDecorator;
+import static org.logbuddy.decorator.Rich.traversing;
 import static org.logbuddy.logger.AsynchronousLogger.asynchronous;
 import static org.logbuddy.logger.CatchingLogger.catching;
 import static org.logbuddy.logger.ComposedLogger.compose;
@@ -253,39 +255,6 @@ public class Documentation {
     service.toString();
   }
 
-  public static void decorator_traversing() {
-    class Service {
-      void serve() {}
-
-      public String toString() {
-        return "Service#" + hashCode();
-      }
-    }
-    class App {
-      Service serviceA = new Service();
-      Service serviceB = new Service();
-
-      void start() {
-        serviceA.serve();
-        serviceB.serve();
-      }
-
-      public String toString() {
-        return "App";
-      }
-    }
-
-    Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
-    Decorator decorator = traversing(invocationDecorator(logger));
-
-    decorator.decorate(new App()).start();
-  }
-
-  public static void decorator_traversing_filter(Decorator decorator) {
-    traversing(decorator)
-        .filter(field -> !field.getType().isArray());
-  }
-
   public static void decorator_caching(Decorator decorator, Object object) {
     Decorator cachingDecorator = caching(decorator);
     assertSame(
@@ -359,6 +328,12 @@ public class Documentation {
         .forEach(components(decorator)::decorate);
 
     decorator.decorate(app).start();
+  }
+
+  @SuppressWarnings("unused")
+  public static void configured_rich() {
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = traversing(richDecorator(rich(logger)));
   }
 
   public static void custom_render_color_original() {

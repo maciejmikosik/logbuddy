@@ -293,51 +293,6 @@ This works as long as you cast that proxy only to public superclass and peeled i
     java.awt.Color[r=0,g=0,b=255].toString()
     returned java.awt.Color[r=0,g=0,b=255]
 
-`TraversingDecorator` helps you decorate whole dependency graph at once.
-It will crawl through all instances reachable from original instance.
-Those instance's fields will be injected with decorated instances.
-Original instance is also decorated.
-
-Let's assume all dependencies are reachable through `app` instance.
-
-    class Service {
-      void serve() {}
-
-      public String toString() {
-        return "Service#" + hashCode();
-      }
-    }
-    class App {
-      Service serviceA = new Service();
-      Service serviceB = new Service();
-
-      void start() {
-        serviceA.serve();
-        serviceB.serve();
-      }
-
-      public String toString() {
-        return "App";
-      }
-    }
-
-    Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
-    Decorator decorator = traversing(invocationDecorator(logger));
-
-    decorator.decorate(new App()).start();
-    -------------- prints --------------
-      App.start()
-        Service#1521118594.serve()
-        returned
-        Service#1682463303.serve()
-        returned
-      returned
-
-Optionally, you can restrict this recursion and skip some fields by providing `Predicate<Field>`.
-
-    traversing(decorator)
-        .filter(field -> !field.getType().isArray());
-
 `CachingDecorator` remembers objects you already decorated.
 If you decorate same object again, it returns same result as first time.
 
@@ -426,6 +381,18 @@ Decorating every single object in dependency graph is tedious. That's why logbud
       Service#659748578.serve()
       returned
     returned
+
+`Rich` class contains pre-configured loggers and decorators.
+
+  - `rich(Logger)` - includes `invocationDepth` and `Fuse`
+  - `richDecorator(Logger)` - includes `invocationDecorator(Logger)`, `trying` and `connecting(Logger)`
+  - `traversing(Decorator)` - uses `recursive(decomposer())` to decorate all components and root
+
+example:
+
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = traversing(richDecorator(rich(logger)));
+
 
 # Customization
 

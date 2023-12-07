@@ -22,6 +22,7 @@ import org.quackery.Test;
 import org.quackery.junit.QuackeryRunner;
 import org.quackery.report.AssumeException;
 
+@SuppressWarnings("deprecation")
 @RunWith(QuackeryRunner.class)
 public class TestTraversingDecorator {
   @Quackery
