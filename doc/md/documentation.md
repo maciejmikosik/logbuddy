@@ -231,12 +231,119 @@ This attribute is recognized by `TextRenderer` and rendered as intendation which
         returned true
       returned true
 
-`TraversingDecorator` helps you decorate whole dependency graph at once.
-It will crawl through all instances reachable from original instance.
-Those instance's fields will be injected with decorated instances.
-Original instance is also decorated.
+`JdkDecorator` helps you decorate non-public classes from `java.` package. When ByteBuddy creates proxy for an object of non-public class, it defines proxy class in the same package as non-public class in order to access it. This is not possible for classes from `java.` package due to security checks. ByteBuddy is forced to define class in different package which makes superclass invisible.
 
-Let's assume all dependencies are reachable through `app` instance.
+```
+Logger logger = consoleLogger(new TextRenderer());
+Decorator decorator = invocationDecorator(logger);
+List<String> decorable = Arrays.asList("string");
+decorator.decorate(decorable);
+
+-------------- prints --------------
+
+Exception in thread "main" java.lang.IllegalStateException: Invisible super type class java.util.Arrays$ArrayList for class net.bytebuddy.renamed.java.util.Arrays$ArrayList$ByteBuddy$RBH9CXJA
+	at net.bytebuddy.dynamic.scaffold.InstrumentedType$Default.validated(InstrumentedType.java:1566)
+	at net.bytebuddy.dynamic.scaffold.MethodRegistry$Default.prepare(MethodRegistry.java:519)
+	at net.bytebuddy.dynamic.scaffold.subclass.SubclassDynamicTypeBuilder.toTypeWriter(SubclassDynamicTypeBuilder.java:212)
+	at net.bytebuddy.dynamic.scaffold.subclass.SubclassDynamicTypeBuilder.toTypeWriter(SubclassDynamicTypeBuilder.java:203)
+	at net.bytebuddy.dynamic.DynamicType$Builder$AbstractBase$UsingTypeWriter.make(DynamicType.java:4055)
+	at net.bytebuddy.dynamic.DynamicType$Builder$AbstractBase.make(DynamicType.java:3739)
+	at net.bytebuddy.dynamic.DynamicType$Builder$AbstractBase$Delegator.make(DynamicType.java:3991)
+	at org.logbuddy.decorator.InvocationDecorator.decorate(InvocationDecorator.java:49)
+	at Documentation.decorator_jdk_fail(Documentation.java:224)
+	at Documentation.main(Documentation.java:53)
+```
+
+`JdkDecorator` solves it by wrapping object being decorated in extra proxy first, before delegating decoration to another `Decorator`. This proxy, instead of being of non-public type, is defined as subclass of nearest public superclass and implements interfaces that were peeled of from non-public classes.
+
+For example `Arrays.asList("")` returns instance of non-public class `java.util.Arrays$ArrayList`. `JdkDecorator` wraps it in proxy extending `AbstractList` and implementing interfaces `RandomAccess` and `Serializable`.
+
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = jdk(invocationDecorator(logger));
+    List<String> decorable = Arrays.asList("string");
+    List<String> decorated = decorator.decorate(decorable);
+    decorated.get(0);
+    -------------- prints --------------
+    List[string].get(0)
+    returned string
+
+This works as long as you cast that proxy only to public superclass and peeled interfaces. Casting proxy to original non-public class causes `ClassCastException`. In those cases simpler aproach is to skip decoration of problematic instances by using `TryingDecorator`.
+
+`ComponentsDecorator` allows you to decorate fields of an object and elements of an array. It uses reflection to read value of each field/element, decorate it using provided `Decorator` and sets it back.
+
+    class Service {
+      private final Color red = Color.RED;
+      private final Color green = Color.GREEN;
+      private final Color blue = Color.BLUE;
+
+      public String toString() {
+        return "" + red + green + blue;
+      }
+    }
+
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = components(invocationDecorator(logger));
+    Service service = new Service();
+    decorator.decorate(service).toString();
+    -------------- prints --------------
+    java.awt.Color[r=255,g=0,b=0].toString()
+    returned java.awt.Color[r=255,g=0,b=0]
+    java.awt.Color[r=0,g=255,b=0].toString()
+    returned java.awt.Color[r=0,g=255,b=0]
+    java.awt.Color[r=0,g=0,b=255].toString()
+    returned java.awt.Color[r=0,g=0,b=255]
+
+`CachingDecorator` remembers objects you already decorated.
+If you decorate same object again, it returns same result as first time.
+
+    Decorator cachingDecorator = caching(decorator);
+    assertSame(
+        cachingDecorator.decorate(object),
+        cachingDecorator.decorate(object));
+
+`ConnectingLoggerDecorator` allows you to manually log messages in production code. It replaces instance of `NoLogger` by the one provided. Other instances of `Logger` manually assigned by client are ignored. Decoration of all other objects is delegated to provided `Decorator`. It works best in combination with `ComponentsDecorator`.
+
+    class Service {
+      Logger logger = noLogger();
+
+      public void serve() {
+        logger.log(message("adhoc message"));
+      }
+    }
+    Logger logger = consoleLogger(new TextRenderer());
+    Decorator decorator = components(connecting(logger, noDecorator()));
+
+    decorator.decorate(new Service()).serve();
+    -------------- prints --------------
+    adhoc message
+
+`ComposedDecorator` lets you combine two decorators into one.
+For example you want to combine functionality of `InvocationDecorator` with `ConnectingLoggerDecorator`.
+
+    class Service {
+      Logger logger = noLogger();
+
+      public void serve() {
+        logger.log(message("adhoc message"));
+      }
+
+      public String toString() {
+        return "Service#" + hashCode();
+      }
+    }
+
+    Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
+    Decorator decorator = compose(
+        invocationDecorator(logger),
+        components(connecting(logger, noDecorator())));
+
+    decorator.decorate(new Service()).serve();
+    -------------- prints --------------
+      Service#1920387277.serve()
+        adhoc message
+      returned
+
+Decorating every single object in dependency graph is tedious. That's why logbuddy provides methods for traversing graph so you can decorate all of them. `DefaultDecomposer` extracts all objects assigned to fields and all elements from array. `RecursiveDecomposer` provides way to do this recursively.
 
     class Service {
       void serve() {}
@@ -258,76 +365,33 @@ Let's assume all dependencies are reachable through `app` instance.
         return "App";
       }
     }
+    App app = new App();
 
     Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
-    Decorator decorator = traversing(invocationDecorator(logger));
+    Decorator decorator = invocationDecorator(logger);
+    recursive(decomposer())
+        .decompose(app)
+        .forEach(components(decorator)::decorate);
 
-    decorator.decorate(new App()).start();
+    decorator.decorate(app).start();
     -------------- prints --------------
-      App.start()
-        Service#1521118594.serve()
-        returned
-        Service#1682463303.serve()
-        returned
+    App.start()
+      Service#1802598046.serve()
       returned
+      Service#659748578.serve()
+      returned
+    returned
 
-Optionally, you can restrict this recursion and skip some fields by providing `Predicate<Field>`.
+`Rich` class contains pre-configured loggers and decorators.
 
-    traversing(decorator)
-        .filter(field -> !field.getType().isArray());
+  - `rich(Logger)` - includes `invocationDepth` and `Fuse`
+  - `richDecorator(Logger)` - includes `invocationDecorator(Logger)`, `trying` and `connecting(Logger)`
+  - `traversing(Decorator)` - uses `recursive(decomposer())` to decorate all components and root
 
-`CachingDecorator` remembers objects you already decorated.
-If you decorate same object again, it returns same result as first time.
-
-    Decorator cachingDecorator = caching(decorator);
-    assertSame(
-        cachingDecorator.decorate(object),
-        cachingDecorator.decorate(object));
-
-`InjectingDecorator` allows you to manually log messages in production code.
-It injects given `Logger` to fields of that type.
-It is wise to initialize this field with instance of `NoLogger` to prevent `NullPointerException` in case instance is not decorated.
-
-    class Service {
-      Logger logger = noLogger();
-
-      public void serve() {
-        logger.log(message("adhoc message"));
-      }
-    }
+example:
 
     Logger logger = consoleLogger(new TextRenderer());
-    Decorator decorator = injecting(logger);
-
-    decorator.decorate(new Service()).serve();
-    -------------- prints --------------
-    adhoc message
-
-`ComposedDecorator` lets you combine two decorators into one.
-For example you want to combine functionality of `InvocationDecorator` with `InjectingLoggerDecorator`.
-
-    class Service {
-      Logger logger = noLogger();
-
-      public void serve() {
-        logger.log(message("adhoc message"));
-      }
-
-      public String toString() {
-        return "Service#" + hashCode();
-      }
-    }
-
-    Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
-    Decorator decorator = compose(
-        invocationDecorator(logger),
-        injecting(logger));
-
-    decorator.decorate(new Service()).serve();
-    -------------- prints --------------
-      Service#1920387277.serve()
-        adhoc message
-      returned
+    Decorator decorator = traversing(richDecorator(rich(logger)));
 
 
 # Customization
