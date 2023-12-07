@@ -11,9 +11,11 @@ import static org.logbuddy.decorator.CachingDecorator.caching;
 import static org.logbuddy.decorator.ComponentsDecorator.components;
 import static org.logbuddy.decorator.ComposedDecorator.compose;
 import static org.logbuddy.decorator.ConnectingLoggerDecorator.connecting;
+import static org.logbuddy.decorator.DefaultDecomposer.decomposer;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
 import static org.logbuddy.decorator.JdkDecorator.jdk;
 import static org.logbuddy.decorator.NoDecorator.noDecorator;
+import static org.logbuddy.decorator.RecursiveDecomposer.recursive;
 import static org.logbuddy.decorator.TraversingDecorator.traversing;
 import static org.logbuddy.logger.AsynchronousLogger.asynchronous;
 import static org.logbuddy.logger.CatchingLogger.catching;
@@ -325,6 +327,38 @@ public class Documentation {
         components(connecting(logger, noDecorator())));
 
     decorator.decorate(new Service()).serve();
+  }
+
+  public static void decomposer_default() {
+    class Service {
+      void serve() {}
+
+      public String toString() {
+        return "Service#" + hashCode();
+      }
+    }
+    class App {
+      Service serviceA = new Service();
+      Service serviceB = new Service();
+
+      void start() {
+        serviceA.serve();
+        serviceB.serve();
+      }
+
+      public String toString() {
+        return "App";
+      }
+    }
+    App app = new App();
+
+    Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
+    Decorator decorator = invocationDecorator(logger);
+    recursive(decomposer())
+        .decompose(app)
+        .forEach(components(decorator)::decorate);
+
+    decorator.decorate(app).start();
   }
 
   public static void custom_render_color_original() {

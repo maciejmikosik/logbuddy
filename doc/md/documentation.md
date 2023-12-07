@@ -388,6 +388,44 @@ For example you want to combine functionality of `InvocationDecorator` with `Con
         adhoc message
       returned
 
+Decorating every single object in dependency graph is tedious. That's why logbuddy provides methods for traversing graph so you can decorate all of them. `DefaultDecomposer` extracts all objects assigned to fields and all elements from array. `RecursiveDecomposer` provides way to do this recursively.
+
+    class Service {
+      void serve() {}
+
+      public String toString() {
+        return "Service#" + hashCode();
+      }
+    }
+    class App {
+      Service serviceA = new Service();
+      Service serviceB = new Service();
+
+      void start() {
+        serviceA.serve();
+        serviceB.serve();
+      }
+
+      public String toString() {
+        return "App";
+      }
+    }
+    App app = new App();
+
+    Logger logger = invocationDepth(consoleLogger(new TextRenderer()));
+    Decorator decorator = invocationDecorator(logger);
+    recursive(decomposer())
+        .decompose(app)
+        .forEach(components(decorator)::decorate);
+
+    decorator.decorate(app).start();
+    -------------- prints --------------
+    App.start()
+      Service#1802598046.serve()
+      returned
+      Service#659748578.serve()
+      returned
+    returned
 
 # Customization
 

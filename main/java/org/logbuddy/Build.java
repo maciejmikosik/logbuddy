@@ -7,12 +7,14 @@ import java.util.List;
 import org.logbuddy.bind.LoggingStream;
 import org.logbuddy.bind.StdioBinder;
 import org.logbuddy.decorator.CachingDecorator;
-import org.logbuddy.decorator.ComposedDecorator;
 import org.logbuddy.decorator.ComponentsDecorator;
+import org.logbuddy.decorator.ComposedDecorator;
+import org.logbuddy.decorator.DefaultDecomposer;
 import org.logbuddy.decorator.InjectingDecorator;
 import org.logbuddy.decorator.InvocationDecorator;
 import org.logbuddy.decorator.JdkDecorator;
 import org.logbuddy.decorator.NoDecorator;
+import org.logbuddy.decorator.RecursiveDecomposer;
 import org.logbuddy.decorator.TraversingDecorator;
 import org.logbuddy.decorator.TryingDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
@@ -72,6 +74,9 @@ public class Build {
       InjectingDecorator.class,
       TraversingDecorator.class,
       CachingDecorator.class);
+  public List<Class<?>> decomposers = asList(
+      DefaultDecomposer.class,
+      RecursiveDecomposer.class);
   public List<Class<?>> bind = asList(
       LoggingStream.class,
       StdioBinder.class);
