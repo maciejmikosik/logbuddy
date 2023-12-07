@@ -14,6 +14,7 @@ import org.logbuddy.decorator.InvocationDecorator;
 import org.logbuddy.decorator.JdkDecorator;
 import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.decorator.TraversingDecorator;
+import org.logbuddy.decorator.TryingDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
 import org.logbuddy.logger.CatchingLogger;
 import org.logbuddy.logger.ComposedLogger;
@@ -64,6 +65,7 @@ public class Build {
       InvocationDecorator.class,
       ComponentsDecorator.class,
       JdkDecorator.class,
+      TryingDecorator.class,
       ComposedDecorator.class,
       NoDecorator.class,
       InjectingDecorator.class,

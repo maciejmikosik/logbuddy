@@ -267,7 +267,7 @@ For example `Arrays.asList("")` returns instance of non-public class `java.util.
     List[string].get(0)
     returned string
 
-This works as long as you cast that proxy only to public superclass and peeled interfaces. Trying to cast proxy to original non-public class causes `ClassCastException`.
+This works as long as you cast that proxy only to public superclass and peeled interfaces. Casting proxy to original non-public class causes `ClassCastException`. In those cases simpler aproach is to skip decoration of problematic instances by using `TryingDecorator`.
 
 `ComponentsDecorator` allows you to decorate fields of an object and elements of an array. It uses reflection to read value of each field/element, decorate it using provided `Decorator` and sets it back.
 
