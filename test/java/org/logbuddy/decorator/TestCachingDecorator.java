@@ -2,6 +2,10 @@ package org.logbuddy.decorator;
 
 import static java.lang.String.format;
 import static org.logbuddy.decorator.CachingDecorator.caching;
+import static org.logbuddy.decorator.MockDecorator.mockDecorator;
+import static org.logbuddy.testing.QuackeryHelpers.assertSame;
+import static org.quackery.Case.newCase;
+import static org.quackery.report.AssumeException.assume;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.thenCalledTimes;
@@ -12,9 +16,13 @@ import static org.testory.Testory.willReturn;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.logbuddy.Decorator;
 import org.logbuddy.LogBuddyException;
+import org.quackery.Quackery;
+import org.quackery.junit.QuackeryRunner;
 
+@RunWith(QuackeryRunner.class)
 public class TestCachingDecorator {
   private Object original, otherOriginal, decorated, otherDecorated;
   private Decorator decorator, cachingDecorator;
@@ -50,6 +58,28 @@ public class TestCachingDecorator {
     given(cachingDecorator.decorate(original));
     when(cachingDecorator.decorate(otherOriginal));
     thenReturned(otherDecorated);
+  }
+
+  @Quackery
+  public static org.quackery.Test testCachingDecorator() {
+    return newCase("cache uses instance indentity, not equals", () -> {
+      String undecoratedA = new String("undecorated");
+      String undecoratedB = new String("undecorated");
+      String decoratedA = new String("decoratedA");
+      String decoratedB = new String("decoratedB");
+      assume(undecoratedA != undecoratedB);
+      assume(undecoratedA.equals(undecoratedB));
+      Decorator decorator = mockDecorator()
+          .nice()
+          .stub(undecoratedA, decoratedA)
+          .stub(undecoratedB, decoratedB);
+
+      Decorator cachingDecorator = caching(decorator);
+      cachingDecorator.decorate(undecoratedA);
+      assertSame(
+          cachingDecorator.decorate(undecoratedB),
+          decoratedB);
+    });
   }
 
   @Test

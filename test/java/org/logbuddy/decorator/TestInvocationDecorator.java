@@ -13,6 +13,9 @@ import static org.logbuddy.testing.TestingAnonymous.anonymousAbstractList;
 import static org.logbuddy.testing.TestingAnonymous.anonymousArrayList;
 import static org.logbuddy.testing.TestingAnonymous.anonymousList;
 import static org.logbuddy.testing.TestingAnonymous.anonymousObject;
+import static org.quackery.Case.newCase;
+import static org.quackery.Suite.suite;
+import static org.quackery.run.Runners.expect;
 import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
@@ -24,12 +27,16 @@ import static org.testory.Testory.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.logbuddy.Decorator;
 import org.logbuddy.LogBuddyException;
 import org.logbuddy.Logger;
 import org.logbuddy.Message;
 import org.logbuddy.message.Invoked;
+import org.quackery.Quackery;
+import org.quackery.junit.QuackeryRunner;
 
+@RunWith(QuackeryRunner.class)
 public class TestInvocationDecorator {
   private Decorator decorator;
   private Logger logger;
@@ -246,5 +253,21 @@ public class TestInvocationDecorator {
     void packagePrivateMethod() {}
 
     protected void protectedMethod() {}
+  }
+
+  @Quackery
+  public static org.quackery.Test testInvocationDecorator() {
+    final class FinalClass {}
+    return expect(IllegalArgumentException.class, suite("cannot decorate")
+        .add(cannotDecorate(new FinalClass()))
+        .add(cannotDecorate(new Object[0]))
+        .add(cannotDecorate(new int[0])));
+  }
+
+  private static org.quackery.Test cannotDecorate(Object object) {
+    return newCase(object.toString(), () -> {
+      Logger logger = message -> {};
+      invocationDecorator(logger).decorate(object);
+    });
   }
 }
