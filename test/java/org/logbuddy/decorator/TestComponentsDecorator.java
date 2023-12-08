@@ -13,6 +13,7 @@ import static org.quackery.report.AssertException.assertEquals;
 import static org.quackery.run.Runners.expect;
 
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 import org.junit.runner.RunWith;
 import org.logbuddy.Decorator;
@@ -52,6 +53,9 @@ public class TestComponentsDecorator {
             .add(includesPrimitiveArrayElements()))
         .add(suite("does not decorate element")
             .add(excludesElementAssignToNull()))
+        .add(cannotResetLambdaFields())
+        .add(doesNotResetUndecoratedField())
+        .add(doesNotResetUndecoratedElement())
         .add(implementsToString())
         .add(validatesArguments());
   }
@@ -335,6 +339,36 @@ public class TestComponentsDecorator {
 
       components(decorator).decorate(decorable);
       assertEquals(decorable[0], null);
+    });
+  }
+
+  private static Test cannotResetLambdaFields() {
+    return newCase("cannot reset lambda fields", () -> {
+      Object fieldInLambda = new Object();
+      Supplier<Object> lambda = () -> fieldInLambda;
+      MockDecorator decorator = mockDecorator()
+          .stub(fieldInLambda, decorated);
+      try {
+        components(decorator).decorate(lambda);
+        throw new AssumeException();
+      } catch (LogBuddyException e) {}
+    });
+  }
+
+  private static Test doesNotResetUndecoratedField() {
+    return newCase("does not reset undecorated field", () -> {
+      Object fieldInLambda = new Object();
+      Supplier<Object> lambda = () -> fieldInLambda;
+
+      components(mockDecorator()
+          .nice()).decorate(lambda);
+      assertEquals(lambda.get(), fieldInLambda);
+    });
+  }
+
+  private static Test doesNotResetUndecoratedElement() {
+    return newCase("does not reset undecorated element", () -> {
+      // TODO figure out how to detect resetting of array element
     });
   }
 

@@ -38,7 +38,9 @@ public class ComponentsDecorator implements Decorator {
       Object undecorated = Array.get(decorable, index);
       if (undecorated != null) {
         Object decorated = decorator.decorate(undecorated);
-        Array.set(decorable, index, decorated);
+        if (decorated != undecorated) {
+          Array.set(decorable, index, decorated);
+        }
       }
     }
     return decorable;
@@ -49,9 +51,12 @@ public class ComponentsDecorator implements Decorator {
         .flatMap(type -> stream(type.getDeclaredFields()))
         .filter(field -> !Modifier.isStatic(field.getModifiers()))
         .forEach(field -> {
-          Object value = read(decorable, field);
-          if (value != null) {
-            set(decorable, field, decorator.decorate(value));
+          Object undecorated = read(decorable, field);
+          if (undecorated != null) {
+            Object decorated = decorator.decorate(undecorated);
+            if (decorated != undecorated) {
+              set(decorable, field, decorated);
+            }
           }
         });
     return decorable;
