@@ -16,6 +16,7 @@ import org.logbuddy.decorator.JdkDecorator;
 import org.logbuddy.decorator.NoDecorator;
 import org.logbuddy.decorator.RecursiveDecomposer;
 import org.logbuddy.decorator.Rich;
+import org.logbuddy.decorator.SkipPrimitivesDecomposer;
 import org.logbuddy.decorator.TraversingDecorator;
 import org.logbuddy.decorator.TryingDecorator;
 import org.logbuddy.logger.AsynchronousLogger;
@@ -77,7 +78,8 @@ public class Build {
       CachingDecorator.class);
   public List<Class<?>> decomposers = asList(
       DefaultDecomposer.class,
-      RecursiveDecomposer.class);
+      RecursiveDecomposer.class,
+      SkipPrimitivesDecomposer.class);
   public List<Class<?>> rich = asList(
       Rich.class);
   public List<Class<?>> bind = asList(

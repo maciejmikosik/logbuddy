@@ -5,6 +5,7 @@ import static org.logbuddy.decorator.ConnectingLoggerDecorator.connecting;
 import static org.logbuddy.decorator.DefaultDecomposer.decomposer;
 import static org.logbuddy.decorator.InvocationDecorator.invocationDecorator;
 import static org.logbuddy.decorator.RecursiveDecomposer.recursive;
+import static org.logbuddy.decorator.SkipPrimitivesDecomposer.skipPrimitives;
 import static org.logbuddy.decorator.TryingDecorator.trying;
 import static org.logbuddy.logger.Fuse.fuse;
 import static org.logbuddy.logger.InvocationDepthLogger.invocationDepth;
@@ -24,7 +25,7 @@ public class Rich {
   public static Decorator traversing(Decorator decorator) {
     return new Decorator() {
       public <T> T decorate(T decorable) {
-        recursive(decomposer())
+        recursive(skipPrimitives(decomposer()))
             .decompose(decorable)
             .forEach(components(decorator)::decorate);
         return decorator.decorate(decorable);

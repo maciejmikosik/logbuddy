@@ -343,7 +343,7 @@ For example you want to combine functionality of `InvocationDecorator` with `Con
         adhoc message
       returned
 
-Decorating every single object in dependency graph is tedious. That's why logbuddy provides methods for traversing graph so you can decorate all of them. `DefaultDecomposer` extracts all objects assigned to fields and all elements from array. `RecursiveDecomposer` provides way to do this recursively.
+Decorating every single object in dependency graph is tedious. That's why logbuddy provides methods for traversing graph so you can decorate all of them. `DefaultDecomposer` extracts all objects assigned to fields and all elements from array. `RecursiveDecomposer` provides way to do this recursively. `SkipPrimitives` ignores components of primitive wrapper types.
 
     class Service {
       void serve() {}
@@ -386,7 +386,7 @@ Decorating every single object in dependency graph is tedious. That's why logbud
 
   - `rich(Logger)` - includes `invocationDepth` and `Fuse`
   - `richDecorator(Logger)` - includes `invocationDecorator(Logger)`, `trying` and `connecting(Logger)`
-  - `traversing(Decorator)` - uses `recursive(decomposer())` to decorate all components and root
+  - `traversing(Decorator)` - uses `recursive(skipPrimitives(decomposer()))` to decorate all components and root
 
 example:
 
